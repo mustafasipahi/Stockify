@@ -1,6 +1,6 @@
 package com.stockify.project.validator;
 
-import com.stockify.project.exception.ProductAmountException;
+import com.stockify.project.exception.ProductPriceException;
 import com.stockify.project.exception.ProductNameAlreadyUseException;
 import com.stockify.project.model.entity.ProductEntity;
 import com.stockify.project.repository.ProductRepository;
@@ -23,9 +23,9 @@ public class ProductUpdateValidator {
         }
     }
 
-    public void validateAmount(BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new ProductAmountException();
+    public void validatePrice(BigDecimal price) {
+        if (price.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new ProductPriceException();
         }
     }
 }

@@ -7,4 +7,5 @@ import lombok.NoArgsConstructor;
 public class CacheConstants {
 
     public static final String PRODUCT_DETAIL = "productDetail_";
+    public static final String PRODUCT_AUDIT_DETAIL = "productAuditDetail_";
 }

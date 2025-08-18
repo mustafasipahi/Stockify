@@ -26,6 +26,7 @@ public class ProductSpecification {
             if (request.getStatus() != null) {
                 predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
             }
+            query.orderBy(criteriaBuilder.desc(root.get("createdDate")));
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }

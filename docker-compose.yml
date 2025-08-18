@@ -19,8 +19,7 @@ services:
       - stockify-app-mysql
       - stockify-app-redis
     volumes:
-      - ./src:/app/src
-      - ./target:/app/target
+      - ./:/stockify_app
 
   stockify-app-mysql:
     container_name: stockify-app-mysql

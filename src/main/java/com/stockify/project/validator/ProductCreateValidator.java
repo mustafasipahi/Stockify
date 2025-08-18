@@ -1,10 +1,10 @@
 package com.stockify.project.validator;
 
-import com.stockify.project.exception.ProductAmountException;
-import com.stockify.project.exception.ProductNameAlreadyUseException;
-import com.stockify.project.exception.ProductNameException;
+import com.stockify.project.exception.*;
+import com.stockify.project.model.entity.CategoryEntity;
 import com.stockify.project.model.entity.ProductEntity;
 import com.stockify.project.model.request.ProductCreateRequest;
+import com.stockify.project.repository.CategoryRepository;
 import com.stockify.project.repository.ProductRepository;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -18,17 +18,22 @@ import java.util.Optional;
 public class ProductCreateValidator {
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
 
     public void validate(ProductCreateRequest request) {
-        validateName(request.getName());
         if (StringUtils.isBlank(request.getName())) {
             throw new ProductNameException();
         }
-        if (request.getAmount() == null) {
-            throw new ProductAmountException();
+        validateName(request.getName());
+        if (request.getCategoryId() == null) {
+            throw new CategoryIdException();
         }
-        if (request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new ProductAmountException();
+        validateCategoryId(request.getCategoryId());
+        if (request.getPrice() == null) {
+            throw new ProductPriceException();
+        }
+        if (request.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new ProductPriceException();
         }
     }
 
@@ -36,6 +41,13 @@ public class ProductCreateValidator {
         Optional<ProductEntity> product = productRepository.findByName(productName);
         if (product.isPresent()) {
             throw new ProductNameAlreadyUseException();
+        }
+    }
+
+    private void validateCategoryId(Long categoryId) {
+        Optional<CategoryEntity> category = categoryRepository.findById(categoryId);
+        if (category.isEmpty()) {
+            throw new CategoryNotFoundException(categoryId);
         }
     }
 }

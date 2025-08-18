@@ -7,9 +7,10 @@ import com.stockify.project.model.request.ProductUpdateRequest;
 import com.stockify.project.security.userdetail.UserPrincipal;
 import com.stockify.project.service.ProductService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -42,7 +43,7 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public Page<ProductDto> search(@ModelAttribute ProductSearchRequest request) {
+    public List<ProductDto> search(@ModelAttribute ProductSearchRequest request) {
         return productService.search(request);
     }
 }

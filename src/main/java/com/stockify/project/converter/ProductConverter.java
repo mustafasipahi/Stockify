@@ -13,7 +13,7 @@ public class ProductConverter {
                 .productId(productEntity.getId())
                 .stockCode(productEntity.getStockCode())
                 .name(productEntity.getName())
-                .amount(productEntity.getAmount())
+                .price(productEntity.getPrice())
                 .createdAgentId(productEntity.getCreatedAgentId())
                 .updatedAgentId(productEntity.getUpdatedAgentId())
                 .createdDate(productEntity.getCreatedDate())

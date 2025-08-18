@@ -12,7 +12,11 @@ public class ErrorCodes {
     public static final int PRODUCT_NAME_ALREADY_USED = 1003;
     public static final int PRODUCT_ID_REQUIRED = 1004;
     public static final int PRODUCT_NAME_REQUIRED = 1005;
-    public static final int PRODUCT_AMOUNT_REQUIRED = 1005;
+    public static final int PRODUCT_PRICE_REQUIRED = 1006;
+    public static final int CATEGORY_NAME_REQUIRED = 1007;
+    public static final int CATEGORY_NAME_ALREADY_USED = 1008;
+    public static final int CATEGORY_ID_REQUIRED = 1009;
+    public static final int CATEGORY_NOT_FOUND = 1010;
 
     public static final int UNKNOWN_ERROR = 9999;
 }

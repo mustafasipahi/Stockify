@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProductCreateRequest {
 
+    private Long categoryId;
     private String name;
-    private BigDecimal amount;
+    private BigDecimal price;
 }

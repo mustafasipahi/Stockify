@@ -18,13 +18,14 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
+import static com.stockify.project.constant.CacheConstants.PRODUCT_AUDIT_DETAIL;
 import static com.stockify.project.constant.CacheConstants.PRODUCT_DETAIL;
 
 @Service
@@ -40,9 +41,10 @@ public class ProductService {
     public ProductDto save(Long userId, ProductCreateRequest request) {
         createValidator.validate(request);
         ProductEntity product = ProductEntity.builder()
+                .categoryId(request.getCategoryId())
                 .stockCode(stockCodeGenerator.generateStockCode())
                 .name(request.getName())
-                .amount(request.getAmount())
+                .price(request.getPrice())
                 .status(ProductStatus.ACTIVE)
                 .createdAgentId(userId)
                 .build();
@@ -50,7 +52,10 @@ public class ProductService {
     }
 
     @Transactional
-    @CacheEvict(value = PRODUCT_DETAIL, key = "#request.productId")
+    @Caching(evict = {
+            @CacheEvict(value = PRODUCT_DETAIL, key = "#request.productId"),
+            @CacheEvict(value = PRODUCT_AUDIT_DETAIL, key = "#request.productId")
+    })
     public ProductDto update(Long userId, ProductUpdateRequest request) {
         if (request.getProductId() == null) {
             throw new ProductIdException();
@@ -61,16 +66,19 @@ public class ProductService {
             updateValidator.validateName(request.getName());
             productEntity.setName(request.getName());
         }
-        if (request.getAmount() != null) {
-            updateValidator.validateAmount(request.getAmount());
-            productEntity.setAmount(request.getAmount());
+        if (request.getPrice() != null) {
+            updateValidator.validatePrice(request.getPrice());
+            productEntity.setPrice(request.getPrice());
         }
         productEntity.setUpdatedAgentId(userId);
         return ProductConverter.toIdDto(productRepository.save(productEntity));
     }
 
     @Transactional
-    @CacheEvict(value = PRODUCT_DETAIL, key = "#productId")
+    @Caching(evict = {
+            @CacheEvict(value = PRODUCT_DETAIL, key = "#productId"),
+            @CacheEvict(value = PRODUCT_AUDIT_DETAIL, key = "#productId")
+    })
     public ProductDto delete(Long userId, Long productId) {
         ProductEntity productEntity = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(productId));
@@ -86,9 +94,10 @@ public class ProductService {
                 .orElseThrow(() -> new ProductNotFoundException(productId));
     }
 
-    public Page<ProductDto> search(ProductSearchRequest request) {
-        PageRequest pageRequest = PageRequest.of(request.getPage(), request.getSize(), Sort.by("createdDate").descending());
+    public List<ProductDto> search(ProductSearchRequest request) {
         Specification<ProductEntity> specification = ProductSpecification.searchByText(request);
-        return productRepository.findAll(specification, pageRequest).map(ProductConverter::toDto);
+        return productRepository.findAll(specification).stream()
+                .map(ProductConverter::toDto)
+                .toList();
     }
 }

@@ -24,7 +24,7 @@ public class ProductDto implements Serializable {
     private Long productId;
     private String stockCode;
     private String name;
-    private BigDecimal amount;
+    private BigDecimal price;
     private Long createdAgentId;
     private Long updatedAgentId;
     private LocalDateTime createdDate;
