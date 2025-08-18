@@ -1,0 +1,57 @@
+version: '3'
+services:
+
+  stockify-app:
+    container_name: stockify-app
+    image: stockify-app:1
+    restart: always
+    build: ./
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://stockify-app-mysql:3306/stockify_app?autoReconnect=true&useSSL=false&createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create
+      REDIS_HOST: stockify-app-redis
+      REDIS_PORT: 6379
+    depends_on:
+      - stockify-app-mysql
+      - stockify-app-redis
+    volumes:
+      - ./src:/app/src
+      - ./target:/app/target
+
+  stockify-app-mysql:
+    container_name: stockify-app-mysql
+    image: mysql:5.7
+    restart: always
+    platform: linux/x86_64
+    environment:
+      MYSQL_URL: jdbc:mysql://stockify-app-mysql:3306/stockify_app?autoReconnect=true&useSSL=false&createDatabaseIfNotExist=true
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: stockify_app
+    ports:
+      - "3306:3306"
+    expose:
+      - 3306
+
+  stockify-app-redis:
+    container_name: stockify-app-redis
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    expose:
+      - 6379
+
+# docker build -t stockify-app -f Dockerfile .
+# docker ps
+# docker images -a
+# docker network ls
+# docker run --name stock-app -p 8080:8080 stock-app
+# docker image rm stock-app
+# docker rmi $(docker images -a -q)
+
+# docker-compose up -d

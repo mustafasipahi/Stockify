@@ -1,0 +1,32 @@
+{
+  "groups": [
+    {
+      "name": "redis-config",
+      "type": "com.stockify.project.configuration.properties.RedisProperties",
+      "sourceType": "com.stockify.project.configuration.properties.RedisProperties"
+    },
+    {
+      "name": "security",
+      "type": "com.stockify.project.security.properties.JWTProperties",
+      "sourceType": "com.stockify.project.security.properties.JWTProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "redis-config.host",
+      "type": "java.lang.String",
+      "sourceType": "com.stockify.project.configuration.properties.RedisProperties"
+    },
+    {
+      "name": "redis-config.port",
+      "type": "java.lang.Integer",
+      "sourceType": "com.stockify.project.configuration.properties.RedisProperties"
+    },
+    {
+      "name": "security.secret-key",
+      "type": "java.lang.String",
+      "sourceType": "com.stockify.project.security.properties.JWTProperties"
+    }
+  ],
+  "hints": []
+}
