@@ -22,6 +22,7 @@ public class ProductDto implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long productId;
+    private Long categoryId;
     private String stockCode;
     private String name;
     private BigDecimal price;
