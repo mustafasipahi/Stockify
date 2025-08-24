@@ -1,19 +1,20 @@
 package com.stockify.project.model.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.math.BigDecimal;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ProductUpdateRequest {
+public class InventoryCreateRequest {
 
     private Long productId;
-    private Long categoryId;
-    private String name;
+    private BigDecimal price;
+    private Integer productCount;
+    private Integer criticalProductCount;
 }

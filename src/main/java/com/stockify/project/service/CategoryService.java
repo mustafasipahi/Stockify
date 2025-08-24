@@ -22,6 +22,7 @@ public class CategoryService {
         createValidator.validate(request);
         CategoryEntity categoryEntity = CategoryEntity.builder()
                 .name(request.getName())
+                .kdv(request.getKdv())
                 .build();
         categoryRepository.save(categoryEntity);
     }

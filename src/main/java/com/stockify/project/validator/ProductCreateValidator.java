@@ -10,7 +10,6 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 
 @Component
@@ -21,33 +20,27 @@ public class ProductCreateValidator {
     private final CategoryRepository categoryRepository;
 
     public void validate(ProductCreateRequest request) {
+        validateName(request);
+        validateCategoryId(request);
+    }
+
+    private void validateName(ProductCreateRequest request) {
         if (StringUtils.isBlank(request.getName())) {
             throw new ProductNameException();
         }
-        validateName(request.getName());
-        if (request.getCategoryId() == null) {
-            throw new CategoryIdException();
-        }
-        validateCategoryId(request.getCategoryId());
-        if (request.getPrice() == null) {
-            throw new ProductPriceException();
-        }
-        if (request.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new ProductPriceException();
-        }
-    }
-
-    private void validateName(String productName) {
-        Optional<ProductEntity> product = productRepository.findByName(productName);
+        Optional<ProductEntity> product = productRepository.findByName(request.getName());
         if (product.isPresent()) {
             throw new ProductNameAlreadyUseException();
         }
     }
 
-    private void validateCategoryId(Long categoryId) {
-        Optional<CategoryEntity> category = categoryRepository.findById(categoryId);
+    private void validateCategoryId(ProductCreateRequest request) {
+        if (request.getCategoryId() == null) {
+            throw new CategoryIdException();
+        }
+        Optional<CategoryEntity> category = categoryRepository.findById(request.getCategoryId());
         if (category.isEmpty()) {
-            throw new CategoryNotFoundException(categoryId);
+            throw new CategoryNotFoundException(request.getCategoryId());
         }
     }
 }

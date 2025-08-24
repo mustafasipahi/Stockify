@@ -14,10 +14,9 @@ public class ProductConverter {
                 .categoryId(productEntity.getCategoryId())
                 .stockCode(productEntity.getStockCode())
                 .name(productEntity.getName())
-                .price(productEntity.getPrice())
-                .createdAgentId(productEntity.getCreatedAgentId())
-                .updatedAgentId(productEntity.getUpdatedAgentId())
+                .status(productEntity.getStatus())
                 .createdDate(productEntity.getCreatedDate())
+                .lastModifiedDate(productEntity.getLastModifiedDate())
                 .build();
     }
 

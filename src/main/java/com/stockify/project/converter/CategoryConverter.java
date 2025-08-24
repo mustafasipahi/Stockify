@@ -12,6 +12,8 @@ public class CategoryConverter {
         return CategoryDto.builder()
                 .id(categoryEntity.getId())
                 .name(categoryEntity.getName())
+                .kdv(categoryEntity.getKdv())
+                .createdDate(categoryEntity.getCreatedDate())
                 .build();
     }
 }
