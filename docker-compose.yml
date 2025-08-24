@@ -18,8 +18,6 @@ services:
     depends_on:
       - stockify-app-mysql
       - stockify-app-redis
-    volumes:
-      - ./:/stockify_app
 
   stockify-app-mysql:
     container_name: stockify-app-mysql
