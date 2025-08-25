@@ -10,7 +10,7 @@ public class CategoryConverter {
 
     public static CategoryDto toDto(CategoryEntity categoryEntity) {
         return CategoryDto.builder()
-                .id(categoryEntity.getId())
+                .categoryId(categoryEntity.getId())
                 .name(categoryEntity.getName())
                 .kdv(categoryEntity.getKdv())
                 .createdDate(categoryEntity.getCreatedDate())

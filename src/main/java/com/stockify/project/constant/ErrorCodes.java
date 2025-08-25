@@ -21,6 +21,10 @@ public class ErrorCodes {
     public static final int INVENTORY_ID_REQUIRED = 1013;
     public static final int INVENTORY_NOT_FOUND = 1014;
     public static final int INVENTORY_CRITICAL_COUNT_REQUIRED = 1015;
+    public static final int BROKER_NAME_REQUIRED = 1016;
+    public static final int BROKER_DISCOUNT_REQUIRED = 1017;
+    public static final int BROKER_ID_REQUIRED = 1018;
+    public static final int BROKER_NOT_FOUND = 1019;
 
     public static final int UNKNOWN_ERROR = 9999;
 }

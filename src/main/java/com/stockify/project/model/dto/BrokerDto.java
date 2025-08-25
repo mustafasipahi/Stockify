@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -13,10 +14,13 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class CategoryDto {
+public class BrokerDto {
 
-    private Long categoryId;
-    private String name;
-    private Double kdv;
+    private Long brokerId;
+    private String firstName;
+    private String lastName;
+    private BigDecimal discount;
+    private BigDecimal debtPrice;
     private LocalDateTime createdDate;
+    private LocalDateTime lastModifiedDate;
 }
