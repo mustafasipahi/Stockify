@@ -8,8 +8,7 @@ import lombok.Getter;
 public enum TenantType {
 
     PUBLIC("public"),
-    GURME("stokify_gurme"),
-    SIPAHI("stokify_sipahi");
+    GURME("stokify_gurme");
 
     private final String stokifySchemaName;
 }

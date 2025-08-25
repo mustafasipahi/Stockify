@@ -30,19 +30,21 @@ public class InventoryService {
     private final ProductService productService;
     private final InventoryCreateValidator inventoryCreateValidator;
     private final InventoryUpdateValidator inventoryUpdateValidator;
+    private final InventoryConverter inventoryConverter;
 
     @Transactional
     public InventoryDto save(InventoryCreateRequest request) {
         inventoryCreateValidator.validate(request);
         ProductEntity productEntity = productService.findById(request.getProductId());
         InventoryEntity inventoryEntity = InventoryEntity.builder()
-                .productEntity(productEntity)
+                .productId(productEntity.getId())
                 .price(request.getPrice())
                 .productCount(request.getProductCount())
                 .criticalProductCount(request.getCriticalProductCount())
                 .status(getInventoryStatus(request.getProductCount(), request.getCriticalProductCount()))
                 .build();
-        return InventoryConverter.toIdDto(inventoryRepository.save(inventoryEntity));
+        InventoryEntity savedInventoryEntity = inventoryRepository.save(inventoryEntity);
+        return inventoryConverter.toIdDto(savedInventoryEntity);
     }
 
     @Transactional
@@ -64,13 +66,14 @@ public class InventoryService {
             inventoryUpdateValidator.validateCriticalProductCount(request.getCriticalProductCount());
             inventoryEntity.setCriticalProductCount(request.getCriticalProductCount());
         }
-        return InventoryConverter.toIdDto(inventoryRepository.save(inventoryEntity));
+        InventoryEntity updatedInventoryEntity = inventoryRepository.save(inventoryEntity);
+        return inventoryConverter.toIdDto(updatedInventoryEntity);
     }
 
     public List<InventoryDto> getAllInventory() {
         Specification<InventoryEntity> specification = InventorySpecification.filter();
         return inventoryRepository.findAll(specification).stream()
-                .map(InventoryConverter::toDto)
+                .map(inventoryConverter::toIdDto)
                 .toList();
     }
 
@@ -78,7 +81,7 @@ public class InventoryService {
         Specification<InventoryEntity> specification = InventorySpecification.filter();
         return inventoryRepository.findAll(specification).stream()
                 .filter(inventoryEntity -> InventoryStatus.CRITICAL.equals(inventoryEntity.getStatus()))
-                .map(InventoryConverter::toDto)
+                .map(inventoryConverter::toIdDto)
                 .toList();
     }
 
@@ -86,7 +89,7 @@ public class InventoryService {
         Specification<InventoryEntity> specification = InventorySpecification.filter();
         return inventoryRepository.findAll(specification).stream()
                 .filter(inventoryEntity -> InventoryStatus.OUT_OF_STOCK.equals(inventoryEntity.getStatus()))
-                .map(InventoryConverter::toDto)
+                .map(inventoryConverter::toIdDto)
                 .toList();
     }
 }

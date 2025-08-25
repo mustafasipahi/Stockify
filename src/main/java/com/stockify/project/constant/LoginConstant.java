@@ -11,8 +11,4 @@ public class LoginConstant {
     public static String GURME_ADMIN_USER_PASSWORD_1 = "test1234";
     public static String GURME_ADMIN_USER_NAME_2 = "selcuk";
     public static String GURME_ADMIN_USER_PASSWORD_2 = "test4321";
-
-    //SIPAHI
-    public static String SIPAHI_ADMIN_USER_NAME_1 = "sipahi";
-    public static String SIPAHI_ADMIN_USER_PASSWORD_1 = "test";
 }

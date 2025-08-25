@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.envers.AuditTable;
 import org.hibernate.envers.Audited;
-import org.hibernate.envers.NotAudited;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -33,6 +32,10 @@ public class InventoryEntity {
 
     @NotNull
     @Column(nullable = false)
+    private Long productId;
+
+    @NotNull
+    @Column(nullable = false)
     private BigDecimal price;
 
     @NotNull
@@ -46,11 +49,6 @@ public class InventoryEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private InventoryStatus status;
-
-    @NotAudited
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "product_id", referencedColumnName = "id")
-    private ProductEntity productEntity;
 
     @CreatedDate
     @Column(name = "created_date")

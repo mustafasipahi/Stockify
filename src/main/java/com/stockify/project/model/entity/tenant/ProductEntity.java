@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.envers.AuditTable;
 import org.hibernate.envers.Audited;
-import org.hibernate.envers.NotAudited;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -46,10 +45,6 @@ public class ProductEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
-
-    @NotAudited
-    @OneToOne(cascade = CascadeType.ALL)
-    private CategoryEntity categoryEntity;
 
     @CreatedDate
     private LocalDateTime createdDate;

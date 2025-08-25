@@ -1,20 +1,25 @@
 package com.stockify.project.converter;
 
 import com.stockify.project.model.dto.InventoryDto;
+import com.stockify.project.model.dto.ProductDto;
 import com.stockify.project.model.entity.tenant.InventoryEntity;
+import com.stockify.project.service.ProductService;
 import com.stockify.project.util.FinanceUtil;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import static com.stockify.project.util.InventoryStatusUtil.getInventoryStatus;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Component
+@AllArgsConstructor
 public class InventoryConverter {
 
-    public static InventoryDto toDto(InventoryEntity inventoryEntity) {
+    private final ProductService productService;
+
+    public InventoryDto toDto(InventoryEntity inventoryEntity) {
         return InventoryDto.builder()
                 .inventoryId(inventoryEntity.getId())
-                .product(ProductConverter.toDto(inventoryEntity.getProductEntity()))
+                .product(getProductDto(inventoryEntity.getProductId()))
                 .price(inventoryEntity.getPrice())
                 .totalPrice(FinanceUtil.multiply(inventoryEntity.getPrice(), inventoryEntity.getProductCount()))
                 .productCount(inventoryEntity.getProductCount())
@@ -25,9 +30,13 @@ public class InventoryConverter {
                 .build();
     }
 
-    public static InventoryDto toIdDto(InventoryEntity inventoryEntity) {
+    public InventoryDto toIdDto(InventoryEntity inventoryEntity) {
         return InventoryDto.builder()
                 .inventoryId(inventoryEntity.getId())
                 .build();
+    }
+
+    private ProductDto getProductDto(Long productId) {
+        return productService.detail(productId);
     }
 }

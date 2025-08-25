@@ -1,6 +1,7 @@
 package com.stockify.project.model.entity.global;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -23,13 +24,16 @@ public class UserEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @NotNull
+    @Column(nullable = false)
     private String username;
 
-    @Column
+    @NotNull
+    @Column(nullable = false)
     private String password;
 
-    @Column
+    @NotNull
+    @Column(nullable = false)
     private String stokifySchemaName;
 
     @CreatedDate
