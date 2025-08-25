@@ -51,7 +51,6 @@ public class InventoryEntity {
     private InventoryStatus status;
 
     @CreatedDate
-    @Column(name = "created_date")
     private LocalDateTime createdDate;
 
     @LastModifiedDate

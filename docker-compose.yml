@@ -9,30 +9,30 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://stockify-app-postgres:5432/stockify_app
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+      SPRING_DATASOURCE_URL: jdbc:mysql://stockify-app-mysql:3306/stockify_app?autoReconnect=true&useSSL=false&createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create
       REDIS_HOST: stockify-app-redis
       REDIS_PORT: 6379
     depends_on:
-      - stockify-app-postgres
+      - stockify-app-mysql
       - stockify-app-redis
 
-  stockify-app-postgres:
-    container_name: stockify-app-postgres
-    image: postgres:15
+  stockify-app-mysql:
+    container_name: stockify-app-mysql
+    image: mysql:5.7
     restart: always
+    platform: linux/x86_64
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: stockify_app
+      MYSQL_URL: jdbc:mysql://stockify-app-mysql:3306/stockify_app?autoReconnect=true&useSSL=false&createDatabaseIfNotExist=true
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: stockify_app
     ports:
-      - "5432:5432"
+      - "3306:3306"
     expose:
-      - 5432
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - 3306
 
   stockify-app-redis:
     container_name: stockify-app-redis
@@ -42,9 +42,6 @@ services:
       - '6379:6379'
     expose:
       - 6379
-
-volumes:
-  postgres_data:
 
 # docker build -t stockify-app -f Dockerfile .
 # docker ps

@@ -18,12 +18,13 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.function.Function;
 
+import static com.stockify.project.constant.LoginConstant.EXPIRE_DURATION_ONE_DAY;
+import static com.stockify.project.constant.LoginConstant.EXPIRE_DURATION_SEVEN_DAY;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class JWTTokenService {
-
-    private static final long EXPIRE_DURATION = 24 * 60 * 60 * 1000; //24 h
 
     private final JWTProperties jwtProperties;
     private final RedisTemplate<String, String> redisTemplate;
@@ -36,12 +37,12 @@ public class JWTTokenService {
         return exportToken(token, Claims::getExpiration);
     }
 
-    public String generateToken(UserPrincipal userPrincipal) {
+    public String generateToken(UserPrincipal userPrincipal, boolean rememberMe) {
         return Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
-                .claim("stokifySchemaName", userPrincipal.getUserEntity().getStokifySchemaName())
+                .claim("tenantId", userPrincipal.getUserEntity().getTenantId())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRE_DURATION))
+                .setExpiration(getTokenExpirationDate(rememberMe))
                 .signWith(getSecretKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -60,8 +61,8 @@ public class JWTTokenService {
         return authorizationHeaderValue.substring(7);
     }
 
-    public String extractCompanySchemaFromToken(String token) {
-        return exportToken(token, claims -> claims.get("stokifySchemaName", String.class));
+    public Long extractCompanySchemaFromToken(String token) {
+        return exportToken(token, claims -> claims.get("tenantId", Long.class));
     }
 
     public boolean validateToken(final String token) {
@@ -128,5 +129,10 @@ public class JWTTokenService {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    private Date getTokenExpirationDate(boolean rememberMe) {
+        long duration = rememberMe ? EXPIRE_DURATION_SEVEN_DAY : EXPIRE_DURATION_ONE_DAY;
+        return new Date(System.currentTimeMillis() + duration);
     }
 }

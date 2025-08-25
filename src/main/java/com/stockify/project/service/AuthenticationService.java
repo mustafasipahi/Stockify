@@ -15,6 +15,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.TimeUnit;
+
+import static com.stockify.project.constant.LoginConstant.EXPIRE_DURATION_ONE_DAY;
+import static com.stockify.project.constant.LoginConstant.EXPIRE_DURATION_SEVEN_DAY;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -31,8 +36,14 @@ public class AuthenticationService {
                     authenticationRequest.getPassword());
             final Authentication authenticate = authenticationManager.authenticate(authenticationToken);
             final UserPrincipal userPrincipal = (UserPrincipal) authenticate.getPrincipal();
-            String token = jwtTokenService.generateToken(userPrincipal);
-            redisTemplate.opsForValue().set(authenticationRequest.getUsername(), token);
+            boolean rememberMe = authenticationRequest.isRememberMe();
+            String token = jwtTokenService.generateToken(userPrincipal, rememberMe);
+            redisTemplate.opsForValue().set(
+                    authenticationRequest.getUsername(),
+                    token,
+                    getTokenExpirationDate(rememberMe),
+                    TimeUnit.MILLISECONDS
+            );
             return AuthenticationResponse.builder()
                     .token(token)
                     .build();
@@ -70,5 +81,9 @@ public class AuthenticationService {
                     .message("Logout failed")
                     .build();
         }
+    }
+
+    private long getTokenExpirationDate(boolean rememberMe) {
+        return rememberMe ? EXPIRE_DURATION_SEVEN_DAY : EXPIRE_DURATION_ONE_DAY;
     }
 }

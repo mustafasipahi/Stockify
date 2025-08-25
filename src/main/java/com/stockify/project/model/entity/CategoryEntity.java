@@ -32,6 +32,5 @@ public class CategoryEntity {
     private Double kdv;
 
     @CreatedDate
-    @Column(name = "created_date")
     private LocalDateTime createdDate;
 }

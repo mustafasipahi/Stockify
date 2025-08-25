@@ -34,9 +34,8 @@ public class UserEntity implements Serializable {
 
     @NotNull
     @Column(nullable = false)
-    private String stokifySchemaName;
+    private Long tenantId;
 
     @CreatedDate
-    @Column(name = "created_date")
     private LocalDateTime createdDate;
 }
