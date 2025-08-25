@@ -1,0 +1,34 @@
+ürün ekle
+-stok gelmicek
+-kritik seviye gelcek zorunlu değil (stok adedi gib)
+-kategory nin kdv si olcak (düzenlenebilir kategory oluştururken gelcek)
+
+stok takip
+-tüm stoklar, kritik stoklar,tükenenler olarak 3 ep
+-ürün adı
+-stok adedi
+-birim fiyatı
+-kritik seviye
+-total price (fiyat x stok adedi)
+-tükendi enum (stok sıfırsa) (tükendi, kritik, stokta var)
+
+-stok adedi güncellenecek
+-price güncellenmicek
+
+
+
+
+satış yap
+-liste olarak gelecek
+-ürün id
+-ürün adet
+-güncel iskonto (iskonto güncelle)
+-boolean fatura oluştur (aksiyon olacak)
+
+satış fişi
+-satış yapı düzenleyebilecek
+-
+
+
+tahsilat
+-elden ödeme al olacak (ödeme türü, miktar)

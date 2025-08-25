@@ -1,7 +1,6 @@
 package com.stockify.project.service;
 
 import com.stockify.project.exception.AuthenticationException;
-import com.stockify.project.model.entity.UserTenantMapping;
 import com.stockify.project.model.response.InvalidateTokenResponse;
 import com.stockify.project.security.dto.AuthenticationRequest;
 import com.stockify.project.security.dto.AuthenticationResponse;
