@@ -36,32 +36,14 @@ public class JWTTokenService {
         return exportToken(token, Claims::getExpiration);
     }
 
-    private <T> T exportToken(String token, Function<Claims, T> claimsTFunction) {
-        final Claims claims = Jwts.parserBuilder()
-                .setSigningKey(getSecretKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-        return claimsTFunction.apply(claims);
-    }
-
     public String generateToken(UserPrincipal userPrincipal) {
         return Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
+                .claim("stokifySchemaName", userPrincipal.getUserEntity().getStokifySchemaName())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRE_DURATION))
                 .signWith(getSecretKey(), SignatureAlgorithm.HS256)
                 .compact();
-    }
-
-    private Key getSecretKey() {
-        try {
-            byte[] key = Decoders.BASE64.decode(jwtProperties.getSecretKey());
-            return Keys.hmacShaKeyFor(key);
-        } catch (Exception e) {
-            log.warn("Secret key is not BASE64 encoded, using direct bytes");
-            return Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8));
-        }
     }
 
     public String extractUsernameFromToken(final String token) {
@@ -76,6 +58,10 @@ public class JWTTokenService {
             return "";
         }
         return authorizationHeaderValue.substring(7);
+    }
+
+    public String extractCompanySchemaFromToken(String token) {
+        return exportToken(token, claims -> claims.get("stokifySchemaName", String.class));
     }
 
     public boolean validateToken(final String token) {
@@ -104,6 +90,25 @@ public class JWTTokenService {
         return UserTokenInfo.builder()
                 .userId(Long.parseLong(claims.getSubject()))
                 .build();
+    }
+
+    private <T> T exportToken(String token, Function<Claims, T> claimsTFunction) {
+        final Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSecretKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return claimsTFunction.apply(claims);
+    }
+
+    private Key getSecretKey() {
+        try {
+            byte[] key = Decoders.BASE64.decode(jwtProperties.getSecretKey());
+            return Keys.hmacShaKeyFor(key);
+        } catch (Exception e) {
+            log.warn("Secret key is not BASE64 encoded, using direct bytes");
+            return Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8));
+        }
     }
 
     private boolean tokenExist(final String token) {

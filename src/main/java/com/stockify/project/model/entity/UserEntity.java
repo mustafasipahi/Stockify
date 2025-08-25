@@ -27,6 +27,9 @@ public class UserEntity implements Serializable {
     @Column
     private String password;
 
+    @Column
+    private String stokifySchemaName;
+
     @CreatedDate
     private LocalDateTime createdDate;
 }

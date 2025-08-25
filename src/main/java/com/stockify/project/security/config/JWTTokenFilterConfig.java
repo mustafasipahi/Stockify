@@ -1,6 +1,8 @@
 package com.stockify.project.security.config;
 
 import com.stockify.project.security.service.JWTTokenService;
+import com.stockify.project.security.userdetail.UserPrincipal;
+import com.stockify.project.tenant.TenantContext;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,39 +35,37 @@ public class JWTTokenFilterConfig extends OncePerRequestFilter {
                                     @NotNull FilterChain filterChain) throws ServletException, IOException {
 
         final String header = request.getHeader("Authorization");
-
-        if (header == null || !header.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        final String token = jwtTokenService.extractTokenFromAuthorizationHeader(header);
-
         try {
-            if (!jwtTokenService.validateToken(token)) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            final String username = jwtTokenService.findUsernameFromToken(token);
-            final Date expirationDate = jwtTokenService.findExpirationFromToken(token);
-
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-                if (username.equals(userDetails.getUsername()) && expirationDate.after(new Date())) {
-                    final UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
-                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            if (header != null && header.startsWith("Bearer ")) {
+                final String token = jwtTokenService.extractTokenFromAuthorizationHeader(header);
+                if (jwtTokenService.validateToken(token)) {
+                    final String username = jwtTokenService.findUsernameFromToken(token);
+                    final Date expirationDate = jwtTokenService.findExpirationFromToken(token);
+                    if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                        UserPrincipal principal = (UserPrincipal) userDetails;
+                        String companySchema = principal.getUserEntity().getStokifySchemaName();
+                        TenantContext.setCurrentTenant(companySchema);
+                        if (username.equals(userDetails.getUsername()) && expirationDate.after(new Date())) {
+                            final UsernamePasswordAuthenticationToken authenticationToken =
+                                    new UsernamePasswordAuthenticationToken(
+                                            userDetails,
+                                            null,
+                                            userDetails.getAuthorities()
+                                    );
+                            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                        }
+                    }
                 }
             }
         } catch (Exception e) {
             log.error("JWT authentication error: {}", e.getMessage());
         }
-        filterChain.doFilter(request, response);
+        try {
+            filterChain.doFilter(request, response);
+        } finally {
+            TenantContext.clear();
+        }
     }
 }

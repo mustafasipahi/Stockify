@@ -13,7 +13,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -32,7 +31,6 @@ public class AuthenticationService {
                     authenticationRequest.getPassword());
             final Authentication authenticate = authenticationManager.authenticate(authenticationToken);
             final UserPrincipal userPrincipal = (UserPrincipal) authenticate.getPrincipal();
-            setTenant(userPrincipal.getUserEntity().getId());
             String token = jwtTokenService.generateToken(userPrincipal);
             redisTemplate.opsForValue().set(authenticationRequest.getUsername(), token);
             return AuthenticationResponse.builder()
@@ -72,9 +70,5 @@ public class AuthenticationService {
                     .message("Logout failed")
                     .build();
         }
-    }
-
-    private void setTenant(Long userId) {
-
     }
 }
