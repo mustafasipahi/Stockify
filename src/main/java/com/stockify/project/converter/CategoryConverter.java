@@ -1,7 +1,7 @@
 package com.stockify.project.converter;
 
 import com.stockify.project.model.dto.CategoryDto;
-import com.stockify.project.model.entity.CategoryEntity;
+import com.stockify.project.model.entity.tenant.CategoryEntity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

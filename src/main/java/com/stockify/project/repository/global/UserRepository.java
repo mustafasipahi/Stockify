@@ -1,6 +1,6 @@
-package com.stockify.project.repository;
+package com.stockify.project.repository.global;
 
-import com.stockify.project.model.entity.UserEntity;
+import com.stockify.project.model.entity.global.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

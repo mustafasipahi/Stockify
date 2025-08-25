@@ -1,8 +1,9 @@
-package com.stockify.project.model.entity;
+package com.stockify.project.model.entity.global;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "users")
+@EntityListeners(AuditingEntityListener.class)
 public class UserEntity implements Serializable {
 
     @Id
@@ -31,5 +33,6 @@ public class UserEntity implements Serializable {
     private String stokifySchemaName;
 
     @CreatedDate
+    @Column(name = "created_date")
     private LocalDateTime createdDate;
 }

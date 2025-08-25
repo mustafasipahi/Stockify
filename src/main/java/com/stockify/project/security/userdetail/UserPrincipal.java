@@ -1,6 +1,6 @@
 package com.stockify.project.security.userdetail;
 
-import com.stockify.project.model.entity.UserEntity;
+import com.stockify.project.model.entity.global.UserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

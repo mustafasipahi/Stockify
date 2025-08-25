@@ -1,6 +1,6 @@
-package com.stockify.project.model.entity;
+package com.stockify.project.model.entity.tenant;
 
-import com.stockify.project.enums.InventoryStatus;
+import com.stockify.project.enums.ProductStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -11,7 +11,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -22,10 +21,10 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Audited
-@Table(name = "inventory")
-@AuditTable(value = "inventory_audit")
+@Table(name = "product")
+@AuditTable(value = "product_audit")
 @EntityListeners(AuditingEntityListener.class)
-public class InventoryEntity {
+public class ProductEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,24 +32,24 @@ public class InventoryEntity {
 
     @NotNull
     @Column(nullable = false)
-    private BigDecimal price;
+    private Long categoryId;
 
     @NotNull
     @Column(nullable = false)
-    private Integer productCount;
+    private String stockCode;
 
-    @Column
-    private Integer criticalProductCount;
+    @NotNull
+    @Column(nullable = false)
+    private String name;
 
     @NotNull
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private InventoryStatus status;
+    private ProductStatus status;
 
     @NotAudited
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "product_id", referencedColumnName = "id")
-    private ProductEntity productEntity;
+    @OneToOne(cascade = CascadeType.ALL)
+    private CategoryEntity categoryEntity;
 
     @CreatedDate
     private LocalDateTime createdDate;

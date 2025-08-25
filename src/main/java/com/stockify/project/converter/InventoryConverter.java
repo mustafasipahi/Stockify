@@ -1,7 +1,7 @@
 package com.stockify.project.converter;
 
 import com.stockify.project.model.dto.InventoryDto;
-import com.stockify.project.model.entity.InventoryEntity;
+import com.stockify.project.model.entity.tenant.InventoryEntity;
 import com.stockify.project.util.FinanceUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

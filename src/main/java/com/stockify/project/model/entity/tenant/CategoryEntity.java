@@ -1,9 +1,10 @@
-package com.stockify.project.model.entity;
+package com.stockify.project.model.entity.tenant;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "category")
+@EntityListeners(AuditingEntityListener.class)
 public class CategoryEntity {
 
     @Id
@@ -29,10 +31,7 @@ public class CategoryEntity {
     @Column(nullable = false)
     private Double kdv;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
-    private ProductEntity productEntity;
-
     @CreatedDate
+    @Column(name = "created_date")
     private LocalDateTime createdDate;
 }

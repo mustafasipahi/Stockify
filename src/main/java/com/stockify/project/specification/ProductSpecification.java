@@ -1,7 +1,7 @@
 package com.stockify.project.specification;
 
 import com.stockify.project.enums.ProductStatus;
-import com.stockify.project.model.entity.ProductEntity;
+import com.stockify.project.model.entity.tenant.ProductEntity;
 import com.stockify.project.model.request.ProductGetAllRequest;
 import jakarta.persistence.criteria.Predicate;
 import lombok.AccessLevel;

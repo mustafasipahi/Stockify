@@ -1,11 +1,11 @@
 package com.stockify.project.validator;
 
 import com.stockify.project.exception.*;
-import com.stockify.project.model.entity.CategoryEntity;
-import com.stockify.project.model.entity.ProductEntity;
+import com.stockify.project.model.entity.tenant.CategoryEntity;
+import com.stockify.project.model.entity.tenant.ProductEntity;
 import com.stockify.project.model.request.ProductCreateRequest;
-import com.stockify.project.repository.CategoryRepository;
-import com.stockify.project.repository.ProductRepository;
+import com.stockify.project.repository.tenant.CategoryRepository;
+import com.stockify.project.repository.tenant.ProductRepository;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
