@@ -1,12 +1,13 @@
 package com.stockify.project.model.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.stockify.project.exception.StockifyRuntimeException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -14,15 +15,16 @@ import java.util.Date;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorResponse {
 
-    private Date date;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime date;
     private String message;
     private int code;
 
     public static ErrorResponse of(int code, String message) {
-        return new ErrorResponse(new Date(), message, code);
+        return new ErrorResponse(LocalDateTime.now(), message, code);
     }
 
     public static ErrorResponse of(StockifyRuntimeException exception) {
-        return new ErrorResponse(new Date(), exception.getMessage(), exception.getCode());
+        return new ErrorResponse(LocalDateTime.now(), exception.getMessage(), exception.getCode());
     }
 }
