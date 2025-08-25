@@ -46,6 +46,10 @@ public class ProductEntity {
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
 
+    @NotNull
+    @Column(nullable = false)
+    private Long tenantId;
+
     @CreatedDate
     private LocalDateTime createdDate;
 

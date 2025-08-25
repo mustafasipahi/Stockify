@@ -50,6 +50,10 @@ public class InventoryEntity {
     @Enumerated(EnumType.STRING)
     private InventoryStatus status;
 
+    @NotNull
+    @Column(nullable = false)
+    private Long tenantId;
+
     @CreatedDate
     private LocalDateTime createdDate;
 

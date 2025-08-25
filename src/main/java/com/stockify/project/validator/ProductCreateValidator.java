@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+import static com.stockify.project.util.TenantContext.getTenantId;
+
 @Component
 @AllArgsConstructor
 public class ProductCreateValidator {
@@ -28,7 +30,7 @@ public class ProductCreateValidator {
         if (StringUtils.isBlank(request.getName())) {
             throw new ProductNameException();
         }
-        Optional<ProductEntity> product = productRepository.findByName(request.getName());
+        Optional<ProductEntity> product = productRepository.findByNameAndTenantId(request.getName(), getTenantId());
         if (product.isPresent()) {
             throw new ProductNameAlreadyUseException();
         }
@@ -38,7 +40,7 @@ public class ProductCreateValidator {
         if (request.getCategoryId() == null) {
             throw new CategoryIdException();
         }
-        Optional<CategoryEntity> category = categoryRepository.findById(request.getCategoryId());
+        Optional<CategoryEntity> category = categoryRepository.findByIdAndTenantId(request.getCategoryId(), getTenantId());
         if (category.isEmpty()) {
             throw new CategoryNotFoundException(request.getCategoryId());
         }

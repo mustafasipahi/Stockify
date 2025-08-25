@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static com.stockify.project.constant.CacheConstants.PRODUCT_DETAIL;
+import static com.stockify.project.util.TenantContext.getTenantId;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +35,7 @@ public class ProductService {
     private final ProductCreateValidator createValidator;
     private final ProductUpdateValidator updateValidator;
     private final StockCodeGenerator stockCodeGenerator;
+    private final ProductConverter productConverter;
 
     @Transactional
     public ProductDto save(ProductCreateRequest request) {
@@ -43,8 +45,10 @@ public class ProductService {
                 .stockCode(stockCodeGenerator.generateStockCode())
                 .name(request.getName())
                 .status(ProductStatus.ACTIVE)
+                .tenantId(getTenantId())
                 .build();
-        return ProductConverter.toIdDto(productRepository.save(product));
+        ProductEntity savedProduct = productRepository.save(product);
+        return productConverter.toIdDto(savedProduct);
     }
 
     @Transactional
@@ -53,40 +57,42 @@ public class ProductService {
         if (request.getProductId() == null) {
             throw new ProductIdException();
         }
-        ProductEntity productEntity = productRepository.findById(request.getProductId())
+        ProductEntity productEntity = productRepository.findByIdAndTenantId(request.getProductId(), getTenantId())
                 .orElseThrow(() -> new ProductNotFoundException(request.getProductId()));
         if (StringUtils.isNotBlank(request.getName())) {
             updateValidator.validateName(request.getName());
             productEntity.setName(request.getName());
         }
-        return ProductConverter.toIdDto(productRepository.save(productEntity));
+        ProductEntity updatedProduct = productRepository.save(productEntity);
+        return productConverter.toIdDto(updatedProduct);
     }
 
     @Transactional
     @CacheEvict(value = PRODUCT_DETAIL, key = "#productId")
     public ProductDto delete(Long productId) {
-        ProductEntity productEntity = productRepository.findById(productId)
+        ProductEntity productEntity = productRepository.findByIdAndTenantId(productId, getTenantId())
                 .orElseThrow(() -> new ProductNotFoundException(productId));
         productEntity.setStatus(ProductStatus.PASSIVE);
-        return ProductConverter.toIdDto(productRepository.save(productEntity));
+        ProductEntity deletedProduct = productRepository.save(productEntity);
+        return productConverter.toIdDto(deletedProduct);
     }
 
     @Cacheable(value = PRODUCT_DETAIL, key = "#productId")
     public ProductDto detail(Long productId) {
-        return productRepository.findById(productId)
-                .map(ProductConverter::toDto)
+        return productRepository.findByIdAndTenantId(productId, getTenantId())
+                .map(productConverter::toDto)
                 .orElseThrow(() -> new ProductNotFoundException(productId));
     }
 
     public ProductEntity findById(Long productId) {
-        return productRepository.findById(productId)
+        return productRepository.findByIdAndTenantId(productId, getTenantId())
                 .orElseThrow(() -> new ProductNotFoundException(productId));
     }
 
     public List<ProductDto> getAll(ProductGetAllRequest request) {
         Specification<ProductEntity> specification = ProductSpecification.filter(request);
         return productRepository.findAll(specification).stream()
-                .map(ProductConverter::toDto)
+                .map(productConverter::toDto)
                 .toList();
     }
 }

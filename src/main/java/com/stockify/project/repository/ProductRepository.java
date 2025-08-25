@@ -8,7 +8,9 @@ import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<ProductEntity, Long>, JpaSpecificationExecutor<ProductEntity> {
 
-    Optional<ProductEntity> findFirstByOrderByCreatedDateDesc();
+    Optional<ProductEntity> findByIdAndTenantId(Long id, Long tenantId);
 
-    Optional<ProductEntity> findByName(String name);
+    Optional<ProductEntity> findByNameAndTenantId(String name, Long tenantId);
+
+    Optional<ProductEntity> findFirstByTenantIdOrderByCreatedDateDesc(Long tenantId);
 }

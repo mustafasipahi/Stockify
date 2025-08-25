@@ -8,6 +8,9 @@ import java.util.Optional;
 
 public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> {
 
-    Optional<CategoryEntity> findByName(String name);
-    List<CategoryEntity> findAllByOrderByNameAsc();
+    Optional<CategoryEntity> findByIdAndTenantId(Long id, Long tenantId);
+
+    Optional<CategoryEntity> findByNameAndTenantId(String name, Long tenantId);
+
+    List<CategoryEntity> findAllByTenantIdOrderByNameAsc(Long tenantId);
 }

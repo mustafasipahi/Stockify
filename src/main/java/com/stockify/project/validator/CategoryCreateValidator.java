@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+import static com.stockify.project.util.TenantContext.getTenantId;
+
 @Component
 @AllArgsConstructor
 public class CategoryCreateValidator {
@@ -25,7 +27,7 @@ public class CategoryCreateValidator {
         if (StringUtils.isBlank(request.getName())) {
             throw new CategoryNameException();
         }
-        Optional<CategoryEntity> categoryByName = categoryRepository.findByName(request.getName());
+        Optional<CategoryEntity> categoryByName = categoryRepository.findByNameAndTenantId(request.getName(), getTenantId());
         if (categoryByName.isPresent()) {
             throw new CategoryNameAlreadyUseException();
         }

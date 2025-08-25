@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static com.stockify.project.util.InventoryStatusUtil.getInventoryStatus;
+import static com.stockify.project.util.TenantContext.getTenantId;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +43,7 @@ public class InventoryService {
                 .productCount(request.getProductCount())
                 .criticalProductCount(request.getCriticalProductCount())
                 .status(getInventoryStatus(request.getProductCount(), request.getCriticalProductCount()))
+                .tenantId(getTenantId())
                 .build();
         InventoryEntity savedInventoryEntity = inventoryRepository.save(inventoryEntity);
         return inventoryConverter.toIdDto(savedInventoryEntity);
@@ -52,7 +54,7 @@ public class InventoryService {
         if (request.getInventoryId() == null) {
             throw new InventoryIdException();
         }
-        InventoryEntity inventoryEntity = inventoryRepository.findById(request.getInventoryId())
+        InventoryEntity inventoryEntity = inventoryRepository.findByIdAndTenantId(request.getInventoryId(), getTenantId())
                 .orElseThrow(() -> new InventoryNotFoundException(request.getInventoryId()));
         if (request.getPrice() != null) {
             inventoryUpdateValidator.validatePrice(request.getPrice());
@@ -73,7 +75,7 @@ public class InventoryService {
     public List<InventoryDto> getAllInventory() {
         Specification<InventoryEntity> specification = InventorySpecification.filter();
         return inventoryRepository.findAll(specification).stream()
-                .map(inventoryConverter::toIdDto)
+                .map(inventoryConverter::toDto)
                 .toList();
     }
 
@@ -81,7 +83,7 @@ public class InventoryService {
         Specification<InventoryEntity> specification = InventorySpecification.filter();
         return inventoryRepository.findAll(specification).stream()
                 .filter(inventoryEntity -> InventoryStatus.CRITICAL.equals(inventoryEntity.getStatus()))
-                .map(inventoryConverter::toIdDto)
+                .map(inventoryConverter::toDto)
                 .toList();
     }
 
@@ -89,7 +91,7 @@ public class InventoryService {
         Specification<InventoryEntity> specification = InventorySpecification.filter();
         return inventoryRepository.findAll(specification).stream()
                 .filter(inventoryEntity -> InventoryStatus.OUT_OF_STOCK.equals(inventoryEntity.getStatus()))
-                .map(inventoryConverter::toIdDto)
+                .map(inventoryConverter::toDto)
                 .toList();
     }
 }

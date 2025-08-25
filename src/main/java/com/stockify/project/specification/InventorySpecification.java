@@ -9,12 +9,15 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.stockify.project.util.TenantContext.getTenantId;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class InventorySpecification {
 
     public static Specification<InventoryEntity> filter() {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
+            predicates.add(criteriaBuilder.equal(root.get("tenantId"), getTenantId()));
             query.orderBy(criteriaBuilder.desc(root.get("createdDate")));
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

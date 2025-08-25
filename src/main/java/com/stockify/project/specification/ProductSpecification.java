@@ -12,6 +12,8 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.stockify.project.util.TenantContext.getTenantId;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ProductSpecification {
 
@@ -29,6 +31,7 @@ public class ProductSpecification {
             } else {
                 predicates.add(criteriaBuilder.equal(root.get("status"), ProductStatus.ACTIVE));
             }
+            predicates.add(criteriaBuilder.equal(root.get("tenantId"), getTenantId()));
             query.orderBy(criteriaBuilder.asc(root.get("name")));
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

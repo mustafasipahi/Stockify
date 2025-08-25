@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+import static com.stockify.project.util.TenantContext.getTenantId;
+
 @Component
 @AllArgsConstructor
 public class ProductUpdateValidator {
@@ -15,7 +17,7 @@ public class ProductUpdateValidator {
     private final ProductRepository productRepository;
 
     public void validateName(String productName) {
-        Optional<ProductEntity> product = productRepository.findByName(productName);
+        Optional<ProductEntity> product = productRepository.findByNameAndTenantId(productName, getTenantId());
         if (product.isPresent()) {
             throw new ProductNameAlreadyUseException();
         }

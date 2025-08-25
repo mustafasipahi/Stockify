@@ -2,16 +2,21 @@ package com.stockify.project.converter;
 
 import com.stockify.project.model.dto.ProductDto;
 import com.stockify.project.model.entity.ProductEntity;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import com.stockify.project.service.CategoryService;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Component
+@AllArgsConstructor
 public class ProductConverter {
 
-    public static ProductDto toDto(ProductEntity productEntity) {
+    private final CategoryService categoryService;
+
+    public ProductDto toDto(ProductEntity productEntity) {
         return ProductDto.builder()
                 .productId(productEntity.getId())
                 .categoryId(productEntity.getCategoryId())
+                .categoryName(getCategoryName(productEntity.getCategoryId()))
                 .stockCode(productEntity.getStockCode())
                 .name(productEntity.getName())
                 .status(productEntity.getStatus())
@@ -20,9 +25,13 @@ public class ProductConverter {
                 .build();
     }
 
-    public static ProductDto toIdDto(ProductEntity productEntity) {
+    public ProductDto toIdDto(ProductEntity productEntity) {
         return ProductDto.builder()
                 .productId(productEntity.getId())
                 .build();
+    }
+
+    private String getCategoryName(Long categoryId) {
+        return categoryService.detail(categoryId).getName();
     }
 }

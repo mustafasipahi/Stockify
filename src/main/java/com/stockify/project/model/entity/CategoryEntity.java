@@ -31,6 +31,10 @@ public class CategoryEntity {
     @Column(nullable = false)
     private Double kdv;
 
+    @NotNull
+    @Column(nullable = false)
+    private Long tenantId;
+
     @CreatedDate
     private LocalDateTime createdDate;
 }
