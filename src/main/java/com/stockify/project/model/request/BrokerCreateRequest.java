@@ -15,5 +15,5 @@ public class BrokerCreateRequest {
 
     private String firstName;
     private String lastName;
-    private BigDecimal discount;
+    private BigDecimal discount = new BigDecimal("0.00");
 }
