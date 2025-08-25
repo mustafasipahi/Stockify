@@ -1,6 +1,6 @@
-package com.stockify.project.repository.tenant;
+package com.stockify.project.repository;
 
-import com.stockify.project.model.entity.tenant.InventoryEntity;
+import com.stockify.project.model.entity.InventoryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

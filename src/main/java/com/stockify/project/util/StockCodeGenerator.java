@@ -1,7 +1,7 @@
 package com.stockify.project.util;
 
-import com.stockify.project.model.entity.tenant.ProductEntity;
-import com.stockify.project.repository.tenant.ProductRepository;
+import com.stockify.project.model.entity.ProductEntity;
+import com.stockify.project.repository.ProductRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;

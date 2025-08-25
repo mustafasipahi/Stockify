@@ -1,4 +1,4 @@
-package com.stockify.project.model.entity.tenant;
+package com.stockify.project.model.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

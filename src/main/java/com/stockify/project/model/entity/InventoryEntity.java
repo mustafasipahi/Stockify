@@ -1,6 +1,6 @@
-package com.stockify.project.model.entity.tenant;
+package com.stockify.project.model.entity;
 
-import com.stockify.project.enums.ProductStatus;
+import com.stockify.project.enums.InventoryStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -10,6 +10,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -20,10 +21,10 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Audited
-@Table(name = "product")
-@AuditTable(value = "product_audit")
+@Table(name = "inventory")
+@AuditTable(value = "inventory_audit")
 @EntityListeners(AuditingEntityListener.class)
-public class ProductEntity {
+public class InventoryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,22 +32,26 @@ public class ProductEntity {
 
     @NotNull
     @Column(nullable = false)
-    private Long categoryId;
+    private Long productId;
 
     @NotNull
     @Column(nullable = false)
-    private String stockCode;
+    private BigDecimal price;
 
     @NotNull
     @Column(nullable = false)
-    private String name;
+    private Integer productCount;
+
+    @Column
+    private Integer criticalProductCount;
 
     @NotNull
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private ProductStatus status;
+    private InventoryStatus status;
 
     @CreatedDate
+    @Column(name = "created_date")
     private LocalDateTime createdDate;
 
     @LastModifiedDate

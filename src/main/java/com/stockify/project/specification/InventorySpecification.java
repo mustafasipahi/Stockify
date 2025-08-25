@@ -1,6 +1,6 @@
 package com.stockify.project.specification;
 
-import com.stockify.project.model.entity.tenant.InventoryEntity;
+import com.stockify.project.model.entity.InventoryEntity;
 import jakarta.persistence.criteria.Predicate;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

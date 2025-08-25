@@ -1,6 +1,6 @@
-package com.stockify.project.repository.tenant;
+package com.stockify.project.repository;
 
-import com.stockify.project.model.entity.tenant.CategoryEntity;
+import com.stockify.project.model.entity.CategoryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

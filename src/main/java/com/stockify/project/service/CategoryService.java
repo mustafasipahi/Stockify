@@ -2,9 +2,9 @@ package com.stockify.project.service;
 
 import com.stockify.project.converter.CategoryConverter;
 import com.stockify.project.model.dto.CategoryDto;
-import com.stockify.project.model.entity.tenant.CategoryEntity;
+import com.stockify.project.model.entity.CategoryEntity;
 import com.stockify.project.model.request.CategoryCreateRequest;
-import com.stockify.project.repository.tenant.CategoryRepository;
+import com.stockify.project.repository.CategoryRepository;
 import com.stockify.project.validator.CategoryCreateValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

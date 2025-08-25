@@ -1,16 +1,12 @@
-package com.stockify.project.model.entity.tenant;
+package com.stockify.project.model.entity;
 
-import com.stockify.project.enums.InventoryStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.hibernate.envers.AuditTable;
-import org.hibernate.envers.Audited;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.math.BigDecimal;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
@@ -20,11 +16,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Audited
-@Table(name = "inventory")
-@AuditTable(value = "inventory_audit")
+@Table(name = "users")
 @EntityListeners(AuditingEntityListener.class)
-public class InventoryEntity {
+public class UserEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,28 +26,17 @@ public class InventoryEntity {
 
     @NotNull
     @Column(nullable = false)
-    private Long productId;
+    private String username;
 
     @NotNull
     @Column(nullable = false)
-    private BigDecimal price;
+    private String password;
 
     @NotNull
     @Column(nullable = false)
-    private Integer productCount;
-
-    @Column
-    private Integer criticalProductCount;
-
-    @NotNull
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private InventoryStatus status;
+    private String stokifySchemaName;
 
     @CreatedDate
     @Column(name = "created_date")
     private LocalDateTime createdDate;
-
-    @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
 }

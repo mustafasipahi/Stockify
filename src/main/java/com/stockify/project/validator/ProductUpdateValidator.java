@@ -1,8 +1,8 @@
 package com.stockify.project.validator;
 
 import com.stockify.project.exception.ProductNameAlreadyUseException;
-import com.stockify.project.model.entity.tenant.ProductEntity;
-import com.stockify.project.repository.tenant.ProductRepository;
+import com.stockify.project.model.entity.ProductEntity;
+import com.stockify.project.repository.ProductRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 

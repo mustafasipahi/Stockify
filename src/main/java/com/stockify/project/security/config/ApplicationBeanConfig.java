@@ -1,6 +1,6 @@
 package com.stockify.project.security.config;
 
-import com.stockify.project.repository.global.UserRepository;
+import com.stockify.project.repository.UserRepository;
 import com.stockify.project.security.userdetail.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

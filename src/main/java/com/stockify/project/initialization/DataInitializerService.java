@@ -1,9 +1,8 @@
 package com.stockify.project.initialization;
 
-import com.stockify.project.model.entity.global.UserEntity;
-import com.stockify.project.repository.global.UserRepository;
+import com.stockify.project.model.entity.UserEntity;
+import com.stockify.project.repository.UserRepository;
 import com.stockify.project.tenant.TenantContext;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
