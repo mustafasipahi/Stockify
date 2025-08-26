@@ -1,5 +1,6 @@
 package com.stockify.project.specification;
 
+import com.stockify.project.enums.InventoryStatus;
 import com.stockify.project.model.entity.InventoryEntity;
 import jakarta.persistence.criteria.Predicate;
 import lombok.AccessLevel;
@@ -14,9 +15,12 @@ import static com.stockify.project.util.TenantContext.getTenantId;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class InventorySpecification {
 
-    public static Specification<InventoryEntity> filter() {
+    public static Specification<InventoryEntity> filter(InventoryStatus status) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
+            if (status != null) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), status));
+            }
             predicates.add(criteriaBuilder.equal(root.get("tenantId"), getTenantId()));
             query.orderBy(criteriaBuilder.desc(root.get("createdDate")));
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

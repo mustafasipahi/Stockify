@@ -7,4 +7,11 @@ import lombok.NoArgsConstructor;
 public class CacheConstants {
 
     public static final String PRODUCT_DETAIL = "productDetail_";
+    public static final String BROKER_DETAIL = "brokerDetail_";
+    public static final String CATEGORY_DETAIL = "categoryDetail_";
+
+    public static final String INVENTORY_ALL = "inventoryAll_";
+    public static final String INVENTORY_AVAILABLE = "inventoryAvailable_";
+    public static final String INVENTORY_CRITICAL = "inventoryCritical_";
+    public static final String INVENTORY_OUT_OF = "inventoryOutOf_";
 }

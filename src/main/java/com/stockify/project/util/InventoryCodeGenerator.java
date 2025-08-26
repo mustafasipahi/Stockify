@@ -10,15 +10,15 @@ import static com.stockify.project.util.TenantContext.getTenantId;
 
 @Component
 @AllArgsConstructor
-public class StockCodeGenerator {
+public class InventoryCodeGenerator {
 
     private static final String PREFIX = "KRY-";
     private final ProductRepository productRepository;
 
     @Transactional
-    public String generateStockCode() {
+    public String generateInventoryCode() {
         String lastCode = productRepository.findFirstByTenantIdOrderByCreatedDateDesc(getTenantId())
-                .map(ProductEntity::getStockCode)
+                .map(ProductEntity::getInventoryCode)
                 .orElse(null);
         int newSequence = 1;
         if (lastCode != null) {

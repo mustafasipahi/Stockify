@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -14,7 +16,10 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class BrokerDto {
+public class BrokerDto implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private Long brokerId;
     private String firstName;

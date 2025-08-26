@@ -6,7 +6,6 @@ import com.stockify.project.exception.InventoryIdException;
 import com.stockify.project.exception.InventoryNotFoundException;
 import com.stockify.project.model.dto.InventoryDto;
 import com.stockify.project.model.entity.InventoryEntity;
-import com.stockify.project.model.entity.ProductEntity;
 import com.stockify.project.model.request.InventoryCreateRequest;
 import com.stockify.project.model.request.InventoryUpdateRequest;
 import com.stockify.project.repository.InventoryRepository;
@@ -14,6 +13,9 @@ import com.stockify.project.specification.InventorySpecification;
 import com.stockify.project.validator.InventoryCreateValidator;
 import com.stockify.project.validator.InventoryUpdateValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 
+import static com.stockify.project.constant.CacheConstants.*;
 import static com.stockify.project.util.InventoryStatusUtil.getInventoryStatus;
 import static com.stockify.project.util.TenantContext.getTenantId;
 
@@ -29,17 +32,21 @@ import static com.stockify.project.util.TenantContext.getTenantId;
 public class InventoryService {
 
     private final InventoryRepository inventoryRepository;
-    private final ProductService productService;
     private final InventoryCreateValidator inventoryCreateValidator;
     private final InventoryUpdateValidator inventoryUpdateValidator;
     private final InventoryConverter inventoryConverter;
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = INVENTORY_ALL),
+            @CacheEvict(value = INVENTORY_AVAILABLE),
+            @CacheEvict(value = INVENTORY_CRITICAL),
+            @CacheEvict(value = INVENTORY_OUT_OF)
+    })
     public InventoryDto save(InventoryCreateRequest request) {
         inventoryCreateValidator.validate(request);
-        ProductEntity productEntity = productService.findById(request.getProductId());
         InventoryEntity inventoryEntity = InventoryEntity.builder()
-                .productId(productEntity.getId())
+                .productId(request.getProductId())
                 .price(request.getPrice())
                 .productCount(request.getProductCount())
                 .criticalProductCount(request.getCriticalProductCount())
@@ -51,6 +58,12 @@ public class InventoryService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = INVENTORY_ALL),
+            @CacheEvict(value = INVENTORY_AVAILABLE),
+            @CacheEvict(value = INVENTORY_CRITICAL),
+            @CacheEvict(value = INVENTORY_OUT_OF)
+    })
     public InventoryDto update(InventoryUpdateRequest request) {
         if (request.getInventoryId() == null) {
             throw new InventoryIdException();
@@ -74,47 +87,56 @@ public class InventoryService {
         return inventoryConverter.toIdDto(updatedInventoryEntity);
     }
 
+    @Cacheable(value = INVENTORY_ALL)
     public List<InventoryDto> getAllInventory() {
-        Specification<InventoryEntity> specification = InventorySpecification.filter();
+        Specification<InventoryEntity> specification = InventorySpecification.filter(null);
         return inventoryRepository.findAll(specification).stream()
                 .map(inventoryConverter::toDto)
                 .toList();
     }
 
+    @Cacheable(value = INVENTORY_AVAILABLE)
     public List<InventoryDto> getAvailableInventory() {
-        Specification<InventoryEntity> specification = InventorySpecification.filter();
+        Specification<InventoryEntity> specification = InventorySpecification.filter(InventoryStatus.AVAILABLE);
         return inventoryRepository.findAll(specification).stream()
-                .filter(inventoryEntity -> InventoryStatus.AVAILABLE.equals(inventoryEntity.getStatus()))
                 .map(inventoryConverter::toDto)
                 .toList();
     }
 
+    @Cacheable(value = INVENTORY_CRITICAL)
     public List<InventoryDto> getCriticalInventory() {
-        Specification<InventoryEntity> specification = InventorySpecification.filter();
+        Specification<InventoryEntity> specification = InventorySpecification.filter(InventoryStatus.CRITICAL);
         return inventoryRepository.findAll(specification).stream()
-                .filter(inventoryEntity -> InventoryStatus.CRITICAL.equals(inventoryEntity.getStatus()))
                 .map(inventoryConverter::toDto)
                 .toList();
     }
 
+    @Cacheable(value = INVENTORY_OUT_OF)
     public List<InventoryDto> getOutOfInventory() {
-        Specification<InventoryEntity> specification = InventorySpecification.filter();
+        Specification<InventoryEntity> specification = InventorySpecification.filter(InventoryStatus.OUT_OF_INVENTORY);
         return inventoryRepository.findAll(specification).stream()
-                .filter(inventoryEntity -> InventoryStatus.OUT_OF_STOCK.equals(inventoryEntity.getStatus()))
                 .map(inventoryConverter::toDto)
                 .toList();
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = INVENTORY_ALL),
+            @CacheEvict(value = INVENTORY_AVAILABLE),
+            @CacheEvict(value = INVENTORY_CRITICAL),
+            @CacheEvict(value = INVENTORY_OUT_OF)
+    })
     public void decreaseInventory(Map<Long, Integer> productDecreaseProductCountMap, Long tenantId) {
         for (Map.Entry<Long, Integer> entry : productDecreaseProductCountMap.entrySet()) {
             Long productId = entry.getKey();
             Integer decreaseProductCount = entry.getValue();
             InventoryEntity inventoryEntity = inventoryRepository.findByProductIdAndTenantId(productId, tenantId)
                     .orElseThrow(() -> new InventoryNotFoundException(productId));
-            Integer decreasedProductCount = inventoryEntity.getProductCount() - decreaseProductCount;
-            InventoryStatus newStatus = getInventoryStatus(decreasedProductCount, inventoryEntity.getCriticalProductCount());
-            inventoryRepository.decreaseProductCount(productId, tenantId, decreaseProductCount, newStatus);
+            Integer newProductCount = inventoryEntity.getProductCount() - decreaseProductCount;
+            InventoryStatus newStatus = getInventoryStatus(newProductCount, inventoryEntity.getCriticalProductCount());
+            inventoryEntity.setProductCount(newProductCount);
+            inventoryEntity.setStatus(newStatus);
+            inventoryRepository.save(inventoryEntity);
         }
     }
 }

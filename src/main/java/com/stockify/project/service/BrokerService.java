@@ -14,12 +14,15 @@ import com.stockify.project.validator.BrokerCreateValidator;
 import com.stockify.project.validator.BrokerUpdateValidator;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+import static com.stockify.project.constant.CacheConstants.BROKER_DETAIL;
 import static com.stockify.project.util.TenantContext.getTenantId;
 
 @Service
@@ -44,6 +47,7 @@ public class BrokerService {
     }
 
     @Transactional
+    @CacheEvict(value = BROKER_DETAIL, key = "#request.brokerId")
     public BrokerDto update(BrokerUpdateRequest request) {
         if (request.getBrokerId() == null) {
             throw new BrokerIdException();
@@ -69,6 +73,7 @@ public class BrokerService {
         return BrokerConverter.toIdDto(updatedBrokerEntity);
     }
 
+    @CacheEvict(value = BROKER_DETAIL, key = "#request.brokerId")
     public void updateDiscount(DiscountUpdateRequest request) {
         if (request.getBrokerId() == null) {
             throw new BrokerIdException();
@@ -85,6 +90,7 @@ public class BrokerService {
         brokerRepository.save(brokerEntity);
     }
 
+    @Cacheable(value = BROKER_DETAIL, key = "#brokerId")
     public BrokerDto detail(Long brokerId) {
         return brokerRepository.findByIdAndTenantId(brokerId, getTenantId())
                 .map(BrokerConverter::toDto)

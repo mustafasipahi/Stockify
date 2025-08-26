@@ -4,5 +4,5 @@ public enum InventoryStatus {
 
     AVAILABLE,
     CRITICAL,
-    OUT_OF_STOCK
+    OUT_OF_INVENTORY
 }

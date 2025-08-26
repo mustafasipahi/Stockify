@@ -35,7 +35,7 @@ public class ProductEntity {
 
     @NotNull
     @Column(nullable = false)
-    private String stockCode;
+    private String inventoryCode;
 
     @NotNull
     @Column(nullable = false)

@@ -9,10 +9,10 @@ public class InventoryStatusUtil {
 
     public static InventoryStatus getInventoryStatus(Integer productCount, Integer criticalProductCount) {
         if (productCount == null) {
-            return InventoryStatus.OUT_OF_STOCK;
+            return InventoryStatus.OUT_OF_INVENTORY;
         }
         if (productCount <= 0) {
-            return InventoryStatus.OUT_OF_STOCK;
+            return InventoryStatus.OUT_OF_INVENTORY;
         }
         if (criticalProductCount == null) {
             return InventoryStatus.AVAILABLE;

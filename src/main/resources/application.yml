@@ -21,3 +21,7 @@ redis-config:
 
 security:
   secretKey: wD3U3XjP7nB3cbmJjQYFhfZ6qPzO7whVYaAkM7b9c10=
+
+stokify:
+  cache:
+    baseCacheTtlMinutes: ${BASE_TTL:30}

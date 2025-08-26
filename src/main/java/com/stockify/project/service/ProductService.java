@@ -11,7 +11,7 @@ import com.stockify.project.model.request.ProductGetAllRequest;
 import com.stockify.project.model.request.ProductUpdateRequest;
 import com.stockify.project.repository.ProductRepository;
 import com.stockify.project.specification.ProductSpecification;
-import com.stockify.project.util.StockCodeGenerator;
+import com.stockify.project.util.InventoryCodeGenerator;
 import com.stockify.project.validator.ProductCreateValidator;
 import com.stockify.project.validator.ProductUpdateValidator;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductCreateValidator createValidator;
     private final ProductUpdateValidator updateValidator;
-    private final StockCodeGenerator stockCodeGenerator;
+    private final InventoryCodeGenerator inventoryCodeGenerator;
     private final ProductConverter productConverter;
 
     @Transactional
@@ -42,7 +42,7 @@ public class ProductService {
         createValidator.validate(request);
         ProductEntity product = ProductEntity.builder()
                 .categoryId(request.getCategoryId())
-                .stockCode(stockCodeGenerator.generateStockCode())
+                .inventoryCode(inventoryCodeGenerator.generateInventoryCode())
                 .name(request.getName())
                 .status(ProductStatus.ACTIVE)
                 .tenantId(getTenantId())
@@ -81,11 +81,6 @@ public class ProductService {
     public ProductDto detail(Long productId) {
         return productRepository.findByIdAndTenantId(productId, getTenantId())
                 .map(productConverter::toDto)
-                .orElseThrow(() -> new ProductNotFoundException(productId));
-    }
-
-    public ProductEntity findById(Long productId) {
-        return productRepository.findByIdAndTenantId(productId, getTenantId())
                 .orElseThrow(() -> new ProductNotFoundException(productId));
     }
 

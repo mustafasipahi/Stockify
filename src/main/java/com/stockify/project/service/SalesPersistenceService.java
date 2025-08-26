@@ -4,6 +4,7 @@ import com.stockify.project.converter.SalesConverter;
 import com.stockify.project.exception.InsufficientInventoryException;
 import com.stockify.project.exception.InventoryCountException;
 import com.stockify.project.exception.ProductNotFoundException;
+import com.stockify.project.model.dto.BrokerDto;
 import com.stockify.project.model.dto.SalesPrepareDto;
 import com.stockify.project.model.dto.SalesPriceDto;
 import com.stockify.project.model.dto.SalesProductDto;
@@ -52,8 +53,8 @@ public class SalesPersistenceService {
         SalesPrepareDto prepareDto = prepareSalesFlow(request, tenantId);
         SalesEntity savedSalesEntity = salesRepository.save(prepareDto.getSalesEntity());
         saveSalesItemEntity(prepareDto.getSalesItems(), savedSalesEntity.getId(), tenantId);
-        updateProductStock(prepareDto.getSalesItems(), tenantId);
-        InvoiceEntity invoiceEntity = createInvoice(request.isCreateInvoice(), savedSalesEntity);
+        decreaseProductInventory(prepareDto.getSalesItems(), tenantId);
+        InvoiceEntity invoiceEntity = createInvoice(request.isCreateInvoice(), savedSalesEntity, prepareDto.getSalesItems());
         return SalesConverter.toResponse(savedSalesEntity, prepareDto.getSalesItems(), invoiceEntity);
     }
 
@@ -80,7 +81,8 @@ public class SalesPersistenceService {
     }
 
     private BigDecimal getDiscountRate(Long brokerId) {
-        return Optional.ofNullable(brokerService.detail(brokerId).getDiscountRate())
+        BrokerDto broker = brokerService.detail(brokerId);
+        return Optional.ofNullable(broker.getDiscountRate())
                 .orElse(BigDecimal.ZERO);
     }
 
@@ -139,16 +141,16 @@ public class SalesPersistenceService {
         salesItemRepository.saveAll(salesItemEntityList);
     }
 
-    private void updateProductStock(List<SalesItemEntity> salesItems, Long tenantId) {
+    private void decreaseProductInventory(List<SalesItemEntity> salesItems, Long tenantId) {
         Map<Long, Integer> productDecreaseProductCountMap = salesItems.stream()
                 .collect(Collectors.toMap(SalesItemEntity::getProductId, SalesItemEntity::getProductCount));
         inventoryService.decreaseInventory(productDecreaseProductCountMap, tenantId);
     }
 
-    private InvoiceEntity createInvoice(boolean createInvoice, SalesEntity savedSalesEntity) {
+    private InvoiceEntity createInvoice(boolean createInvoice, SalesEntity salesEntity, List<SalesItemEntity> salesItems) {
         InvoiceEntity invoiceEntity = null;
         if (createInvoice) {
-            //invoiceEntity = invoiceService.createInvoice(savedSalesEntity);
+            //invoiceEntity = invoiceService.createInvoice(salesEntity);
         }
         return invoiceEntity;
     }

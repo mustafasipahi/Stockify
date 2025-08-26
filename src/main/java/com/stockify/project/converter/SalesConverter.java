@@ -35,15 +35,15 @@ public class SalesConverter {
                 .build();
     }
 
-    public static SalesResponse toResponse(SalesEntity savedSalesEntity, List<SalesItemEntity> salesItems, InvoiceEntity invoiceEntity) {
+    public static SalesResponse toResponse(SalesEntity salesEntity, List<SalesItemEntity> salesItems, InvoiceEntity invoiceEntity) {
         return SalesResponse.builder()
-                .salesId(savedSalesEntity.getId())
+                .salesId(salesEntity.getId())
                 .salesItems(SalesItemConverter.toDto(salesItems))
-                .subtotalPrice(savedSalesEntity.getSubtotalPrice())
-                .totalPrice(savedSalesEntity.getTotalPrice())
-                .discountPrice(savedSalesEntity.getDiscountPrice())
-                .discountRate(savedSalesEntity.getDiscountRate())
-                .createdDate(savedSalesEntity.getCreatedDate())
+                .subtotalPrice(salesEntity.getSubtotalPrice())
+                .totalPrice(salesEntity.getTotalPrice())
+                .discountPrice(salesEntity.getDiscountPrice())
+                .discountRate(salesEntity.getDiscountRate())
+                .createdDate(salesEntity.getCreatedDate())
                 .invoiceId(Optional.ofNullable(invoiceEntity)
                         .map(InvoiceEntity::getId)
                         .orElse(null))

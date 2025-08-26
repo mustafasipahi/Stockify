@@ -1,5 +1,6 @@
 package com.stockify.project.converter;
 
+import com.stockify.project.model.dto.CategoryDto;
 import com.stockify.project.model.dto.ProductDto;
 import com.stockify.project.model.entity.ProductEntity;
 import com.stockify.project.service.CategoryService;
@@ -13,11 +14,13 @@ public class ProductConverter {
     private final CategoryService categoryService;
 
     public ProductDto toDto(ProductEntity productEntity) {
+        CategoryDto category = getCategory(productEntity.getCategoryId());
         return ProductDto.builder()
                 .productId(productEntity.getId())
                 .categoryId(productEntity.getCategoryId())
-                .categoryName(getCategoryName(productEntity.getCategoryId()))
-                .stockCode(productEntity.getStockCode())
+                .categoryName(category.getName())
+                .kdv(category.getKdv())
+                .stockCode(productEntity.getInventoryCode())
                 .name(productEntity.getName())
                 .status(productEntity.getStatus())
                 .createdDate(productEntity.getCreatedDate())
@@ -31,7 +34,7 @@ public class ProductConverter {
                 .build();
     }
 
-    private String getCategoryName(Long categoryId) {
-        return categoryService.detail(categoryId).getName();
+    private CategoryDto getCategory(Long categoryId) {
+        return categoryService.detail(categoryId);
     }
 }

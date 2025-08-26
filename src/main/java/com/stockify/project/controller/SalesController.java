@@ -2,8 +2,10 @@ package com.stockify.project.controller;
 
 import com.stockify.project.model.dto.SalesProductDto;
 import com.stockify.project.model.request.SalesRequest;
+import com.stockify.project.model.response.SalesConfirmResponse;
+import com.stockify.project.model.response.SalesPreviewResponse;
 import com.stockify.project.model.response.SalesResponse;
-import com.stockify.project.service.SalesPersistenceService;
+import com.stockify.project.service.SalesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,20 +16,25 @@ import java.util.List;
 @RequestMapping("/sales")
 public class SalesController {
 
-    private final SalesPersistenceService salesPersistenceService;
+    private final SalesService salesService;
+
+    @PostMapping("/calculate")
+    public SalesResponse salesCalculate(SalesRequest request) {
+        return salesService.salesCalculate(request);
+    }
 
     @PostMapping("/preview")
-    public SalesResponse salesPreview(@RequestBody SalesRequest request) {
-        return salesPersistenceService.salesPreview(request);
+    public SalesPreviewResponse salesPreview(@RequestBody SalesRequest request) {
+        return salesService.salesPreview(request);
     }
 
     @PostMapping("/confirm")
-    public SalesResponse salesConfirm(@RequestBody SalesRequest request) {
-        return salesPersistenceService.salesConfirm(request);
+    public SalesConfirmResponse salesConfirm(@RequestBody SalesRequest request) {
+        return salesService.salesConfirm(request);
     }
 
     @GetMapping("/products")
     public List<SalesProductDto> getProducts() {
-        return salesPersistenceService.getProducts();
+        return salesService.getProducts();
     }
 }
