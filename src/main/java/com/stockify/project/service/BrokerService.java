@@ -1,6 +1,7 @@
 package com.stockify.project.service;
 
 import com.stockify.project.converter.BrokerConverter;
+import com.stockify.project.enums.BrokerStatus;
 import com.stockify.project.exception.BrokerDiscountRateException;
 import com.stockify.project.exception.BrokerIdException;
 import com.stockify.project.exception.BrokerNotFoundException;
@@ -40,6 +41,7 @@ public class BrokerService {
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .discountRate(request.getDiscountRate())
+                .status(BrokerStatus.ACTIVE)
                 .tenantId(getTenantId())
                 .build();
         BrokerEntity savedBrokerEntity = brokerRepository.save(brokerEntity);
@@ -73,6 +75,7 @@ public class BrokerService {
         return BrokerConverter.toIdDto(updatedBrokerEntity);
     }
 
+    @Transactional
     @CacheEvict(value = BROKER_DETAIL, key = "#request.brokerId")
     public void updateDiscount(DiscountUpdateRequest request) {
         if (request.getBrokerId() == null) {
@@ -90,6 +93,16 @@ public class BrokerService {
         brokerRepository.save(brokerEntity);
     }
 
+    @Transactional
+    @CacheEvict(value = BROKER_DETAIL, key = "#brokerId")
+    public BrokerDto delete(Long brokerId) {
+        BrokerEntity brokerEntity = brokerRepository.findByIdAndTenantId(brokerId, getTenantId())
+                .orElseThrow(() -> new BrokerNotFoundException(brokerId));
+        brokerEntity.setStatus(BrokerStatus.PASSIVE);
+        BrokerEntity deletedBrokerEntity = brokerRepository.save(brokerEntity);
+        return BrokerConverter.toIdDto(deletedBrokerEntity);
+    }
+
     @Cacheable(value = BROKER_DETAIL, key = "#brokerId")
     public BrokerDto detail(Long brokerId) {
         return brokerRepository.findByIdAndTenantId(brokerId, getTenantId())
@@ -98,7 +111,7 @@ public class BrokerService {
     }
 
     public List<BrokerDto> getAllBrokers() {
-        return brokerRepository.findAllByTenantIdOrderByFirstNameAsc(getTenantId()).stream()
+        return brokerRepository.findAllByStatusAndTenantIdOrderByFirstNameAsc(BrokerStatus.ACTIVE, getTenantId()).stream()
                 .map(BrokerConverter::toDto)
                 .toList();
     }

@@ -1,5 +1,6 @@
 package com.stockify.project.repository;
 
+import com.stockify.project.enums.BrokerStatus;
 import com.stockify.project.model.entity.BrokerEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -12,5 +13,5 @@ public interface BrokerRepository extends JpaRepository<BrokerEntity, Long> {
 
     Optional<BrokerEntity> findByFirstNameAndLastNameAndTenantId(String firstName, String lastName, Long tenantId);
 
-    List<BrokerEntity> findAllByTenantIdOrderByFirstNameAsc(Long tenantId);
+    List<BrokerEntity> findAllByStatusAndTenantIdOrderByFirstNameAsc(BrokerStatus status, Long tenantId);
 }

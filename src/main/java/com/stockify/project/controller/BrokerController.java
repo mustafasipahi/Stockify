@@ -32,6 +32,16 @@ public class BrokerController {
         brokerService.updateDiscount(request);
     }
 
+    @DeleteMapping("/delete/{id}")
+    public BrokerDto delete(@PathVariable Long id) {
+        return brokerService.delete(id);
+    }
+
+    @GetMapping("/detail/{id}")
+    public BrokerDto detail(@PathVariable Long id) {
+        return brokerService.detail(id);
+    }
+
     @GetMapping("/all")
     public List<BrokerDto> getAllBrokers() {
         return brokerService.getAllBrokers();
