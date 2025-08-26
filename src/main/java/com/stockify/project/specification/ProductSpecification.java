@@ -22,9 +22,9 @@ public class ProductSpecification {
             List<Predicate> predicates = new ArrayList<>();
             if (StringUtils.isNotBlank(request.getProductText())) {
                 String likePattern = "%" + request.getProductText().toLowerCase() + "%";
-                Predicate stockCodePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("stockCode")), likePattern);
+                Predicate inventoryCodePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("inventoryCode")), likePattern);
                 Predicate namePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), likePattern);
-                predicates.add(criteriaBuilder.or(stockCodePredicate, namePredicate));
+                predicates.add(criteriaBuilder.or(inventoryCodePredicate, namePredicate));
             }
             if (request.getStatus() != null) {
                 predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));

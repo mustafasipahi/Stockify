@@ -20,7 +20,7 @@ public class ProductConverter {
                 .categoryId(productEntity.getCategoryId())
                 .categoryName(category.getName())
                 .kdv(category.getKdv())
-                .stockCode(productEntity.getInventoryCode())
+                .inventoryCode(productEntity.getInventoryCode())
                 .name(productEntity.getName())
                 .status(productEntity.getStatus())
                 .createdDate(productEntity.getCreatedDate())
