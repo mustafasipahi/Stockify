@@ -33,7 +33,7 @@ import static com.stockify.project.validator.SalesValidator.validate;
 
 @Service
 @RequiredArgsConstructor
-public class SalesService {
+public class SalesPersistenceService {
 
     private final SalesRepository salesRepository;
     private final SalesItemRepository salesItemRepository;
