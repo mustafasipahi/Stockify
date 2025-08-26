@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-
 @Getter
 @Setter
 @AllArgsConstructor
@@ -16,6 +14,6 @@ import java.math.BigDecimal;
 public class ProductUpdateRequest {
 
     private Long productId;
+    private Long categoryId;
     private String name;
-    private BigDecimal amount;
 }

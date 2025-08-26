@@ -2,7 +2,6 @@ package com.stockify.project.model.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.stockify.project.enums.ProductStatus;
-import com.stockify.project.model.dto.StockifyPageable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,8 +12,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ProductSearchRequest extends StockifyPageable {
+public class ProductGetAllRequest {
 
-    private String searchText;
+    private String productText;
     private ProductStatus status;
 }

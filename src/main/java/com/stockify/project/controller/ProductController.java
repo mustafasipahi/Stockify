@@ -2,14 +2,13 @@ package com.stockify.project.controller;
 
 import com.stockify.project.model.dto.ProductDto;
 import com.stockify.project.model.request.ProductCreateRequest;
-import com.stockify.project.model.request.ProductSearchRequest;
+import com.stockify.project.model.request.ProductGetAllRequest;
 import com.stockify.project.model.request.ProductUpdateRequest;
-import com.stockify.project.security.userdetail.UserPrincipal;
 import com.stockify.project.service.ProductService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,21 +18,18 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping("/save")
-    public ProductDto save(@AuthenticationPrincipal final UserPrincipal userPrincipal,
-                           @RequestBody ProductCreateRequest request) {
-        return productService.save(userPrincipal.getUserEntity().getId(), request);
+    public ProductDto save(@RequestBody ProductCreateRequest request) {
+        return productService.save(request);
     }
 
     @PutMapping("/update")
-    public ProductDto update(@AuthenticationPrincipal final UserPrincipal userPrincipal,
-                             @RequestBody ProductUpdateRequest request) {
-        return productService.update(userPrincipal.getUserEntity().getId(), request);
+    public ProductDto update(@RequestBody ProductUpdateRequest request) {
+        return productService.update(request);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ProductDto delete(@AuthenticationPrincipal final UserPrincipal userPrincipal,
-                             @PathVariable Long id) {
-        return productService.delete(userPrincipal.getUserEntity().getId(), id);
+    public ProductDto delete(@PathVariable Long id) {
+        return productService.delete(id);
     }
 
     @GetMapping("/detail/{id}")
@@ -41,8 +37,8 @@ public class ProductController {
         return productService.detail(id);
     }
 
-    @GetMapping("/search")
-    public Page<ProductDto> search(@ModelAttribute ProductSearchRequest request) {
-        return productService.search(request);
+    @GetMapping("/all")
+    public List<ProductDto> getAll(@ModelAttribute ProductGetAllRequest request) {
+        return productService.getAll(request);
     }
 }

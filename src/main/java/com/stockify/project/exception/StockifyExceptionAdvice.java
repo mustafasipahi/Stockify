@@ -26,6 +26,6 @@ public class StockifyExceptionAdvice {
         log.error("An unknown exception occurred!", e);
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(ErrorResponse.of(UNKNOWN_ERROR, e.getMessage()));
+            .body(ErrorResponse.of(UNKNOWN_ERROR, "An unknown exception occurred!"));
     }
 }

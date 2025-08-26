@@ -12,15 +12,12 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://stockify-app-mysql:3306/stockify_app?autoReconnect=true&useSSL=false&createDatabaseIfNotExist=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
-      SPRING_JPA_HIBERNATE_DDL_AUTO: create
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none
       REDIS_HOST: stockify-app-redis
       REDIS_PORT: 6379
     depends_on:
       - stockify-app-mysql
       - stockify-app-redis
-    volumes:
-      - ./src:/app/src
-      - ./target:/app/target
 
   stockify-app-mysql:
     container_name: stockify-app-mysql
@@ -36,6 +33,10 @@ services:
       - "3306:3306"
     expose:
       - 3306
+    command: [
+      "--character-set-server=utf8mb4",
+      "--collation-server=utf8mb4_turkish_ci"
+    ]
 
   stockify-app-redis:
     container_name: stockify-app-redis
@@ -45,6 +46,8 @@ services:
       - '6379:6379'
     expose:
       - 6379
+
+#  docker exec -it stockify-app-redis redis-cli FLUSHALL
 
 # docker build -t stockify-app -f Dockerfile .
 # docker ps

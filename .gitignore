@@ -1,12 +1,38 @@
 # Maven build directory
 target/
+.mvn
+mvnw*
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**
+!**/src/test/**
 
 # IDE files
+### IntelliJ IDEA ###
 .idea/
+*.iws
 *.iml
+*.ipr
 .project
 .classpath
 .settings/
+
+### STS ###
+.apt_generated
+.factorypath
+.springBeans
+.sts4-cache
+.metadata
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+
+### VS Code ###
+.vscode/
 
 # Compiled class files
 *.class
@@ -27,3 +53,11 @@ hs_err_pid*
 
 # Local configuration files
 .DS_Store
+.AppleDouble
+.LSOverride
+
+# Help file
+HELP.md
+
+# Thumbnails
+._*

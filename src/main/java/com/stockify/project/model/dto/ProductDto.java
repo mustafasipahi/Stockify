@@ -1,6 +1,7 @@
 package com.stockify.project.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.stockify.project.enums.ProductStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,7 +9,6 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -22,10 +22,12 @@ public class ProductDto implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long productId;
-    private String stockCode;
+    private Long categoryId;
+    private String categoryName;
+    private Double kdv;
+    private String inventoryCode;
     private String name;
-    private BigDecimal amount;
-    private Long createdAgentId;
-    private Long updatedAgentId;
+    private ProductStatus status;
     private LocalDateTime createdDate;
+    private LocalDateTime lastModifiedDate;
 }

@@ -6,17 +6,19 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.stockify.project.util.TenantContext.getTenantId;
+
 @Component
 @AllArgsConstructor
-public class StockCodeGenerator {
+public class InventoryCodeGenerator {
 
     private static final String PREFIX = "KRY-";
     private final ProductRepository productRepository;
 
     @Transactional
-    public String generateStockCode() {
-        String lastCode = productRepository.findFirstByOrderByCreatedDateDesc()
-                .map(ProductEntity::getStockCode)
+    public String generateInventoryCode() {
+        String lastCode = productRepository.findFirstByTenantIdOrderByCreatedDateDesc(getTenantId())
+                .map(ProductEntity::getInventoryCode)
                 .orElse(null);
         int newSequence = 1;
         if (lastCode != null) {

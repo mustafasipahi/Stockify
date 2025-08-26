@@ -18,12 +18,13 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.function.Function;
 
+import static com.stockify.project.constant.LoginConstant.EXPIRE_DURATION_ONE_DAY;
+import static com.stockify.project.constant.LoginConstant.EXPIRE_DURATION_SEVEN_DAY;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class JWTTokenService {
-
-    private static final long EXPIRE_DURATION = 24 * 60 * 60 * 1000; //24 h
 
     private final JWTProperties jwtProperties;
     private final RedisTemplate<String, String> redisTemplate;
@@ -36,32 +37,14 @@ public class JWTTokenService {
         return exportToken(token, Claims::getExpiration);
     }
 
-    private <T> T exportToken(String token, Function<Claims, T> claimsTFunction) {
-        final Claims claims = Jwts.parserBuilder()
-                .setSigningKey(getSecretKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-        return claimsTFunction.apply(claims);
-    }
-
-    public String generateToken(UserPrincipal userPrincipal) {
+    public String generateToken(UserPrincipal userPrincipal, boolean rememberMe) {
         return Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
+                .claim("tenantId", userPrincipal.getUserEntity().getTenantId())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRE_DURATION))
+                .setExpiration(getTokenExpirationDate(rememberMe))
                 .signWith(getSecretKey(), SignatureAlgorithm.HS256)
                 .compact();
-    }
-
-    private Key getSecretKey() {
-        try {
-            byte[] key = Decoders.BASE64.decode(jwtProperties.getSecretKey());
-            return Keys.hmacShaKeyFor(key);
-        } catch (Exception e) {
-            log.warn("Secret key is not BASE64 encoded, using direct bytes");
-            return Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8));
-        }
     }
 
     public String extractUsernameFromToken(final String token) {
@@ -76,6 +59,10 @@ public class JWTTokenService {
             return "";
         }
         return authorizationHeaderValue.substring(7);
+    }
+
+    public Long extractCompanySchemaFromToken(String token) {
+        return exportToken(token, claims -> claims.get("tenantId", Long.class));
     }
 
     public boolean validateToken(final String token) {
@@ -106,6 +93,25 @@ public class JWTTokenService {
                 .build();
     }
 
+    private <T> T exportToken(String token, Function<Claims, T> claimsTFunction) {
+        final Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSecretKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return claimsTFunction.apply(claims);
+    }
+
+    private Key getSecretKey() {
+        try {
+            byte[] key = Decoders.BASE64.decode(jwtProperties.getSecretKey());
+            return Keys.hmacShaKeyFor(key);
+        } catch (Exception e) {
+            log.warn("Secret key is not BASE64 encoded, using direct bytes");
+            return Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8));
+        }
+    }
+
     private boolean tokenExist(final String token) {
         try {
             String memberKey = extractUsernameFromToken(token);
@@ -123,5 +129,10 @@ public class JWTTokenService {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    private Date getTokenExpirationDate(boolean rememberMe) {
+        long duration = rememberMe ? EXPIRE_DURATION_SEVEN_DAY : EXPIRE_DURATION_ONE_DAY;
+        return new Date(System.currentTimeMillis() + duration);
     }
 }

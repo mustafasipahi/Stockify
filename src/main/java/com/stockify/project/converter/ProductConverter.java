@@ -1,28 +1,40 @@
 package com.stockify.project.converter;
 
+import com.stockify.project.model.dto.CategoryDto;
 import com.stockify.project.model.dto.ProductDto;
 import com.stockify.project.model.entity.ProductEntity;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import com.stockify.project.service.CategoryService;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Component
+@AllArgsConstructor
 public class ProductConverter {
 
-    public static ProductDto toDto(ProductEntity productEntity) {
+    private final CategoryService categoryService;
+
+    public ProductDto toDto(ProductEntity productEntity) {
+        CategoryDto category = getCategory(productEntity.getCategoryId());
         return ProductDto.builder()
                 .productId(productEntity.getId())
-                .stockCode(productEntity.getStockCode())
+                .categoryId(productEntity.getCategoryId())
+                .categoryName(category.getName())
+                .kdv(category.getKdv())
+                .inventoryCode(productEntity.getInventoryCode())
                 .name(productEntity.getName())
-                .amount(productEntity.getAmount())
-                .createdAgentId(productEntity.getCreatedAgentId())
-                .updatedAgentId(productEntity.getUpdatedAgentId())
+                .status(productEntity.getStatus())
                 .createdDate(productEntity.getCreatedDate())
+                .lastModifiedDate(productEntity.getLastModifiedDate())
                 .build();
     }
 
-    public static ProductDto toIdDto(ProductEntity productEntity) {
+    public ProductDto toIdDto(ProductEntity productEntity) {
         return ProductDto.builder()
                 .productId(productEntity.getId())
                 .build();
+    }
+
+    private CategoryDto getCategory(Long categoryId) {
+        return categoryService.detail(categoryId);
     }
 }
