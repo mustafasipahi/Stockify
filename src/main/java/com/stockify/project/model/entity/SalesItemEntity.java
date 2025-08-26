@@ -3,8 +3,8 @@ package com.stockify.project.model.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.envers.Audited;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
@@ -17,9 +17,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "broker")
+@Audited
+@Table(name = "sales_items")
 @EntityListeners(AuditingEntityListener.class)
-public class BrokerEntity {
+public class SalesItemEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,14 +28,23 @@ public class BrokerEntity {
 
     @NotNull
     @Column(nullable = false)
-    private String firstName;
+    private Long salesId;
 
     @NotNull
     @Column(nullable = false)
-    private String lastName;
+    private Long productId;
 
-    @Column
-    private BigDecimal discountRate;
+    @NotNull
+    @Column(nullable = false)
+    private BigDecimal unitPrice;
+
+    @NotNull
+    @Column(nullable = false)
+    private BigDecimal totalPrice;
+
+    @NotNull
+    @Column(nullable = false)
+    private Integer productCount;
 
     @NotNull
     @Column(nullable = false)
@@ -42,7 +52,4 @@ public class BrokerEntity {
 
     @CreatedDate
     private LocalDateTime createdDate;
-
-    @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
 }

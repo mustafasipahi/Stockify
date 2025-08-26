@@ -1,6 +1,6 @@
 package com.stockify.project.validator;
 
-import com.stockify.project.exception.BrokerDiscountException;
+import com.stockify.project.exception.BrokerDiscountRateException;
 import com.stockify.project.exception.BrokerNameException;
 import com.stockify.project.repository.BrokerRepository;
 import lombok.AllArgsConstructor;
@@ -34,9 +34,9 @@ public class BrokerUpdateValidator {
         }
     }
 
-    public void validateDiscount(BigDecimal discount) {
-        if (discount.compareTo(BigDecimal.ZERO) < 0) {
-            throw new BrokerDiscountException();
+    public void validateDiscountRate(BigDecimal discountRate) {
+        if (discountRate.compareTo(BigDecimal.ZERO) < 0) {
+            throw new BrokerDiscountRateException();
         }
     }
 

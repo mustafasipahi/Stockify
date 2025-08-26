@@ -31,6 +31,11 @@ public class InventoryController {
         return inventoryService.getAllInventory();
     }
 
+    @GetMapping("/available")
+    public List<InventoryDto> getAvailableInventory() {
+        return inventoryService.getAvailableInventory();
+    }
+
     @GetMapping("/critical")
     public List<InventoryDto> getCriticalInventory() {
         return inventoryService.getCriticalInventory();

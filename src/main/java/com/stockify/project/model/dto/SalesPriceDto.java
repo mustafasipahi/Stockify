@@ -7,20 +7,16 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class BrokerDto {
+public class SalesPriceDto {
 
-    private Long brokerId;
-    private String firstName;
-    private String lastName;
+    private BigDecimal subtotalPrice;
+    private BigDecimal totalPrice;
+    private BigDecimal discountPrice;
     private BigDecimal discountRate;
-    private BigDecimal debtPrice;
-    private LocalDateTime createdDate;
-    private LocalDateTime lastModifiedDate;
 }

@@ -11,10 +11,8 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class BrokerUpdateRequest {
+public class DiscountUpdateRequest {
 
     private Long brokerId;
-    private String firstName;
-    private String lastName;
     private BigDecimal discountRate;
 }

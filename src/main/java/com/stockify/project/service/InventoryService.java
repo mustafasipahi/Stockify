@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.stockify.project.util.InventoryStatusUtil.getInventoryStatus;
 import static com.stockify.project.util.TenantContext.getTenantId;
@@ -68,6 +69,7 @@ public class InventoryService {
             inventoryUpdateValidator.validateCriticalProductCount(request.getCriticalProductCount());
             inventoryEntity.setCriticalProductCount(request.getCriticalProductCount());
         }
+        inventoryEntity.setStatus(getInventoryStatus(inventoryEntity.getProductCount(), inventoryEntity.getCriticalProductCount()));
         InventoryEntity updatedInventoryEntity = inventoryRepository.save(inventoryEntity);
         return inventoryConverter.toIdDto(updatedInventoryEntity);
     }
@@ -75,6 +77,14 @@ public class InventoryService {
     public List<InventoryDto> getAllInventory() {
         Specification<InventoryEntity> specification = InventorySpecification.filter();
         return inventoryRepository.findAll(specification).stream()
+                .map(inventoryConverter::toDto)
+                .toList();
+    }
+
+    public List<InventoryDto> getAvailableInventory() {
+        Specification<InventoryEntity> specification = InventorySpecification.filter();
+        return inventoryRepository.findAll(specification).stream()
+                .filter(inventoryEntity -> InventoryStatus.AVAILABLE.equals(inventoryEntity.getStatus()))
                 .map(inventoryConverter::toDto)
                 .toList();
     }
@@ -93,5 +103,18 @@ public class InventoryService {
                 .filter(inventoryEntity -> InventoryStatus.OUT_OF_STOCK.equals(inventoryEntity.getStatus()))
                 .map(inventoryConverter::toDto)
                 .toList();
+    }
+
+    @Transactional
+    public void decreaseInventory(Map<Long, Integer> productDecreaseProductCountMap, Long tenantId) {
+        for (Map.Entry<Long, Integer> entry : productDecreaseProductCountMap.entrySet()) {
+            Long productId = entry.getKey();
+            Integer decreaseProductCount = entry.getValue();
+            InventoryEntity inventoryEntity = inventoryRepository.findByProductIdAndTenantId(productId, tenantId)
+                    .orElseThrow(() -> new InventoryNotFoundException(productId));
+            Integer decreasedProductCount = inventoryEntity.getProductCount() - decreaseProductCount;
+            InventoryStatus newStatus = getInventoryStatus(decreasedProductCount, inventoryEntity.getCriticalProductCount());
+            inventoryRepository.decreaseProductCount(productId, tenantId, decreaseProductCount, newStatus);
+        }
     }
 }

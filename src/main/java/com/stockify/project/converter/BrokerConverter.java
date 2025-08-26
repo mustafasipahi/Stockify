@@ -13,7 +13,7 @@ public class BrokerConverter {
                 .brokerId(brokerEntity.getId())
                 .firstName(brokerEntity.getFirstName())
                 .lastName(brokerEntity.getLastName())
-                .discount(brokerEntity.getDiscount())
+                .discountRate(brokerEntity.getDiscountRate())
                 .debtPrice(null)
                 .createdDate(brokerEntity.getCreatedDate())
                 .lastModifiedDate(brokerEntity.getLastModifiedDate())

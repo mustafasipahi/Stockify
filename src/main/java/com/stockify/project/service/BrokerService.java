@@ -1,12 +1,14 @@
 package com.stockify.project.service;
 
 import com.stockify.project.converter.BrokerConverter;
+import com.stockify.project.exception.BrokerDiscountRateException;
 import com.stockify.project.exception.BrokerIdException;
 import com.stockify.project.exception.BrokerNotFoundException;
 import com.stockify.project.model.dto.BrokerDto;
 import com.stockify.project.model.entity.BrokerEntity;
 import com.stockify.project.model.request.BrokerCreateRequest;
 import com.stockify.project.model.request.BrokerUpdateRequest;
+import com.stockify.project.model.request.DiscountUpdateRequest;
 import com.stockify.project.repository.BrokerRepository;
 import com.stockify.project.validator.BrokerCreateValidator;
 import com.stockify.project.validator.BrokerUpdateValidator;
@@ -15,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static com.stockify.project.util.TenantContext.getTenantId;
@@ -33,7 +36,7 @@ public class BrokerService {
         BrokerEntity brokerEntity = BrokerEntity.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
-                .discount(request.getDiscount())
+                .discountRate(request.getDiscountRate())
                 .tenantId(getTenantId())
                 .build();
         BrokerEntity savedBrokerEntity = brokerRepository.save(brokerEntity);
@@ -58,12 +61,34 @@ public class BrokerService {
             brokerUpdateValidator.validateLastName(brokerEntity.getFirstName(), request.getLastName());
             brokerEntity.setLastName(request.getLastName());
         }
-        if (request.getDiscount() != null) {
-            brokerUpdateValidator.validateDiscount(request.getDiscount());
-            brokerEntity.setDiscount(request.getDiscount());
+        if (request.getDiscountRate() != null) {
+            brokerUpdateValidator.validateDiscountRate(request.getDiscountRate());
+            brokerEntity.setDiscountRate(request.getDiscountRate());
         }
         BrokerEntity updatedBrokerEntity = brokerRepository.save(brokerEntity);
         return BrokerConverter.toIdDto(updatedBrokerEntity);
+    }
+
+    public void updateDiscount(DiscountUpdateRequest request) {
+        if (request.getBrokerId() == null) {
+            throw new BrokerIdException();
+        }
+        if (request.getDiscountRate() == null) {
+            throw new BrokerDiscountRateException();
+        }
+        if (request.getDiscountRate().compareTo(BigDecimal.ZERO) < 0) {
+            throw new BrokerDiscountRateException();
+        }
+        BrokerEntity brokerEntity = brokerRepository.findByIdAndTenantId(request.getBrokerId(), getTenantId())
+                .orElseThrow(() -> new BrokerNotFoundException(request.getBrokerId()));
+        brokerEntity.setDiscountRate(request.getDiscountRate());
+        brokerRepository.save(brokerEntity);
+    }
+
+    public BrokerDto detail(Long brokerId) {
+        return brokerRepository.findByIdAndTenantId(brokerId, getTenantId())
+                .map(BrokerConverter::toDto)
+                .orElseThrow(() -> new BrokerNotFoundException(brokerId));
     }
 
     public List<BrokerDto> getAllBrokers() {

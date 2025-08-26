@@ -3,6 +3,7 @@ package com.stockify.project.controller;
 import com.stockify.project.model.dto.BrokerDto;
 import com.stockify.project.model.request.BrokerCreateRequest;
 import com.stockify.project.model.request.BrokerUpdateRequest;
+import com.stockify.project.model.request.DiscountUpdateRequest;
 import com.stockify.project.service.BrokerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,11 @@ public class BrokerController {
     @PutMapping("/update")
     public BrokerDto update(@RequestBody BrokerUpdateRequest request) {
         return brokerService.update(request);
+    }
+
+    @PutMapping("/update/discount")
+    public void updateDiscount(@RequestBody DiscountUpdateRequest request) {
+        brokerService.updateDiscount(request);
     }
 
     @GetMapping("/all")

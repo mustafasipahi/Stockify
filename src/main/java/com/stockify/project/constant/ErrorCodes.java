@@ -25,6 +25,7 @@ public class ErrorCodes {
     public static final int BROKER_DISCOUNT_REQUIRED = 1017;
     public static final int BROKER_ID_REQUIRED = 1018;
     public static final int BROKER_NOT_FOUND = 1019;
+    public static final int MULTIPLE_PRODUCT_ID = 1020;
 
     public static final int UNKNOWN_ERROR = 9999;
 }

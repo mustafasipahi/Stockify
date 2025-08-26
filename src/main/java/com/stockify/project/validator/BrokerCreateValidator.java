@@ -1,6 +1,6 @@
 package com.stockify.project.validator;
 
-import com.stockify.project.exception.BrokerDiscountException;
+import com.stockify.project.exception.BrokerDiscountRateException;
 import com.stockify.project.exception.BrokerNameException;
 import com.stockify.project.model.entity.BrokerEntity;
 import com.stockify.project.model.request.BrokerCreateRequest;
@@ -22,7 +22,7 @@ public class BrokerCreateValidator {
 
     public void validate(BrokerCreateRequest request) {
         validateName(request);
-        validateDiscount(request.getDiscount());
+        validateDiscountRate(request.getDiscountRate());
     }
 
     private void validateName(BrokerCreateRequest request) {
@@ -41,12 +41,12 @@ public class BrokerCreateValidator {
         }
     }
 
-    private void validateDiscount(BigDecimal discount) {
-        if (discount == null) {
+    private void validateDiscountRate(BigDecimal discountRate) {
+        if (discountRate == null) {
             return;
         }
-        if (discount.compareTo(BigDecimal.ZERO) < 0) {
-            throw new BrokerDiscountException();
+        if (discountRate.compareTo(BigDecimal.ZERO) < 0) {
+            throw new BrokerDiscountRateException();
         }
     }
 }

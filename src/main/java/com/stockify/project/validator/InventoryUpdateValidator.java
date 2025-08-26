@@ -19,13 +19,13 @@ public class InventoryUpdateValidator {
     }
 
     public void validateProductCount(Integer productCount) {
-        if (productCount <= 0) {
+        if (productCount < 0) {
             throw new InventoryCountException();
         }
     }
 
     public void validateCriticalProductCount(Integer criticalProductCount) {
-        if (criticalProductCount <= 0) {
+        if (criticalProductCount < 0) {
             throw new InventoryCriticalCountException();
         }
     }

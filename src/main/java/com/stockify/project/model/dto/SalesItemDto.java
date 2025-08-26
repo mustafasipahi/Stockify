@@ -14,13 +14,13 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class BrokerDto {
+public class SalesItemDto {
 
-    private Long brokerId;
-    private String firstName;
-    private String lastName;
-    private BigDecimal discountRate;
-    private BigDecimal debtPrice;
+    private Long id;
+    private Long salesId;
+    private Long productId;
+    private BigDecimal unitPrice;
+    private BigDecimal totalPrice;
+    private Integer productCount;
     private LocalDateTime createdDate;
-    private LocalDateTime lastModifiedDate;
 }
