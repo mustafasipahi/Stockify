@@ -10,7 +10,7 @@ spring:
   jpa:
     database: mysql
     hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:create}
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:none}
   sql:
     init:
       platform: mysql

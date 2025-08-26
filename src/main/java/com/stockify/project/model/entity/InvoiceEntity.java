@@ -2,7 +2,6 @@ package com.stockify.project.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.envers.Audited;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
@@ -12,7 +11,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @AllArgsConstructor
 @Builder
 @Entity
-@Audited
 @Table(name = "invoice")
 @EntityListeners(AuditingEntityListener.class)
 public class InvoiceEntity {
