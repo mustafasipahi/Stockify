@@ -19,7 +19,7 @@ public class SalesController {
     private final SalesService salesService;
 
     @PostMapping("/calculate")
-    public SalesResponse salesCalculate(SalesRequest request) {
+    public SalesResponse salesCalculate(@RequestBody SalesRequest request) {
         return salesService.salesCalculate(request);
     }
 

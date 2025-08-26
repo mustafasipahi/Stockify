@@ -97,7 +97,7 @@ public class SalesPersistenceService {
             if (availableProduct == null) {
                 throw new ProductNotFoundException(requestedProduct.getProductId());
             }
-            if (requestedProduct.getProductCount() == null || requestedProduct.getProductCount() < 0) {
+            if (requestedProduct.getProductCount() == null || requestedProduct.getProductCount() <= 0) {
                 throw new InventoryCountException();
             }
             if (availableProduct.getProductCount() < requestedProduct.getProductCount()) {

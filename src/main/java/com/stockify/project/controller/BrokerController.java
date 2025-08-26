@@ -27,7 +27,7 @@ public class BrokerController {
         return brokerService.update(request);
     }
 
-    @PutMapping("/update/discount")
+    @PutMapping("/update/discount-rate")
     public void updateDiscount(@RequestBody DiscountUpdateRequest request) {
         brokerService.updateDiscount(request);
     }

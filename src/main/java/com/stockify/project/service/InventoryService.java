@@ -20,6 +20,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -38,10 +39,10 @@ public class InventoryService {
 
     @Transactional
     @Caching(evict = {
-            @CacheEvict(value = INVENTORY_ALL),
-            @CacheEvict(value = INVENTORY_AVAILABLE),
-            @CacheEvict(value = INVENTORY_CRITICAL),
-            @CacheEvict(value = INVENTORY_OUT_OF)
+            @CacheEvict(value = INVENTORY_ALL, allEntries = true),
+            @CacheEvict(value = INVENTORY_AVAILABLE, allEntries = true),
+            @CacheEvict(value = INVENTORY_CRITICAL, allEntries = true),
+            @CacheEvict(value = INVENTORY_OUT_OF, allEntries = true)
     })
     public InventoryDto save(InventoryCreateRequest request) {
         inventoryCreateValidator.validate(request);
@@ -59,10 +60,10 @@ public class InventoryService {
 
     @Transactional
     @Caching(evict = {
-            @CacheEvict(value = INVENTORY_ALL),
-            @CacheEvict(value = INVENTORY_AVAILABLE),
-            @CacheEvict(value = INVENTORY_CRITICAL),
-            @CacheEvict(value = INVENTORY_OUT_OF)
+            @CacheEvict(value = INVENTORY_ALL, allEntries = true),
+            @CacheEvict(value = INVENTORY_AVAILABLE, allEntries = true),
+            @CacheEvict(value = INVENTORY_CRITICAL, allEntries = true),
+            @CacheEvict(value = INVENTORY_OUT_OF, allEntries = true)
     })
     public InventoryDto update(InventoryUpdateRequest request) {
         if (request.getInventoryId() == null) {
@@ -89,7 +90,7 @@ public class InventoryService {
 
     @Cacheable(value = INVENTORY_ALL)
     public List<InventoryDto> getAllInventory() {
-        Specification<InventoryEntity> specification = InventorySpecification.filter(null);
+        Specification<InventoryEntity> specification = InventorySpecification.filter(Collections.emptyList());
         return inventoryRepository.findAll(specification).stream()
                 .map(inventoryConverter::toDto)
                 .toList();
@@ -97,7 +98,7 @@ public class InventoryService {
 
     @Cacheable(value = INVENTORY_AVAILABLE)
     public List<InventoryDto> getAvailableInventory() {
-        Specification<InventoryEntity> specification = InventorySpecification.filter(InventoryStatus.AVAILABLE);
+        Specification<InventoryEntity> specification = InventorySpecification.filter(List.of(InventoryStatus.AVAILABLE, InventoryStatus.CRITICAL));
         return inventoryRepository.findAll(specification).stream()
                 .map(inventoryConverter::toDto)
                 .toList();
@@ -105,7 +106,7 @@ public class InventoryService {
 
     @Cacheable(value = INVENTORY_CRITICAL)
     public List<InventoryDto> getCriticalInventory() {
-        Specification<InventoryEntity> specification = InventorySpecification.filter(InventoryStatus.CRITICAL);
+        Specification<InventoryEntity> specification = InventorySpecification.filter(List.of(InventoryStatus.CRITICAL));
         return inventoryRepository.findAll(specification).stream()
                 .map(inventoryConverter::toDto)
                 .toList();
@@ -113,7 +114,7 @@ public class InventoryService {
 
     @Cacheable(value = INVENTORY_OUT_OF)
     public List<InventoryDto> getOutOfInventory() {
-        Specification<InventoryEntity> specification = InventorySpecification.filter(InventoryStatus.OUT_OF_INVENTORY);
+        Specification<InventoryEntity> specification = InventorySpecification.filter(List.of(InventoryStatus.OUT_OF_INVENTORY));
         return inventoryRepository.findAll(specification).stream()
                 .map(inventoryConverter::toDto)
                 .toList();
@@ -121,10 +122,10 @@ public class InventoryService {
 
     @Transactional
     @Caching(evict = {
-            @CacheEvict(value = INVENTORY_ALL),
-            @CacheEvict(value = INVENTORY_AVAILABLE),
-            @CacheEvict(value = INVENTORY_CRITICAL),
-            @CacheEvict(value = INVENTORY_OUT_OF)
+            @CacheEvict(value = INVENTORY_ALL, allEntries = true),
+            @CacheEvict(value = INVENTORY_AVAILABLE, allEntries = true),
+            @CacheEvict(value = INVENTORY_CRITICAL, allEntries = true),
+            @CacheEvict(value = INVENTORY_OUT_OF, allEntries = true)
     })
     public void decreaseInventory(Map<Long, Integer> productDecreaseProductCountMap, Long tenantId) {
         for (Map.Entry<Long, Integer> entry : productDecreaseProductCountMap.entrySet()) {

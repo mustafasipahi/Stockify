@@ -40,7 +40,7 @@ public class InventoryCreateValidator {
         if (request.getProductCount() == null) {
             throw new InventoryCountException();
         }
-        if (request.getProductCount() <= 0) {
+        if (request.getProductCount() < 0) {
             throw new InventoryCountException();
         }
     }
@@ -49,7 +49,7 @@ public class InventoryCreateValidator {
         if (request.getCriticalProductCount() == null) {
             return;
         }
-        if (request.getProductCount() <= 0) {
+        if (request.getCriticalProductCount() < 0) {
             throw new InventoryCriticalCountException();
         }
     }
