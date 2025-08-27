@@ -47,7 +47,9 @@ services:
     expose:
       - 6379
 
-#  docker exec -it stockify-app-redis redis-cli FLUSHALL
+# docker exec -i stockify-app-mysql mysqldump -u root -p --no-create-info --skip-add-locks --skip-disable-keys --skip-lock-tables --compact stockify_app > src/main/java/com/stockify/project/initialization/dump.sql
+
+# docker exec -it stockify-app-redis redis-cli FLUSHALL
 
 # docker build -t stockify-app -f Dockerfile .
 # docker ps
