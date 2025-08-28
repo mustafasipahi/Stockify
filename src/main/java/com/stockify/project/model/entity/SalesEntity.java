@@ -31,6 +31,10 @@ public class SalesEntity {
 
     @NotNull
     @Column(nullable = false)
+    private BigDecimal totalPriceWithTax;
+
+    @NotNull
+    @Column(nullable = false)
     private BigDecimal subtotalPrice;
 
     @NotNull

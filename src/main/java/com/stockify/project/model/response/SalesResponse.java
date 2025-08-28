@@ -20,6 +20,7 @@ public class SalesResponse {
 
     private Long salesId;
     private List<SalesItemDto> salesItems;
+    private BigDecimal totalPriceWithTax;
     private BigDecimal subtotalPrice;
     private BigDecimal totalPrice;
     private BigDecimal discountPrice;

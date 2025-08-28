@@ -118,8 +118,8 @@ public class SalesPersistenceService {
             BigDecimal unitPrice = availableProduct.getPrice();
             BigDecimal totalPrice = unitPrice.multiply(BigDecimal.valueOf(requestedProduct.getProductCount()));
             BigDecimal taxRate = availableProduct.getTaxRate();
-            BigDecimal taxAmount = totalPrice.multiply(taxRate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-            BigDecimal totalPriceWithTax = totalPrice.add(taxAmount);
+            BigDecimal taxPrice = totalPrice.multiply(taxRate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+            BigDecimal totalPriceWithTax = totalPrice.add(taxPrice);
 
             SalesItemEntity salesItem = SalesItemEntity.builder()
                     .productId(requestedProduct.getProductId())
@@ -128,7 +128,7 @@ public class SalesPersistenceService {
                     .totalPriceWithTax(totalPriceWithTax)
                     .productCount(requestedProduct.getProductCount())
                     .taxRate(taxRate)
-                    .taxAmount(taxAmount)
+                    .taxPrice(taxPrice)
                     .tenantId(tenantId)
                     .build();
             salesItems.add(salesItem);
@@ -145,7 +145,7 @@ public class SalesPersistenceService {
                 .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_DOWN);
 
         BigDecimal totalPriceAfterDiscount = subtotalPrice.subtract(discountPrice);
-        BigDecimal totalTaxAmount = salesItems.stream()
+        BigDecimal totalTaxPrice = salesItems.stream()
                 .map(item -> {
                     BigDecimal itemPriceAfterDiscount = item.getTotalPrice()
                             .subtract(item.getTotalPrice().multiply(discountRate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_DOWN));
@@ -155,12 +155,12 @@ public class SalesPersistenceService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return SalesPriceDto.builder()
+                .totalPriceWithTax(totalPriceAfterDiscount.add(totalTaxPrice))
                 .subtotalPrice(subtotalPrice)
                 .discountRate(discountRate)
                 .discountPrice(discountPrice)
                 .totalPrice(totalPriceAfterDiscount)
-                .totalTaxAmount(totalTaxAmount)
-                .totalPriceWithTax(totalPriceAfterDiscount.add(totalTaxAmount))
+                .totalTaxPrice(totalTaxPrice)
                 .build();
     }
 

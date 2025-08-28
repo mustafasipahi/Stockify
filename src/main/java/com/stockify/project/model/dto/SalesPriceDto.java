@@ -15,10 +15,10 @@ import java.math.BigDecimal;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SalesPriceDto {
 
+    private BigDecimal totalPriceWithTax;
     private BigDecimal subtotalPrice;
     private BigDecimal discountRate;
     private BigDecimal discountPrice;
     private BigDecimal totalPrice;
-    private BigDecimal totalTaxAmount;
-    private BigDecimal totalPriceWithTax;
+    private BigDecimal totalTaxPrice;
 }

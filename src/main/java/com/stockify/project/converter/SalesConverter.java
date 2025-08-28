@@ -27,6 +27,7 @@ public class SalesConverter {
     public static SalesEntity toEntity(Long brokerId, SalesPriceDto salesPriceDto) {
         return SalesEntity.builder()
                 .brokerId(brokerId)
+                .totalPriceWithTax(salesPriceDto.getTotalPriceWithTax())
                 .subtotalPrice(salesPriceDto.getSubtotalPrice())
                 .discountRate(salesPriceDto.getDiscountRate())
                 .discountPrice(salesPriceDto.getDiscountPrice())
@@ -39,6 +40,7 @@ public class SalesConverter {
         return SalesResponse.builder()
                 .salesId(salesEntity.getId())
                 .salesItems(SalesItemConverter.toDto(salesItems))
+                .totalPriceWithTax(salesEntity.getTotalPriceWithTax())
                 .subtotalPrice(salesEntity.getSubtotalPrice())
                 .totalPrice(salesEntity.getTotalPrice())
                 .discountPrice(salesEntity.getDiscountPrice())

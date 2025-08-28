@@ -54,7 +54,7 @@ public class SalesItemEntity {
 
     @NotNull
     @Column(nullable = false)
-    private BigDecimal taxAmount;
+    private BigDecimal taxPrice;
 
     @NotNull
     @Column(nullable = false)
