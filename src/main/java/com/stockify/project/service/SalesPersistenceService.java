@@ -180,8 +180,8 @@ public class SalesPersistenceService {
         inventoryService.decreaseInventory(productDecreaseProductCountMap, tenantId);
     }
 
-    private void updateBrokerDebt(Long brokerId, BigDecimal totalPrice, Long tenantId) {
-        brokerService.increaseDebtPrice(brokerId, totalPrice, tenantId);
+    private void updateBrokerDebt(Long brokerId, BigDecimal price, Long tenantId) {
+        brokerService.increaseDebtPrice(brokerId, price, tenantId);
     }
 
     private InvoiceEntity createInvoice(boolean createInvoice, SalesEntity salesEntity, List<SalesItemEntity> salesItems) {
