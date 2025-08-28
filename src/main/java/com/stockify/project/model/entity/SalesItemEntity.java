@@ -46,6 +46,14 @@ public class SalesItemEntity {
 
     @NotNull
     @Column(nullable = false)
+    private BigDecimal taxRate;
+
+    @NotNull
+    @Column(nullable = false)
+    private BigDecimal taxAmount;
+
+    @NotNull
+    @Column(nullable = false)
     private Long tenantId;
 
     @CreatedDate

@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -24,7 +25,7 @@ public class ProductDto implements Serializable {
     private Long productId;
     private Long categoryId;
     private String categoryName;
-    private Double taxRate;
+    private BigDecimal taxRate;
     private String inventoryCode;
     private String name;
     private ProductStatus status;

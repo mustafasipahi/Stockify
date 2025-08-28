@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -22,6 +23,6 @@ public class CategoryDto implements Serializable {
 
     private Long categoryId;
     private String name;
-    private Double taxRate;
+    private BigDecimal taxRate;
     private LocalDateTime createdDate;
 }

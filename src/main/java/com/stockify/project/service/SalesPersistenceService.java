@@ -79,6 +79,7 @@ public class SalesPersistenceService {
                         .productName(inventory.getProduct().getName())
                         .productCount(inventory.getProductCount())
                         .price(inventory.getPrice())
+                        .taxRate(inventory.getProduct().getTaxRate())
                         .build())
                 .toList();
     }

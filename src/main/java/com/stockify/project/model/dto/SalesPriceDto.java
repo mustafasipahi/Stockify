@@ -16,7 +16,9 @@ import java.math.BigDecimal;
 public class SalesPriceDto {
 
     private BigDecimal subtotalPrice;
-    private BigDecimal totalPrice;
-    private BigDecimal discountPrice;
     private BigDecimal discountRate;
+    private BigDecimal discountPrice;
+    private BigDecimal totalPrice;
+    private BigDecimal totalTaxAmount;
+    private BigDecimal totalPriceWithTax;
 }
