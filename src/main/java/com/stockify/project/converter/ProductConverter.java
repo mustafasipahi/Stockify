@@ -19,7 +19,7 @@ public class ProductConverter {
                 .productId(productEntity.getId())
                 .categoryId(productEntity.getCategoryId())
                 .categoryName(category.getName())
-                .kdv(category.getKdv())
+                .taxRate(category.getTaxRate())
                 .inventoryCode(productEntity.getInventoryCode())
                 .name(productEntity.getName())
                 .status(productEntity.getStatus())

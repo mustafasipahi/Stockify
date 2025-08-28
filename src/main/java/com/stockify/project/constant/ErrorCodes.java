@@ -16,7 +16,7 @@ public class ErrorCodes {
     public static final int CATEGORY_NAME_ALREADY_USED = 1008;
     public static final int CATEGORY_ID_REQUIRED = 1009;
     public static final int CATEGORY_NOT_FOUND = 1010;
-    public static final int KDV_REQUIRED = 1011;
+    public static final int TAX_RATE_REQUIRED = 1011;
     public static final int INVENTORY_COUNT_REQUIRED = 1012;
     public static final int INVENTORY_ID_REQUIRED = 1013;
     public static final int INVENTORY_NOT_FOUND = 1014;

@@ -1,6 +1,7 @@
 package com.stockify.project.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.stockify.project.enums.BrokerStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,8 +25,9 @@ public class BrokerDto implements Serializable {
     private Long brokerId;
     private String firstName;
     private String lastName;
-    private BigDecimal discountRate;
     private BigDecimal debtPrice;
+    private BigDecimal discountRate;
+    private BrokerStatus status;
     private LocalDateTime createdDate;
     private LocalDateTime lastModifiedDate;
 }

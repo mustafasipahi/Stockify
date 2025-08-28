@@ -12,5 +12,5 @@ import lombok.*;
 public class CategoryCreateRequest {
 
     private String name;
-    private Double kdv;
+    private Double taxRate;
 }

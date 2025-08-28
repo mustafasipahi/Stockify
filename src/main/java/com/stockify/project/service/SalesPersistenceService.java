@@ -1,6 +1,8 @@
 package com.stockify.project.service;
 
 import com.stockify.project.converter.SalesConverter;
+import com.stockify.project.enums.BrokerStatus;
+import com.stockify.project.exception.BrokerNotFoundException;
 import com.stockify.project.exception.InsufficientInventoryException;
 import com.stockify.project.exception.InventoryCountException;
 import com.stockify.project.exception.ProductNotFoundException;
@@ -54,6 +56,7 @@ public class SalesPersistenceService {
         SalesEntity savedSalesEntity = salesRepository.save(prepareDto.getSalesEntity());
         saveSalesItemEntity(prepareDto.getSalesItems(), savedSalesEntity.getId(), tenantId);
         decreaseProductInventory(prepareDto.getSalesItems(), tenantId);
+        updateBrokerDebt(request.getBrokerId(), savedSalesEntity.getTotalPrice(), tenantId);
         InvoiceEntity invoiceEntity = createInvoice(request.isCreateInvoice(), savedSalesEntity, prepareDto.getSalesItems());
         return SalesConverter.toResponse(savedSalesEntity, prepareDto.getSalesItems(), invoiceEntity);
     }
@@ -82,6 +85,9 @@ public class SalesPersistenceService {
 
     private BigDecimal getDiscountRate(Long brokerId) {
         BrokerDto broker = brokerService.detail(brokerId);
+        if (broker.getStatus() != BrokerStatus.ACTIVE) {
+            throw new BrokerNotFoundException(brokerId);
+        }
         return Optional.ofNullable(broker.getDiscountRate())
                 .orElse(BigDecimal.ZERO);
     }
@@ -145,6 +151,10 @@ public class SalesPersistenceService {
         Map<Long, Integer> productDecreaseProductCountMap = salesItems.stream()
                 .collect(Collectors.toMap(SalesItemEntity::getProductId, SalesItemEntity::getProductCount));
         inventoryService.decreaseInventory(productDecreaseProductCountMap, tenantId);
+    }
+
+    private void updateBrokerDebt(Long brokerId, BigDecimal totalPrice, Long tenantId) {
+        brokerService.increaseDebtPrice(brokerId, totalPrice, tenantId);
     }
 
     private InvoiceEntity createInvoice(boolean createInvoice, SalesEntity salesEntity, List<SalesItemEntity> salesItems) {

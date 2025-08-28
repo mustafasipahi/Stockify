@@ -29,7 +29,7 @@ public class BrokerController {
 
     @PutMapping("/update/discount-rate")
     public void updateDiscount(@RequestBody DiscountUpdateRequest request) {
-        brokerService.updateDiscount(request);
+        brokerService.updateDiscountRate(request);
     }
 
     @DeleteMapping("/delete/{id}")

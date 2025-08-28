@@ -29,7 +29,7 @@ public class CategoryEntity {
 
     @NotNull
     @Column(nullable = false)
-    private Double kdv;
+    private Double taxRate;
 
     @NotNull
     @Column(nullable = false)

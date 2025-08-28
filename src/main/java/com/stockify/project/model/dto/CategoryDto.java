@@ -22,6 +22,6 @@ public class CategoryDto implements Serializable {
 
     private Long categoryId;
     private String name;
-    private Double kdv;
+    private Double taxRate;
     private LocalDateTime createdDate;
 }

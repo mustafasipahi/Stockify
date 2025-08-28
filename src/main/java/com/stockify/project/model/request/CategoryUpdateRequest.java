@@ -13,5 +13,5 @@ public class CategoryUpdateRequest {
 
     private Long categoryId;
     private String name;
-    private Double kdv;
+    private Double taxRate;
 }

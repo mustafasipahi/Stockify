@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import static com.stockify.project.constant.CacheConstants.BROKER_DETAIL;
 import static com.stockify.project.util.TenantContext.getTenantId;
@@ -40,7 +41,9 @@ public class BrokerService {
         BrokerEntity brokerEntity = BrokerEntity.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
-                .discountRate(request.getDiscountRate())
+                .debtPrice(BigDecimal.ZERO)
+                .discountRate(Optional.ofNullable(request.getDiscountRate())
+                        .orElse(BigDecimal.ZERO))
                 .status(BrokerStatus.ACTIVE)
                 .tenantId(getTenantId())
                 .build();
@@ -76,8 +79,28 @@ public class BrokerService {
     }
 
     @Transactional
+    @CacheEvict(value = BROKER_DETAIL, key = "#brokerId")
+    public void increaseDebtPrice(Long brokerId, BigDecimal newDebtPrice, Long tenantId) {
+        BrokerEntity brokerEntity = brokerRepository.findByIdAndTenantId(brokerId, tenantId)
+                .orElseThrow(() -> new BrokerNotFoundException(brokerId));
+        BigDecimal oldDebtPrice = brokerEntity.getDebtPrice();
+        brokerEntity.setDebtPrice(oldDebtPrice.multiply(newDebtPrice));
+        brokerRepository.save(brokerEntity);
+    }
+
+    @Transactional
+    @CacheEvict(value = BROKER_DETAIL, key = "#brokerId")
+    public void decreaseDebtPrice(Long brokerId, BigDecimal newDebtPrice, Long tenantId) {
+        BrokerEntity brokerEntity = brokerRepository.findByIdAndTenantId(brokerId, tenantId)
+                .orElseThrow(() -> new BrokerNotFoundException(brokerId));
+        BigDecimal oldDebtPrice = brokerEntity.getDebtPrice();
+        brokerEntity.setDebtPrice(oldDebtPrice.subtract(newDebtPrice));
+        brokerRepository.save(brokerEntity);
+    }
+
+    @Transactional
     @CacheEvict(value = BROKER_DETAIL, key = "#request.brokerId")
-    public void updateDiscount(DiscountUpdateRequest request) {
+    public void updateDiscountRate(DiscountUpdateRequest request) {
         if (request.getBrokerId() == null) {
             throw new BrokerIdException();
         }
