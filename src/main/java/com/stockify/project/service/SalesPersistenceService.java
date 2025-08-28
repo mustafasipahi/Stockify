@@ -99,6 +99,7 @@ public class SalesPersistenceService {
         Map<Long, SalesProductDto> productMap = availableProducts.stream()
                 .collect(Collectors.toMap(SalesProductDto::getProductId, Function.identity()));
         List<SalesItemEntity> salesItems = new ArrayList<>();
+
         for (SalesProductRequest requestedProduct : requestedProducts) {
             SalesProductDto availableProduct = productMap.get(requestedProduct.getProductId());
             if (availableProduct == null) {
@@ -113,11 +114,21 @@ public class SalesPersistenceService {
                         availableProduct.getProductCount(),
                         requestedProduct.getProductCount());
             }
+
+            BigDecimal unitPrice = availableProduct.getPrice();
+            BigDecimal totalPrice = unitPrice.multiply(BigDecimal.valueOf(requestedProduct.getProductCount()));
+            BigDecimal taxRate = availableProduct.getTaxRate();
+            BigDecimal taxAmount = totalPrice.multiply(taxRate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+            BigDecimal totalPriceWithTax = totalPrice.add(taxAmount);
+
             SalesItemEntity salesItem = SalesItemEntity.builder()
                     .productId(requestedProduct.getProductId())
-                    .unitPrice(availableProduct.getPrice())
-                    .totalPrice(availableProduct.getPrice().multiply(BigDecimal.valueOf(requestedProduct.getProductCount())))
+                    .unitPrice(unitPrice)
+                    .totalPrice(totalPrice)
+                    .totalPriceWithTax(totalPriceWithTax)
                     .productCount(requestedProduct.getProductCount())
+                    .taxRate(taxRate)
+                    .taxAmount(taxAmount)
                     .tenantId(tenantId)
                     .build();
             salesItems.add(salesItem);
@@ -129,12 +140,27 @@ public class SalesPersistenceService {
         BigDecimal subtotalPrice = salesItems.stream()
                 .map(SalesItemEntity::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal discountPrice = subtotalPrice.multiply(discountRate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_DOWN);
+
+        BigDecimal discountPrice = subtotalPrice.multiply(discountRate)
+                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_DOWN);
+
+        BigDecimal totalPriceAfterDiscount = subtotalPrice.subtract(discountPrice);
+        BigDecimal totalTaxAmount = salesItems.stream()
+                .map(item -> {
+                    BigDecimal itemPriceAfterDiscount = item.getTotalPrice()
+                            .subtract(item.getTotalPrice().multiply(discountRate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_DOWN));
+                    return itemPriceAfterDiscount.multiply(item.getTaxRate())
+                            .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         return SalesPriceDto.builder()
                 .subtotalPrice(subtotalPrice)
                 .discountRate(discountRate)
                 .discountPrice(discountPrice)
-                .totalPrice(subtotalPrice.subtract(discountPrice))
+                .totalPrice(totalPriceAfterDiscount)
+                .totalTaxAmount(totalTaxAmount)
+                .totalPriceWithTax(totalPriceAfterDiscount.add(totalTaxAmount))
                 .build();
     }
 
