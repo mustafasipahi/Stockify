@@ -40,6 +40,7 @@ public class PaymentEntity {
 
     @NotNull
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private PaymentType type;
 
     @NotNull

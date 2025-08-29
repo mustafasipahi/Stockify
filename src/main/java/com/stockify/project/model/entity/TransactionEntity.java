@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "sales_items")
+@Table(name = "transaction")
 @EntityListeners(AuditingEntityListener.class)
 public class TransactionEntity {
 
@@ -29,12 +29,10 @@ public class TransactionEntity {
     @Column(nullable = false)
     private Long brokerId;
 
-    @NotNull
-    @Column(nullable = false)
+    @Column
     private Long salesId;
 
-    @NotNull
-    @Column(nullable = false)
+    @Column
     private Long paymentId;
 
     @NotNull
