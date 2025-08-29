@@ -22,7 +22,7 @@ spring:
 
 app:
   database:
-    initialize: true
+    initialize: false
 
 redis-config:
   host: ${REDIS_HOST:localhost}
