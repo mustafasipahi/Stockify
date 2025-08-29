@@ -1,5 +1,6 @@
 package com.stockify.project.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,5 +25,6 @@ public class CategoryDto implements Serializable {
     private Long categoryId;
     private String name;
     private BigDecimal taxRate;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdDate;
 }

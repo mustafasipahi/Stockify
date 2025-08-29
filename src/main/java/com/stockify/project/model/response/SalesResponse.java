@@ -1,5 +1,6 @@
 package com.stockify.project.model.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.stockify.project.model.dto.SalesItemDto;
 import lombok.AllArgsConstructor;
@@ -25,6 +26,7 @@ public class SalesResponse {
     private BigDecimal totalPrice;
     private BigDecimal discountPrice;
     private BigDecimal discountRate;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdDate;
     private Long invoiceId;
 }

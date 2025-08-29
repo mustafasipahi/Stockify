@@ -1,5 +1,6 @@
 package com.stockify.project.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.stockify.project.enums.ProductStatus;
 import lombok.AllArgsConstructor;
@@ -29,6 +30,8 @@ public class ProductDto implements Serializable {
     private String inventoryCode;
     private String name;
     private ProductStatus status;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdDate;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastModifiedDate;
 }

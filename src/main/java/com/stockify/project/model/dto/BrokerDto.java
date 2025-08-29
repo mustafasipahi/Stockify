@@ -1,5 +1,6 @@
 package com.stockify.project.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.stockify.project.enums.BrokerStatus;
 import lombok.AllArgsConstructor;
@@ -28,6 +29,8 @@ public class BrokerDto implements Serializable {
     private BigDecimal currentBalance;
     private BigDecimal discountRate;
     private BrokerStatus status;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdDate;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastModifiedDate;
 }
