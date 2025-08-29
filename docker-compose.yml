@@ -5,16 +5,21 @@ services:
     container_name: stockify-app
     image: stockify-app:1
     restart: always
-    build: ./
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        BUILDKIT_INLINE_CACHE: 1
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://stockify-app-mysql:3306/stockify_app?autoReconnect=true&useSSL=false&createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://stockify-app-mysql:3306/stockify_app?autoReconnect=true&useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
       SPRING_JPA_HIBERNATE_DDL_AUTO: none
       REDIS_HOST: stockify-app-redis
       REDIS_PORT: 6379
+      JAVA_OPTS: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
     depends_on:
       stockify-app-mysql:
         condition: service_healthy
@@ -27,24 +32,28 @@ services:
     restart: always
     platform: linux/x86_64
     environment:
-      MYSQL_URL: jdbc:mysql://stockify-app-mysql:3306/stockify_app?autoReconnect=true&useSSL=false&createDatabaseIfNotExist=true
-      MYSQL_PASSWORD: root
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: stockify_app
+      MYSQL_USER: stockify
+      MYSQL_PASSWORD: stockify
     ports:
       - "3306:3306"
     expose:
       - 3306
     command: [
       "--character-set-server=utf8mb4",
-      "--collation-server=utf8mb4_turkish_ci"
+      "--collation-server=utf8mb4_turkish_ci",
+      "--innodb_use_native_aio=0",
+      "--explicit_defaults_for_timestamp=1"
     ]
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
-      timeout: 20s
-      retries: 10
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot", "--silent"]
+      timeout: 10s
+      retries: 15
       interval: 10s
-      start_period: 40s
+      start_period: 60s
+    volumes:
+      - mysql_data:/var/lib/mysql
 
   stockify-app-redis:
     container_name: stockify-app-redis
@@ -60,6 +69,12 @@ services:
       retries: 5
       interval: 5s
       start_period: 10s
+    volumes:
+      - redis_data:/data
+
+volumes:
+  mysql_data:
+  redis_data:
 
 # docker exec -i stockify-app-mysql mysqldump -u root -p --no-create-info --skip-add-locks --skip-disable-keys --skip-lock-tables --compact stockify_app > src/main/java/com/stockify/project/initialization/dump.sql
 
