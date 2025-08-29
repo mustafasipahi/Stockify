@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 services:
 
   stockify-app:
@@ -16,8 +16,10 @@ services:
       REDIS_HOST: stockify-app-redis
       REDIS_PORT: 6379
     depends_on:
-      - stockify-app-mysql
-      - stockify-app-redis
+      stockify-app-mysql:
+        condition: service_healthy
+      stockify-app-redis:
+        condition: service_healthy
 
   stockify-app-mysql:
     container_name: stockify-app-mysql
@@ -37,6 +39,12 @@ services:
       "--character-set-server=utf8mb4",
       "--collation-server=utf8mb4_turkish_ci"
     ]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      timeout: 20s
+      retries: 10
+      interval: 10s
+      start_period: 40s
 
   stockify-app-redis:
     container_name: stockify-app-redis
@@ -46,6 +54,12 @@ services:
       - '6379:6379'
     expose:
       - 6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 3s
+      retries: 5
+      interval: 5s
+      start_period: 10s
 
 # docker exec -i stockify-app-mysql mysqldump -u root -p --no-create-info --skip-add-locks --skip-disable-keys --skip-lock-tables --compact stockify_app > src/main/java/com/stockify/project/initialization/dump.sql
 
