@@ -2,7 +2,7 @@ package com.stockify.project.controller;
 
 import com.stockify.project.model.dto.ProductDto;
 import com.stockify.project.model.request.ProductCreateRequest;
-import com.stockify.project.model.request.ProductGetAllRequest;
+import com.stockify.project.model.request.ProductSearchRequest;
 import com.stockify.project.model.request.ProductUpdateRequest;
 import com.stockify.project.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ public class ProductController {
     }
 
     @GetMapping("/all")
-    public List<ProductDto> getAll(@ModelAttribute ProductGetAllRequest request) {
+    public List<ProductDto> getAll(@ModelAttribute ProductSearchRequest request) {
         return productService.getAll(request);
     }
 }

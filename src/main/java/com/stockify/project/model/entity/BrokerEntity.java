@@ -34,10 +34,6 @@ public class BrokerEntity {
     @Column(nullable = false)
     private String lastName;
 
-    @NotNull
-    @Column(nullable = false)
-    private BigDecimal debtPrice;
-
     @Column
     private BigDecimal discountRate;
 

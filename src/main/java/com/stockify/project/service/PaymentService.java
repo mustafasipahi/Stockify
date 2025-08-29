@@ -13,8 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
+import java.util.Optional;
 
+import static com.stockify.project.constant.DocumentNumberConstants.PAYMENT_DEFAULT;
+import static com.stockify.project.constant.DocumentNumberConstants.PAYMENT_PREFIX;
 import static com.stockify.project.util.TenantContext.getTenantId;
 
 @Service
@@ -23,21 +25,19 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final BrokerService brokerService;
+    private final TransactionService transactionService;
 
     @Transactional
     public PaymentResponse save(PaymentCreateRequest request) {
         PaymentCreateValidator.validate(request);
         BrokerDto broker = getBroker(request.getBrokerId());
         Long tenantId = getTenantId();
-        PaymentEntity paymentEntity = PaymentEntity.builder()
-                .brokerId(request.getBrokerId())
-                .price(request.getPaymentPrice())
-                .type(request.getPaymentType())
-                .tenantId(tenantId)
-                .build();
-        paymentRepository.save(paymentEntity);
-        updateBrokerDebt(request.getBrokerId(), request.getPaymentPrice(), tenantId);
-        return PaymentConverter.toResponse(request, broker);
+        String documentNumber = getDocumentNumber();
+        PaymentEntity paymentEntity = PaymentConverter.toEntity(request, documentNumber, tenantId);
+        PaymentEntity savedPaymentEntity = paymentRepository.save(paymentEntity);
+        evictBrokerCache(savedPaymentEntity.getBrokerId());
+        saveTransaction(savedPaymentEntity);
+        return PaymentConverter.toResponse(savedPaymentEntity, broker);
     }
 
     private BrokerDto getBroker(Long brokerId) {
@@ -48,7 +48,17 @@ public class PaymentService {
         return broker;
     }
 
-    private void updateBrokerDebt(Long brokerId, BigDecimal price, Long tenantId) {
-        brokerService.decreaseDebtPrice(brokerId, price, tenantId);
+    private String getDocumentNumber() {
+        return Optional.ofNullable(paymentRepository.findMaxDocumentNumberNumeric())
+                .map(lastDocumentNumber -> PAYMENT_PREFIX + (lastDocumentNumber + 1))
+                .orElse(PAYMENT_PREFIX + PAYMENT_DEFAULT);
+    }
+
+    private void evictBrokerCache(Long brokerId) {
+        brokerService.evictBrokerCache(brokerId);
+    }
+
+    private void saveTransaction(PaymentEntity savedPaymentEntity) {
+        transactionService.createPaymentTransaction(savedPaymentEntity);
     }
 }

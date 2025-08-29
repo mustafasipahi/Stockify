@@ -1,11 +1,10 @@
 package com.stockify.project.model.entity;
 
-import com.stockify.project.enums.PaymentType;
+import com.stockify.project.enums.TransactionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
@@ -18,9 +17,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "payment")
+@Table(name = "sales_items")
 @EntityListeners(AuditingEntityListener.class)
-public class PaymentEntity {
+public class TransactionEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,6 +31,14 @@ public class PaymentEntity {
 
     @NotNull
     @Column(nullable = false)
+    private Long salesId;
+
+    @NotNull
+    @Column(nullable = false)
+    private Long paymentId;
+
+    @NotNull
+    @Column(nullable = false)
     private String documentNumber;
 
     @NotNull
@@ -40,7 +47,12 @@ public class PaymentEntity {
 
     @NotNull
     @Column(nullable = false)
-    private PaymentType type;
+    private BigDecimal balance;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TransactionType type;
 
     @NotNull
     @Column(nullable = false)
@@ -48,7 +60,4 @@ public class PaymentEntity {
 
     @CreatedDate
     private LocalDateTime createdDate;
-
-    @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
 }

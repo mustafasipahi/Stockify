@@ -12,7 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ProductGetAllRequest {
+public class ProductSearchRequest {
 
     private String productText;
     private ProductStatus status;

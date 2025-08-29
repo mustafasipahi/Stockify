@@ -31,6 +31,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.stockify.project.constant.DocumentNumberConstants.*;
 import static com.stockify.project.util.TenantContext.getTenantId;
 import static com.stockify.project.validator.SalesValidator.validate;
 
@@ -42,6 +43,7 @@ public class SalesPersistenceService {
     private final SalesItemRepository salesItemRepository;
     private final InventoryService inventoryService;
     private final BrokerService brokerService;
+    private final TransactionService transactionService;
 
     @Transactional
     public SalesResponse salesPreview(SalesRequest request) {
@@ -53,11 +55,13 @@ public class SalesPersistenceService {
     public SalesResponse salesConfirm(SalesRequest request) {
         Long tenantId = getTenantId();
         SalesPrepareDto prepareDto = prepareSalesFlow(request, tenantId);
-        SalesEntity savedSalesEntity = salesRepository.save(prepareDto.getSalesEntity());
+        setDocumentNumber(prepareDto.getSalesEntity());
+        SalesEntity savedSalesEntity = saveSalesEntity(prepareDto.getSalesEntity());
         saveSalesItemEntity(prepareDto.getSalesItems(), savedSalesEntity.getId(), tenantId);
         decreaseProductInventory(prepareDto.getSalesItems(), tenantId);
-        updateBrokerDebt(request.getBrokerId(), savedSalesEntity.getTotalPrice(), tenantId);
+        evictBrokerCache(request.getBrokerId());
         InvoiceEntity invoiceEntity = createInvoice(request.isCreateInvoice(), savedSalesEntity, prepareDto.getSalesItems());
+        saveTransaction(savedSalesEntity);
         return SalesConverter.toResponse(savedSalesEntity, prepareDto.getSalesItems(), invoiceEntity);
     }
 
@@ -164,6 +168,17 @@ public class SalesPersistenceService {
                 .build();
     }
 
+    private void setDocumentNumber(SalesEntity salesEntity) {
+        String documentNumber = Optional.ofNullable(salesRepository.findMaxDocumentNumberNumeric())
+                .map(lastDocumentNumber -> SALES_PREFIX + (lastDocumentNumber + 1))
+                .orElse(SALES_PREFIX + SALES_DEFAULT);
+        salesEntity.setDocumentNumber(documentNumber);
+    }
+
+    private SalesEntity saveSalesEntity(SalesEntity salesEntity) {
+        return salesRepository.save(salesEntity);
+    }
+
     private void saveSalesItemEntity(List<SalesItemEntity> salesItems, Long salesId, Long tenantId) {
         List<SalesItemEntity> salesItemEntityList = salesItems.stream()
                 .peek(salesItem -> {
@@ -180,8 +195,8 @@ public class SalesPersistenceService {
         inventoryService.decreaseInventory(productDecreaseProductCountMap, tenantId);
     }
 
-    private void updateBrokerDebt(Long brokerId, BigDecimal price, Long tenantId) {
-        brokerService.increaseDebtPrice(brokerId, price, tenantId);
+    private void evictBrokerCache(Long brokerId) {
+        brokerService.evictBrokerCache(brokerId);
     }
 
     private InvoiceEntity createInvoice(boolean createInvoice, SalesEntity salesEntity, List<SalesItemEntity> salesItems) {
@@ -190,5 +205,9 @@ public class SalesPersistenceService {
             //invoiceEntity = invoiceService.createInvoice(salesEntity);
         }
         return invoiceEntity;
+    }
+
+    private void saveTransaction(SalesEntity salesEntity) {
+        transactionService.createSalesTransaction(salesEntity);
     }
 }

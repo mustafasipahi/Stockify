@@ -7,7 +7,7 @@ import com.stockify.project.exception.ProductNotFoundException;
 import com.stockify.project.model.dto.ProductDto;
 import com.stockify.project.model.entity.ProductEntity;
 import com.stockify.project.model.request.ProductCreateRequest;
-import com.stockify.project.model.request.ProductGetAllRequest;
+import com.stockify.project.model.request.ProductSearchRequest;
 import com.stockify.project.model.request.ProductUpdateRequest;
 import com.stockify.project.repository.ProductRepository;
 import com.stockify.project.specification.ProductSpecification;
@@ -84,7 +84,7 @@ public class ProductService {
                 .orElseThrow(() -> new ProductNotFoundException(productId));
     }
 
-    public List<ProductDto> getAll(ProductGetAllRequest request) {
+    public List<ProductDto> getAll(ProductSearchRequest request) {
         Specification<ProductEntity> specification = ProductSpecification.filter(request);
         return productRepository.findAll(specification).stream()
                 .map(productConverter::toDto)
