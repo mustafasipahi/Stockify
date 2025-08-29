@@ -2,32 +2,28 @@ package com.stockify.project.converter;
 
 import com.stockify.project.model.dto.BrokerDto;
 import com.stockify.project.model.entity.BrokerEntity;
-import com.stockify.project.service.TransactionService;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
-import static com.stockify.project.util.TenantContext.getTenantId;
+import java.math.BigDecimal;
 
-@Component
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BrokerConverter {
 
-    private TransactionService transactionService;
-
-    public BrokerDto toDto(BrokerEntity brokerEntity) {
+    public static BrokerDto toDto(BrokerEntity brokerEntity, BigDecimal currentBalance) {
         return BrokerDto.builder()
                 .brokerId(brokerEntity.getId())
                 .firstName(brokerEntity.getFirstName())
                 .lastName(brokerEntity.getLastName())
                 .discountRate(brokerEntity.getDiscountRate())
-                .currentBalance(transactionService.getBrokerCurrentBalance(brokerEntity.getId(), getTenantId()))
+                .currentBalance(currentBalance)
                 .status(brokerEntity.getStatus())
                 .createdDate(brokerEntity.getCreatedDate())
                 .lastModifiedDate(brokerEntity.getLastModifiedDate())
                 .build();
     }
 
-    public BrokerDto toIdDto(BrokerEntity brokerEntity) {
+    public static BrokerDto toIdDto(BrokerEntity brokerEntity) {
         return BrokerDto.builder()
                 .brokerId(brokerEntity.getId())
                 .build();

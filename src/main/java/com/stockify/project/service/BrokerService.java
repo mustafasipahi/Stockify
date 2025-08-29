@@ -36,7 +36,7 @@ public class BrokerService {
     private final BrokerRepository brokerRepository;
     private final BrokerCreateValidator brokerCreateValidator;
     private final BrokerUpdateValidator brokerUpdateValidator;
-    private final BrokerConverter brokerConverter;
+    private final TransactionService transactionService;
 
     @Transactional
     public BrokerDto save(BrokerCreateRequest request) {
@@ -50,7 +50,7 @@ public class BrokerService {
                 .tenantId(getTenantId())
                 .build();
         BrokerEntity savedBrokerEntity = brokerRepository.save(brokerEntity);
-        return brokerConverter.toIdDto(savedBrokerEntity);
+        return BrokerConverter.toIdDto(savedBrokerEntity);
     }
 
     @Transactional
@@ -77,7 +77,7 @@ public class BrokerService {
             brokerEntity.setDiscountRate(request.getDiscountRate());
         }
         BrokerEntity updatedBrokerEntity = brokerRepository.save(brokerEntity);
-        return brokerConverter.toIdDto(updatedBrokerEntity);
+        return BrokerConverter.toIdDto(updatedBrokerEntity);
     }
 
     @Transactional
@@ -111,19 +111,29 @@ public class BrokerService {
                 .orElseThrow(() -> new BrokerNotFoundException(brokerId));
         brokerEntity.setStatus(BrokerStatus.PASSIVE);
         BrokerEntity deletedBrokerEntity = brokerRepository.save(brokerEntity);
-        return brokerConverter.toIdDto(deletedBrokerEntity);
+        return BrokerConverter.toIdDto(deletedBrokerEntity);
     }
 
     @Cacheable(value = BROKER_DETAIL, key = "#brokerId")
     public BrokerDto detail(Long brokerId) {
-        return brokerRepository.findByIdAndTenantId(brokerId, getTenantId())
-                .map(brokerConverter::toDto)
+        Long tenantId = getTenantId();
+        BigDecimal brokerCurrentBalance = getBrokerCurrentBalance(brokerId, tenantId);
+        return brokerRepository.findByIdAndTenantId(brokerId, tenantId)
+                .map(brokerEntity -> BrokerConverter.toDto(brokerEntity, brokerCurrentBalance))
                 .orElseThrow(() -> new BrokerNotFoundException(brokerId));
     }
 
     public List<BrokerDto> getAllBrokers() {
-        return brokerRepository.findAllByStatusAndTenantIdOrderByFirstNameAsc(BrokerStatus.ACTIVE, getTenantId()).stream()
-                .map(brokerConverter::toDto)
+        Long tenantId = getTenantId();
+        return brokerRepository.findAllByStatusAndTenantIdOrderByFirstNameAsc(BrokerStatus.ACTIVE, tenantId).stream()
+                .map(brokerEntity -> {
+                    BigDecimal brokerCurrentBalance = getBrokerCurrentBalance(brokerEntity.getId(), tenantId);
+                    return BrokerConverter.toDto(brokerEntity, brokerCurrentBalance);
+                })
                 .toList();
+    }
+
+    private BigDecimal getBrokerCurrentBalance(Long brokerId, Long tenantId) {
+        return transactionService.getBrokerCurrentBalanceCache(brokerId, tenantId);
     }
 }

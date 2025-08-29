@@ -13,12 +13,16 @@ import com.stockify.project.model.request.TransactionSearchRequest;
 import com.stockify.project.repository.TransactionRepository;
 import com.stockify.project.specification.TransactionSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+
+import static com.stockify.project.constant.CacheConstants.BROKER_BALANCE;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +32,7 @@ public class TransactionService {
     private final BrokerService brokerService;
 
     @Transactional
+    @CacheEvict(value = BROKER_BALANCE, key = "#salesEntity.brokerId")
     public void createSalesTransaction(SalesEntity salesEntity) {
         BigDecimal currentBalance = getBrokerCurrentBalance(salesEntity.getBrokerId(), salesEntity.getTenantId());
         BigDecimal newBalance = currentBalance.add(salesEntity.getTotalPrice());
@@ -44,6 +49,7 @@ public class TransactionService {
     }
 
     @Transactional
+    @CacheEvict(value = BROKER_BALANCE, key = "#paymentEntity.brokerId")
     public void createPaymentTransaction(PaymentEntity paymentEntity) {
         BigDecimal currentBalance = getBrokerCurrentBalance(paymentEntity.getBrokerId(), paymentEntity.getTenantId());
         BigDecimal newBalance = currentBalance.subtract(paymentEntity.getPrice());
@@ -59,10 +65,9 @@ public class TransactionService {
         transactionRepository.save(transaction);
     }
 
-    public BigDecimal getBrokerCurrentBalance(Long brokerId, Long tenantId) {
-        return transactionRepository.findTopByBrokerIdAndTenantIdOrderByCreatedDateDesc(brokerId, tenantId)
-                .map(TransactionEntity::getBalance)
-                .orElse(BigDecimal.ZERO);
+    @Cacheable(value = BROKER_BALANCE, key = "#brokerId")
+    public BigDecimal getBrokerCurrentBalanceCache(Long brokerId, Long tenantId) {
+        return getBrokerCurrentBalance(brokerId, tenantId);
     }
 
     public List<TransactionDto> getTransactions(TransactionSearchRequest request) {
@@ -71,6 +76,12 @@ public class TransactionService {
         return transactionRepository.findAll(specification).stream()
                 .map(transactionEntity -> TransactionConverter.toDto(transactionEntity, broker))
                 .toList();
+    }
+
+    private BigDecimal getBrokerCurrentBalance(Long brokerId, Long tenantId) {
+        return transactionRepository.findTopByBrokerIdAndTenantIdOrderByCreatedDateDesc(brokerId, tenantId)
+                .map(TransactionEntity::getBalance)
+                .orElse(BigDecimal.ZERO);
     }
 
     private BrokerDto getBroker(Long brokerId) {

@@ -29,4 +29,4 @@ security:
 
 stokify:
   cache:
-    baseCacheTtlMinutes: ${BASE_TTL:30}
+    baseCacheTtlMinutes: ${BASE_TTL:60}

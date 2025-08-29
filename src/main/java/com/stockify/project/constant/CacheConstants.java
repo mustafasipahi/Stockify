@@ -14,4 +14,6 @@ public class CacheConstants {
     public static final String INVENTORY_AVAILABLE = "inventoryAvailable_";
     public static final String INVENTORY_CRITICAL = "inventoryCritical_";
     public static final String INVENTORY_OUT_OF = "inventoryOutOf_";
+
+    public static final String BROKER_BALANCE = "brokerBalance_";
 }
