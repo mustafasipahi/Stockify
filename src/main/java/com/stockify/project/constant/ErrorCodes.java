@@ -28,6 +28,7 @@ public class ErrorCodes {
     public static final int MULTIPLE_PRODUCT_ID = 1020;
     public static final int PAYMENT_PRICE_REQUIRED = 1021;
     public static final int PAYMENT_TYPE_REQUIRED = 1022;
+    public static final int COMPANY_INFO_NOT_FOUND = 1023;
 
     public static final int UNKNOWN_ERROR = 9999;
 }

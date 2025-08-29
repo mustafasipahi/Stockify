@@ -20,10 +20,6 @@ spring:
     init:
       platform: mysql
 
-app:
-  database:
-    initialize: false
-
 redis-config:
   host: ${REDIS_HOST:localhost}
   port: ${REDIS_PORT:6379}

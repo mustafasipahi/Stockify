@@ -26,7 +26,7 @@ public class SalesResponse {
     private BigDecimal totalPrice;
     private BigDecimal discountPrice;
     private BigDecimal discountRate;
+    private String documentNumber;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdDate;
-    private Long invoiceId;
 }

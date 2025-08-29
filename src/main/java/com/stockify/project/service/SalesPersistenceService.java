@@ -10,7 +10,6 @@ import com.stockify.project.model.dto.BrokerDto;
 import com.stockify.project.model.dto.SalesPrepareDto;
 import com.stockify.project.model.dto.SalesPriceDto;
 import com.stockify.project.model.dto.SalesProductDto;
-import com.stockify.project.model.entity.InvoiceEntity;
 import com.stockify.project.model.entity.SalesEntity;
 import com.stockify.project.model.entity.SalesItemEntity;
 import com.stockify.project.model.request.SalesProductRequest;
@@ -48,7 +47,7 @@ public class SalesPersistenceService {
     @Transactional
     public SalesResponse salesPreview(SalesRequest request) {
         SalesPrepareDto prepareDto = prepareSalesFlow(request, null);
-        return SalesConverter.toResponse(prepareDto.getSalesEntity(), prepareDto.getSalesItems(), null);
+        return SalesConverter.toResponse(prepareDto.getSalesEntity(), prepareDto.getSalesItems());
     }
 
     @Transactional
@@ -60,9 +59,8 @@ public class SalesPersistenceService {
         saveSalesItemEntity(prepareDto.getSalesItems(), savedSalesEntity.getId(), tenantId);
         decreaseProductInventory(prepareDto.getSalesItems(), tenantId);
         evictBrokerCache(request.getBrokerId());
-        InvoiceEntity invoiceEntity = createInvoice(request.isCreateInvoice(), savedSalesEntity, prepareDto.getSalesItems());
         saveTransaction(savedSalesEntity);
-        return SalesConverter.toResponse(savedSalesEntity, prepareDto.getSalesItems(), invoiceEntity);
+        return SalesConverter.toResponse(savedSalesEntity, prepareDto.getSalesItems());
     }
 
     private SalesPrepareDto prepareSalesFlow(SalesRequest request, Long tenantId) {
@@ -197,14 +195,6 @@ public class SalesPersistenceService {
 
     private void evictBrokerCache(Long brokerId) {
         brokerService.evictBrokerCache(brokerId);
-    }
-
-    private InvoiceEntity createInvoice(boolean createInvoice, SalesEntity salesEntity, List<SalesItemEntity> salesItems) {
-        InvoiceEntity invoiceEntity = null;
-        if (createInvoice) {
-            //invoiceEntity = invoiceService.createInvoice(salesEntity);
-        }
-        return invoiceEntity;
     }
 
     private void saveTransaction(SalesEntity salesEntity) {

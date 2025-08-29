@@ -72,6 +72,7 @@ public class RedisConfiguration {
         redisCacheConfigurationMap.put(INVENTORY_CRITICAL, baseCacheTtl);
         redisCacheConfigurationMap.put(INVENTORY_OUT_OF, baseCacheTtl);
         redisCacheConfigurationMap.put(BROKER_BALANCE, baseCacheTtl);
+        redisCacheConfigurationMap.put(COMPANY_DETAIL, baseCacheTtl);
         return redisCacheConfigurationMap;
     }
 }
