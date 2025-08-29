@@ -36,7 +36,7 @@ public class BrokerService {
     private final BrokerRepository brokerRepository;
     private final BrokerCreateValidator brokerCreateValidator;
     private final BrokerUpdateValidator brokerUpdateValidator;
-    private final TransactionService transactionService;
+    private final BalanceService balanceService;
 
     @Transactional
     public BrokerDto save(BrokerCreateRequest request) {
@@ -134,6 +134,6 @@ public class BrokerService {
     }
 
     private BigDecimal getBrokerCurrentBalance(Long brokerId, Long tenantId) {
-        return transactionService.getBrokerCurrentBalanceCache(brokerId, tenantId);
+        return balanceService.getBrokerCurrentBalance(brokerId, tenantId);
     }
 }

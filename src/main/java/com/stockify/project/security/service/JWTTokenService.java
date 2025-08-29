@@ -72,8 +72,6 @@ public class JWTTokenService {
                     .build()
                     .parseClaimsJws(token);
             return tokenExist(token);
-        } catch (SignatureException ex) {
-            log.info("Invalid JWT signature: {}", ex.getMessage());
         } catch (MalformedJwtException ex) {
             log.info("Invalid JWT token: {}", ex.getMessage());
         } catch (ExpiredJwtException ex) {
@@ -82,6 +80,8 @@ public class JWTTokenService {
             log.info("Unsupported JWT token: {}", ex.getMessage());
         } catch (IllegalArgumentException ex) {
             log.info("JWT claims string is empty: {}", ex.getMessage());
+        } catch (Exception ex) {
+            log.info("Invalid JWT: {}", ex.getMessage());
         }
         return false;
     }
