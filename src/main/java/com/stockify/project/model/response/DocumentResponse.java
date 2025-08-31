@@ -17,6 +17,7 @@ public class DocumentResponse {
     private String id;
     private String name;
     private String documentType;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private String contentType;
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime uploadDate;
 }

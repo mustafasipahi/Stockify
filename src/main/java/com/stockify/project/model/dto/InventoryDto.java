@@ -28,8 +28,8 @@ public class InventoryDto implements Serializable {
     private Integer productCount;
     private Integer criticalProductCount;
     private InventoryStatus status;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime createdDate;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime lastModifiedDate;
 }

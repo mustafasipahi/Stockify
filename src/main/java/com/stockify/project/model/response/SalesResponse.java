@@ -27,6 +27,6 @@ public class SalesResponse {
     private BigDecimal discountPrice;
     private BigDecimal discountRate;
     private String documentNumber;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime createdDate;
 }

@@ -25,6 +25,6 @@ public class CategoryDto implements Serializable {
     private Long categoryId;
     private String name;
     private BigDecimal taxRate;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime createdDate;
 }

@@ -46,18 +46,20 @@ public class DocumentService {
         try {
             String documentNameDate = getDocumentNameDate();
             String originalFilename = file.getOriginalFilename();
-            String fileName = safeFileName(originalFilename + "_" + username + "_" + documentNameDate);
+            String safeFileName = safeFileName(originalFilename + "_" + username + "_" + documentNameDate);
+            String safeOriginalFilename = safeFileName(originalFilename);
             DBObject metadata = new BasicDBObject();
-            metadata.put("originalFileName", file.getOriginalFilename());
+            metadata.put("safeFileName", safeFileName);
             metadata.put("tenantId", getTenantId());
             metadata.put("brokerId", request.getBrokerId());
             metadata.put("documentType", request.getDocumentType());
             metadata.put("contentType", file.getContentType());
             metadata.put("createdDate", new Date());
-            ObjectId fileId = gridFsTemplate.store(file.getInputStream(), fileName, file.getContentType(), metadata);
+            ObjectId fileId = gridFsTemplate.store(file.getInputStream(), safeOriginalFilename, file.getContentType(), metadata);
             return DocumentResponse.builder()
                     .id(fileId.toHexString())
-                    .name(fileName)
+                    .name(safeFileName)
+                    .contentType(file.getContentType())
                     .build();
         } catch (Exception e) {
             throw new DocumentUploadException();
@@ -94,8 +96,9 @@ public class DocumentService {
         gridFsTemplate.find(query).forEach(file -> {
             DocumentResponse documentSearchResponse = new DocumentResponse();
             documentSearchResponse.setId(file.getObjectId().toHexString());
-            documentSearchResponse.setName(getMetadataValue(file, "originalFileName", null));
+            documentSearchResponse.setName(getMetadataValue(file, "safeFileName", null));
             documentSearchResponse.setDocumentType(getMetadataValue(file, "documentType", null));
+            documentSearchResponse.setContentType(getMetadataValue(file, "contentType", null));
             documentSearchResponse.setUploadDate(getMetadataDate(file, "createdDate"));
             responseList.add(documentSearchResponse);
         });

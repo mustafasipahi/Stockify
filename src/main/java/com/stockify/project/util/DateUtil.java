@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter;
 public class DateUtil {
 
     public static String getDocumentNameDate() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy_HHmm");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy_HHmmss");
         LocalDateTime now = LocalDateTime.now();
         return now.format(formatter);
     }
