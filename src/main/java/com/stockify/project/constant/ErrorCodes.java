@@ -29,6 +29,13 @@ public class ErrorCodes {
     public static final int PAYMENT_PRICE_REQUIRED = 1021;
     public static final int PAYMENT_TYPE_REQUIRED = 1022;
     public static final int COMPANY_INFO_NOT_FOUND = 1023;
+    public static final int DOCUMENT_REQUIRED = 1024;
+    public static final int DOCUMENT_TYPE_REQUIRED = 1025;
+    public static final int INVALID_CONTENT_TYPE = 1026;
+    public static final int INVALID_DOCUMENT_SIZE = 1027;
+    public static final int DOCUMENT_UPLOAD_ERROR = 1028;
+    public static final int DOCUMENT_DOWNLOAD_ERROR = 1029;
+    public static final int DOCUMENT_NOT_FOUND = 1030;
 
     public static final int UNKNOWN_ERROR = 9999;
 }
