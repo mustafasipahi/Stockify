@@ -3,6 +3,8 @@ package com.stockify.project.model.request;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @Builder
@@ -13,5 +15,5 @@ public class CategoryUpdateRequest {
 
     private Long categoryId;
     private String name;
-    private Double kdv;
+    private BigDecimal taxRate;
 }

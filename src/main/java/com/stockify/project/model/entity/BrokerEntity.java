@@ -1,5 +1,6 @@
 package com.stockify.project.model.entity;
 
+import com.stockify.project.enums.BrokerStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -35,6 +36,11 @@ public class BrokerEntity {
 
     @Column
     private BigDecimal discountRate;
+
+    @NotNull
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private BrokerStatus status;
 
     @NotNull
     @Column(nullable = false)

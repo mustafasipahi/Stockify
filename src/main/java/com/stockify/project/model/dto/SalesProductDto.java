@@ -19,4 +19,5 @@ public class SalesProductDto {
     private String productName;
     private Integer productCount;
     private BigDecimal price;
+    private BigDecimal taxRate;
 }

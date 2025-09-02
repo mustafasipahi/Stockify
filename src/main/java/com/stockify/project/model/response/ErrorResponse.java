@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -15,16 +15,16 @@ import java.util.Date;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorResponse {
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
-    private Date date;
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
+    private LocalDateTime date;
     private String message;
     private int code;
 
     public static ErrorResponse of(int code, String message) {
-        return new ErrorResponse(new Date(), message, code);
+        return new ErrorResponse(LocalDateTime.now(), message, code);
     }
 
     public static ErrorResponse of(StockifyRuntimeException exception) {
-        return new ErrorResponse(new Date(), exception.getMessage(), exception.getCode());
+        return new ErrorResponse(LocalDateTime.now(), exception.getMessage(), exception.getCode());
     }
 }

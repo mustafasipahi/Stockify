@@ -7,6 +7,7 @@ import com.stockify.project.exception.InventoryNotFoundException;
 import com.stockify.project.model.dto.InventoryDto;
 import com.stockify.project.model.entity.InventoryEntity;
 import com.stockify.project.model.request.InventoryCreateRequest;
+import com.stockify.project.model.request.InventorySearchRequest;
 import com.stockify.project.model.request.InventoryUpdateRequest;
 import com.stockify.project.repository.InventoryRepository;
 import com.stockify.project.specification.InventorySpecification;
@@ -90,7 +91,8 @@ public class InventoryService {
 
     @Cacheable(value = INVENTORY_ALL)
     public List<InventoryDto> getAllInventory() {
-        Specification<InventoryEntity> specification = InventorySpecification.filter(Collections.emptyList());
+        InventorySearchRequest searchRequest = getInventorySearchRequest(Collections.emptyList());
+        Specification<InventoryEntity> specification = InventorySpecification.filter(searchRequest);
         return inventoryRepository.findAll(specification).stream()
                 .map(inventoryConverter::toDto)
                 .toList();
@@ -98,7 +100,8 @@ public class InventoryService {
 
     @Cacheable(value = INVENTORY_AVAILABLE)
     public List<InventoryDto> getAvailableInventory() {
-        Specification<InventoryEntity> specification = InventorySpecification.filter(List.of(InventoryStatus.AVAILABLE, InventoryStatus.CRITICAL));
+        InventorySearchRequest searchRequest = getInventorySearchRequest(List.of(InventoryStatus.AVAILABLE, InventoryStatus.CRITICAL));
+        Specification<InventoryEntity> specification = InventorySpecification.filter(searchRequest);
         return inventoryRepository.findAll(specification).stream()
                 .map(inventoryConverter::toDto)
                 .toList();
@@ -106,7 +109,8 @@ public class InventoryService {
 
     @Cacheable(value = INVENTORY_CRITICAL)
     public List<InventoryDto> getCriticalInventory() {
-        Specification<InventoryEntity> specification = InventorySpecification.filter(List.of(InventoryStatus.CRITICAL));
+        InventorySearchRequest searchRequest = getInventorySearchRequest(List.of(InventoryStatus.CRITICAL));
+        Specification<InventoryEntity> specification = InventorySpecification.filter(searchRequest);
         return inventoryRepository.findAll(specification).stream()
                 .map(inventoryConverter::toDto)
                 .toList();
@@ -114,7 +118,8 @@ public class InventoryService {
 
     @Cacheable(value = INVENTORY_OUT_OF)
     public List<InventoryDto> getOutOfInventory() {
-        Specification<InventoryEntity> specification = InventorySpecification.filter(List.of(InventoryStatus.OUT_OF_INVENTORY));
+        InventorySearchRequest searchRequest = getInventorySearchRequest(List.of(InventoryStatus.OUT_OF_INVENTORY));
+        Specification<InventoryEntity> specification = InventorySpecification.filter(searchRequest);
         return inventoryRepository.findAll(specification).stream()
                 .map(inventoryConverter::toDto)
                 .toList();
@@ -139,5 +144,11 @@ public class InventoryService {
             inventoryEntity.setStatus(newStatus);
             inventoryRepository.save(inventoryEntity);
         }
+    }
+
+    private InventorySearchRequest getInventorySearchRequest(List<InventoryStatus> statusList) {
+        return InventorySearchRequest.builder()
+                .statusList(statusList)
+                .build();
     }
 }

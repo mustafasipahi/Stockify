@@ -35,7 +35,7 @@ public class CategoryService {
         createValidator.validate(request);
         CategoryEntity categoryEntity = CategoryEntity.builder()
                 .name(request.getName())
-                .kdv(request.getKdv())
+                .taxRate(request.getTaxRate())
                 .tenantId(getTenantId())
                 .build();
         categoryRepository.save(categoryEntity);
@@ -53,8 +53,8 @@ public class CategoryService {
             updateValidator.validateName(request.getName());
             categoryEntity.setName(request.getName());
         }
-        if (request.getKdv() != null) {
-            categoryEntity.setKdv(request.getKdv());
+        if (request.getTaxRate() != null) {
+            categoryEntity.setTaxRate(request.getTaxRate());
         }
         categoryRepository.save(categoryEntity);
     }

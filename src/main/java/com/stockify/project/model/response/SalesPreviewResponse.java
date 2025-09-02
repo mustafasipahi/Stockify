@@ -1,15 +1,11 @@
 package com.stockify.project.model.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.stockify.project.model.dto.SalesItemDto;
+import com.stockify.project.model.dto.ReceiptInfoDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -18,5 +14,6 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SalesPreviewResponse {
 
+    private ReceiptInfoDto receiptInfo;
     private SalesResponse salesResponse;
 }

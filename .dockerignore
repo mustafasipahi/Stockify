@@ -1,0 +1,25 @@
+# Gereksiz dosyaları exclude et
+target/
+!target/*.jar
+.git
+.gitignore
+README.md
+Dockerfile
+.dockerignore
+*.log
+*.tmp
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Node modules (eğer varsa)
+node_modules/
+
+# Test files
+src/test/

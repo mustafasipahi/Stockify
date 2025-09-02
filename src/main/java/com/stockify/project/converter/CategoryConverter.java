@@ -12,7 +12,7 @@ public class CategoryConverter {
         return CategoryDto.builder()
                 .categoryId(categoryEntity.getId())
                 .name(categoryEntity.getName())
-                .kdv(categoryEntity.getKdv())
+                .taxRate(categoryEntity.getTaxRate())
                 .createdDate(categoryEntity.getCreatedDate())
                 .build();
     }

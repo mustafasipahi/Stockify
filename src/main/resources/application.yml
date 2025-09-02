@@ -7,10 +7,14 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME:root}
     password: ${SPRING_DATASOURCE_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017/stockify_files}
+      auto-index-creation: true
   jpa:
     database: mysql
     hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:none}
     properties:
       hibernate:
         connection:
@@ -19,6 +23,10 @@ spring:
   sql:
     init:
       platform: mysql
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
 
 redis-config:
   host: ${REDIS_HOST:localhost}
@@ -29,4 +37,15 @@ security:
 
 stokify:
   cache:
-    baseCacheTtlMinutes: ${BASE_TTL:30}
+    baseCacheTtlMinutes: ${BASE_TTL:60}
+  files:
+    storage:
+      type: gridfs
+      allowed-types:
+        - application/pdf
+        - image/jpeg
+        - image/png
+        - image/gif
+        - application/vnd.ms-excel
+        - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+      max-file-size: 50MB

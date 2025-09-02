@@ -5,16 +5,19 @@ import com.stockify.project.model.entity.BrokerEntity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BrokerConverter {
 
-    public static BrokerDto toDto(BrokerEntity brokerEntity) {
+    public static BrokerDto toDto(BrokerEntity brokerEntity, BigDecimal currentBalance) {
         return BrokerDto.builder()
                 .brokerId(brokerEntity.getId())
                 .firstName(brokerEntity.getFirstName())
                 .lastName(brokerEntity.getLastName())
                 .discountRate(brokerEntity.getDiscountRate())
-                .debtPrice(null)
+                .currentBalance(currentBalance)
+                .status(brokerEntity.getStatus())
                 .createdDate(brokerEntity.getCreatedDate())
                 .lastModifiedDate(brokerEntity.getLastModifiedDate())
                 .build();

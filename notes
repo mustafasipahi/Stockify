@@ -1,7 +1,7 @@
 ürün ekle
 -stok gelmicek
 -kritik seviye gelcek zorunlu değil (stok adedi gib)
--kategory nin kdv si olcak (düzenlenebilir kategory oluştururken gelcek)
+-kategory nin tax rate si olcak (düzenlenebilir kategory oluştururken gelcek)
 
 stok takip
 -tüm stoklar, kritik stoklar,tükenenler olarak 3 ep

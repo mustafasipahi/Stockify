@@ -2,7 +2,7 @@ package com.stockify.project.specification;
 
 import com.stockify.project.enums.ProductStatus;
 import com.stockify.project.model.entity.ProductEntity;
-import com.stockify.project.model.request.ProductGetAllRequest;
+import com.stockify.project.model.request.ProductSearchRequest;
 import jakarta.persistence.criteria.Predicate;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -17,7 +17,7 @@ import static com.stockify.project.util.TenantContext.getTenantId;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ProductSpecification {
 
-    public static Specification<ProductEntity> filter(ProductGetAllRequest request) {
+    public static Specification<ProductEntity> filter(ProductSearchRequest request) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             if (StringUtils.isNotBlank(request.getProductText())) {

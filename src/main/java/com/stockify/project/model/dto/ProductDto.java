@@ -1,5 +1,6 @@
 package com.stockify.project.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.stockify.project.enums.ProductStatus;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -24,10 +26,12 @@ public class ProductDto implements Serializable {
     private Long productId;
     private Long categoryId;
     private String categoryName;
-    private Double kdv;
+    private BigDecimal taxRate;
     private String inventoryCode;
     private String name;
     private ProductStatus status;
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime createdDate;
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime lastModifiedDate;
 }
