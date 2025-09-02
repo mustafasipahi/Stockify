@@ -27,6 +27,9 @@ spring:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
 
 redis-config:
   host: ${REDIS_HOST:localhost}

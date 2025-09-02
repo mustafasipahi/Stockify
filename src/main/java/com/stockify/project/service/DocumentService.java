@@ -24,6 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.*;
 
@@ -46,7 +47,7 @@ public class DocumentService {
         try {
             String documentNameDate = getDocumentNameDate();
             String originalFilename = file.getOriginalFilename();
-            String safeFileName = safeFileName(originalFilename + "_" + username + "_" + documentNameDate);
+            String safeFileName = safeFileName(username + "_" + documentNameDate + "_" + originalFilename);
             String safeOriginalFilename = safeFileName(originalFilename);
             DBObject metadata = new BasicDBObject();
             metadata.put("safeFileName", safeFileName);
@@ -57,9 +58,10 @@ public class DocumentService {
             metadata.put("createdDate", new Date());
             ObjectId fileId = gridFsTemplate.store(file.getInputStream(), safeOriginalFilename, file.getContentType(), metadata);
             return DocumentResponse.builder()
-                    .id(fileId.toHexString())
                     .name(safeFileName)
+                    .documentType(request.getDocumentType().name())
                     .contentType(file.getContentType())
+                    .downloadUrl(getDownloadUrl(fileId.toHexString()))
                     .build();
         } catch (Exception e) {
             throw new DocumentUploadException();
@@ -95,13 +97,21 @@ public class DocumentService {
         List<DocumentResponse> responseList = new ArrayList<>();
         gridFsTemplate.find(query).forEach(file -> {
             DocumentResponse documentSearchResponse = new DocumentResponse();
-            documentSearchResponse.setId(file.getObjectId().toHexString());
             documentSearchResponse.setName(getMetadataValue(file, "safeFileName", null));
             documentSearchResponse.setDocumentType(getMetadataValue(file, "documentType", null));
             documentSearchResponse.setContentType(getMetadataValue(file, "contentType", null));
             documentSearchResponse.setUploadDate(getMetadataDate(file, "createdDate"));
+            documentSearchResponse.setDownloadUrl(getDownloadUrl(file.getObjectId().toHexString()));
             responseList.add(documentSearchResponse);
         });
         return responseList;
+    }
+
+    public String getDownloadUrl(String id) {
+        return ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/documents/download/")
+                .path(id)
+                .toUriString();
     }
 }
