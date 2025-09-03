@@ -6,6 +6,7 @@ import com.stockify.project.exception.BrokerNotFoundException;
 import com.stockify.project.model.dto.BrokerDto;
 import com.stockify.project.model.entity.PaymentEntity;
 import com.stockify.project.model.request.PaymentCreateRequest;
+import com.stockify.project.model.response.DocumentResponse;
 import com.stockify.project.model.response.PaymentResponse;
 import com.stockify.project.repository.PaymentRepository;
 import com.stockify.project.validator.PaymentCreateValidator;
@@ -25,6 +26,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final BrokerService brokerService;
     private final TransactionService transactionService;
+    private final DocumentService documentService;
 
     @Transactional
     public PaymentResponse save(PaymentCreateRequest request) {
@@ -55,7 +57,8 @@ public class PaymentService {
     }
 
     private String uploadDocument(PaymentEntity paymentEntity) {
-        String documentId = "null";
+        DocumentResponse documentResponse = documentService.uploadPaymentFile();
+        String documentId = documentResponse.getId();
         paymentEntity.setDocumentId(documentId);
         paymentEntity.setDocumentNumber(getDocumentNumber());
         return documentId;

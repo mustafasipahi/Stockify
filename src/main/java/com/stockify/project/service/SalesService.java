@@ -10,6 +10,7 @@ import com.stockify.project.model.dto.*;
 import com.stockify.project.model.entity.SalesEntity;
 import com.stockify.project.model.request.SalesProductRequest;
 import com.stockify.project.model.request.SalesRequest;
+import com.stockify.project.model.response.DocumentResponse;
 import com.stockify.project.model.response.SalesResponse;
 import com.stockify.project.repository.SalesItemRepository;
 import com.stockify.project.repository.SalesRepository;
@@ -39,6 +40,7 @@ public class SalesService {
     private final InventoryService inventoryService;
     private final BrokerService brokerService;
     private final TransactionService transactionService;
+    private final DocumentService documentService;
 
     @Transactional
     public SalesResponse salesCalculate(SalesRequest request) {
@@ -170,7 +172,8 @@ public class SalesService {
     }
 
     private String uploadDocument(SalesEntity savedSalesEntity) {
-        String documentId = "null";
+        DocumentResponse documentResponse = documentService.uploadSalesFile();
+        String documentId = documentResponse.getId();
         savedSalesEntity.setDocumentId(documentId);
         savedSalesEntity.setDocumentNumber(getDocumentNumber());
         return documentId;

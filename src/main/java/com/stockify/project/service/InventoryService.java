@@ -47,14 +47,7 @@ public class InventoryService {
     })
     public InventoryDto save(InventoryCreateRequest request) {
         inventoryCreateValidator.validate(request);
-        InventoryEntity inventoryEntity = InventoryEntity.builder()
-                .productId(request.getProductId())
-                .price(request.getPrice())
-                .productCount(request.getProductCount())
-                .criticalProductCount(request.getCriticalProductCount())
-                .status(getInventoryStatus(request.getProductCount(), request.getCriticalProductCount()))
-                .tenantId(getTenantId())
-                .build();
+        InventoryEntity inventoryEntity = inventoryConverter.toEntity(request);
         InventoryEntity savedInventoryEntity = inventoryRepository.save(inventoryEntity);
         return inventoryConverter.toIdDto(savedInventoryEntity);
     }
@@ -89,7 +82,7 @@ public class InventoryService {
         return inventoryConverter.toIdDto(updatedInventoryEntity);
     }
 
-    @Cacheable(value = INVENTORY_ALL)
+    //@Cacheable(value = INVENTORY_ALL)
     public List<InventoryDto> getAllInventory() {
         InventorySearchRequest searchRequest = getInventorySearchRequest(Collections.emptyList());
         Specification<InventoryEntity> specification = InventorySpecification.filter(searchRequest);

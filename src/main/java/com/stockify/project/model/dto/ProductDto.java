@@ -2,10 +2,7 @@ package com.stockify.project.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.stockify.project.enums.ProductStatus;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;

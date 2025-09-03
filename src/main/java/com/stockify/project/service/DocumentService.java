@@ -42,6 +42,14 @@ public class DocumentService {
     private final GridFsTemplate gridFsTemplate;
     private final GridFSBucket gridFSBucket;
 
+    public DocumentResponse uploadSalesFile() {
+        return new DocumentResponse();
+    }
+
+    public DocumentResponse uploadPaymentFile() {
+        return new DocumentResponse();
+    }
+
     public DocumentResponse uploadFile(MultipartFile file, DocumentUploadRequest request, String username) {
         uploadValidator.validate(file, request);
         try {
@@ -58,6 +66,7 @@ public class DocumentService {
             metadata.put("createdDate", new Date());
             ObjectId fileId = gridFsTemplate.store(file.getInputStream(), safeOriginalFilename, file.getContentType(), metadata);
             return DocumentResponse.builder()
+                    .id(fileId.toHexString())
                     .name(safeFileName)
                     .documentType(request.getDocumentType().name())
                     .contentType(file.getContentType())
