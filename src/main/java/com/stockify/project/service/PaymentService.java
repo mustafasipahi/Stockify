@@ -17,7 +17,6 @@ import java.util.Optional;
 
 import static com.stockify.project.constant.DocumentNumberConstants.PAYMENT_DEFAULT;
 import static com.stockify.project.constant.DocumentNumberConstants.PAYMENT_PREFIX;
-import static com.stockify.project.util.TenantContext.getTenantId;
 
 @Service
 @RequiredArgsConstructor
@@ -31,13 +30,12 @@ public class PaymentService {
     public PaymentResponse save(PaymentCreateRequest request) {
         PaymentCreateValidator.validate(request);
         BrokerDto broker = getBroker(request.getBrokerId());
-        Long tenantId = getTenantId();
-        String documentNumber = getDocumentNumber();
-        PaymentEntity paymentEntity = PaymentConverter.toEntity(request, documentNumber, tenantId);
-        PaymentEntity savedPaymentEntity = paymentRepository.save(paymentEntity);
+        PaymentEntity paymentEntity = PaymentConverter.toEntity(request);
+        String documentId = uploadDocument(paymentEntity);
+        PaymentEntity savedPaymentEntity = savePaymentEntity(paymentEntity);
         evictBrokerCache(savedPaymentEntity.getBrokerId());
         saveTransaction(savedPaymentEntity);
-        return PaymentConverter.toResponse(savedPaymentEntity, broker);
+        return PaymentConverter.toResponse(savedPaymentEntity, broker, documentId);
     }
 
     private BrokerDto getBroker(Long brokerId) {
@@ -48,17 +46,28 @@ public class PaymentService {
         return broker;
     }
 
-    private String getDocumentNumber() {
-        return Optional.ofNullable(paymentRepository.findMaxDocumentNumberNumeric())
-                .map(lastDocumentNumber -> PAYMENT_PREFIX + (lastDocumentNumber + 1))
-                .orElse(PAYMENT_PREFIX + PAYMENT_DEFAULT);
+    private PaymentEntity savePaymentEntity(PaymentEntity paymentEntity) {
+        return paymentRepository.save(paymentEntity);
     }
 
     private void evictBrokerCache(Long brokerId) {
         brokerService.evictBrokerCache(brokerId);
     }
 
+    private String uploadDocument(PaymentEntity paymentEntity) {
+        String documentId = "null";
+        paymentEntity.setDocumentId(documentId);
+        paymentEntity.setDocumentNumber(getDocumentNumber());
+        return documentId;
+    }
+
     private void saveTransaction(PaymentEntity savedPaymentEntity) {
         transactionService.createPaymentTransaction(savedPaymentEntity);
+    }
+
+    private String getDocumentNumber() {
+        return Optional.ofNullable(paymentRepository.findMaxDocumentNumberNumeric())
+                .map(lastDocumentNumber -> PAYMENT_PREFIX + (lastDocumentNumber + 1))
+                .orElse(PAYMENT_PREFIX + PAYMENT_DEFAULT);
     }
 }

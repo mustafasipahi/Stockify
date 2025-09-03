@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Getter
@@ -13,13 +15,12 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ReceiptInfoDto {
+public class CompanyInfoDto implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private String companyName;
     private String companyAddress;
     private String cari;
-    private Long documentDate;
-    private String documentNumber;
-    private BigDecimal oldBalance;
-    private BigDecimal newBalance;
 }

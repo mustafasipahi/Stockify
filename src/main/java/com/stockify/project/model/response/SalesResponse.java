@@ -18,12 +18,14 @@ import java.util.List;
 public class SalesResponse {
 
     private Long salesId;
-    private List<SalesItemDto> salesItems;
-    private BigDecimal totalPriceWithTax;
-    private BigDecimal subtotalPrice;
-    private BigDecimal totalPrice;
-    private BigDecimal discountPrice;
-    private BigDecimal discountRate;
     private String documentNumber;
+    private List<SalesItemDto> salesItems;
+    private BigDecimal subtotalPrice;
+    private BigDecimal discountRate;
+    private BigDecimal discountPrice;
+    private BigDecimal totalPrice;
+    private BigDecimal totalTaxPrice;
+    private BigDecimal totalPriceWithTax;
+    private String downloadUrl;
     private Long createdDate;
 }

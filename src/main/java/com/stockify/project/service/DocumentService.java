@@ -24,7 +24,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.*;
 
@@ -106,13 +105,5 @@ public class DocumentService {
             responseList.add(documentSearchResponse);
         });
         return responseList;
-    }
-
-    public String getDownloadUrl(String id) {
-        return ServletUriComponentsBuilder
-                .fromCurrentContextPath()
-                .path("/documents/download/")
-                .path(id)
-                .toUriString();
     }
 }

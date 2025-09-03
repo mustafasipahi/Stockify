@@ -18,8 +18,12 @@ public class SalesItemDto {
     private Long id;
     private Long salesId;
     private Long productId;
+    private String productName;
+    private Integer productCount;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;
-    private Integer productCount;
+    private BigDecimal taxRate;
+    private BigDecimal taxPrice;
+    private BigDecimal totalPriceWithTax;
     private Long createdDate;
 }

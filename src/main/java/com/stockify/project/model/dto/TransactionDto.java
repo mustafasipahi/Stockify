@@ -21,5 +21,6 @@ public class TransactionDto {
     private BigDecimal price;
     private BigDecimal balance;
     private TransactionType type;
+    private String downloadUrl;
     private Long createdDate;
 }

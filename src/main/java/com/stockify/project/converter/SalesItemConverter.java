@@ -14,20 +14,5 @@ import static com.stockify.project.util.DateUtil.getTime;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SalesItemConverter {
 
-    public static List<SalesItemDto> toDto(List<SalesItemEntity> salesItems) {
-        if (CollectionUtils.isEmpty(salesItems)) {
-            return Collections.emptyList();
-        }
-        return salesItems.stream()
-                .map(salesItem -> SalesItemDto.builder()
-                        .id(salesItem.getId())
-                        .salesId(salesItem.getSalesId())
-                        .productId(salesItem.getProductId())
-                        .unitPrice(salesItem.getUnitPrice())
-                        .totalPrice(salesItem.getTotalPrice())
-                        .productCount(salesItem.getProductCount())
-                        .createdDate(getTime(salesItem.getCreatedDate()))
-                        .build())
-                .toList();
-    }
+
 }

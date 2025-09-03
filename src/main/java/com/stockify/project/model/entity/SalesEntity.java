@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
@@ -31,11 +30,11 @@ public class SalesEntity {
 
     @NotNull
     @Column(nullable = false)
-    private String documentNumber;
+    private String documentId;
 
     @NotNull
     @Column(nullable = false)
-    private BigDecimal totalPriceWithTax;
+    private String documentNumber;
 
     @NotNull
     @Column(nullable = false)
@@ -43,7 +42,7 @@ public class SalesEntity {
 
     @NotNull
     @Column(nullable = false)
-    private BigDecimal totalPrice;
+    private BigDecimal discountRate;
 
     @NotNull
     @Column(nullable = false)
@@ -51,7 +50,15 @@ public class SalesEntity {
 
     @NotNull
     @Column(nullable = false)
-    private BigDecimal discountRate;
+    private BigDecimal totalPrice;
+
+    @NotNull
+    @Column(nullable = false)
+    private BigDecimal totalTaxPrice;
+
+    @NotNull
+    @Column(nullable = false)
+    private BigDecimal totalPriceWithTax;
 
     @NotNull
     @Column(nullable = false)
@@ -59,7 +66,4 @@ public class SalesEntity {
 
     @CreatedDate
     private LocalDateTime createdDate;
-
-    @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
 }

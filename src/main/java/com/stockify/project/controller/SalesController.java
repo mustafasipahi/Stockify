@@ -2,8 +2,6 @@ package com.stockify.project.controller;
 
 import com.stockify.project.model.dto.SalesProductDto;
 import com.stockify.project.model.request.SalesRequest;
-import com.stockify.project.model.response.SalesConfirmResponse;
-import com.stockify.project.model.response.SalesPreviewResponse;
 import com.stockify.project.model.response.SalesResponse;
 import com.stockify.project.service.SalesService;
 import lombok.RequiredArgsConstructor;
@@ -23,13 +21,8 @@ public class SalesController {
         return salesService.salesCalculate(request);
     }
 
-    @PostMapping("/preview")
-    public SalesPreviewResponse salesPreview(@RequestBody SalesRequest request) {
-        return salesService.salesPreview(request);
-    }
-
     @PostMapping("/confirm")
-    public SalesConfirmResponse salesConfirm(@RequestBody SalesRequest request) {
+    public SalesResponse salesConfirm(@RequestBody SalesRequest request) {
         return salesService.salesConfirm(request);
     }
 

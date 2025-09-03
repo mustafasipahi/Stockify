@@ -14,13 +14,15 @@ import com.stockify.project.repository.TransactionRepository;
 import com.stockify.project.specification.TransactionSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import static com.stockify.project.constant.CacheConstants.BROKER_BALANCE;
 
@@ -39,6 +41,7 @@ public class TransactionService {
         TransactionEntity transaction = TransactionEntity.builder()
                 .tenantId(salesEntity.getTenantId())
                 .brokerId(salesEntity.getBrokerId())
+                .documentId(salesEntity.getDocumentId())
                 .type(TransactionType.SALE)
                 .salesId(salesEntity.getId())
                 .documentNumber(salesEntity.getDocumentNumber())
@@ -56,6 +59,7 @@ public class TransactionService {
         TransactionEntity transaction = TransactionEntity.builder()
                 .tenantId(paymentEntity.getTenantId())
                 .brokerId(paymentEntity.getBrokerId())
+                .documentId(paymentEntity.getDocumentId())
                 .type(TransactionType.PAYMENT)
                 .paymentId(paymentEntity.getId())
                 .documentNumber(paymentEntity.getDocumentNumber())
@@ -65,17 +69,13 @@ public class TransactionService {
         transactionRepository.save(transaction);
     }
 
-    @Cacheable(value = BROKER_BALANCE, key = "#brokerId")
-    public BigDecimal getBrokerCurrentBalanceCache(Long brokerId, Long tenantId) {
-        return getBrokerCurrentBalance(brokerId, tenantId);
-    }
-
-    public List<TransactionDto> getTransactions(TransactionSearchRequest request) {
+    public Page<TransactionDto> getAllTransactions(TransactionSearchRequest request, int page, int size) {
         BrokerDto broker = getBroker(request.getBrokerId());
         Specification<TransactionEntity> specification = TransactionSpecification.filter(request);
-        return transactionRepository.findAll(specification).stream()
-                .map(transactionEntity -> TransactionConverter.toDto(transactionEntity, broker))
-                .toList();
+        Sort sort = Sort.by("createdDate").descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return transactionRepository.findAll(specification, pageable)
+                .map(transactionEntity -> TransactionConverter.toDto(transactionEntity, broker));
     }
 
     private BigDecimal getBrokerCurrentBalance(Long brokerId, Long tenantId) {

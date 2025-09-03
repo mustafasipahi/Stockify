@@ -132,11 +132,11 @@ public class InventoryService {
             @CacheEvict(value = INVENTORY_CRITICAL, allEntries = true),
             @CacheEvict(value = INVENTORY_OUT_OF, allEntries = true)
     })
-    public void decreaseInventory(Map<Long, Integer> productDecreaseProductCountMap, Long tenantId) {
+    public void decreaseInventory(Map<Long, Integer> productDecreaseProductCountMap) {
         for (Map.Entry<Long, Integer> entry : productDecreaseProductCountMap.entrySet()) {
             Long productId = entry.getKey();
             Integer decreaseProductCount = entry.getValue();
-            InventoryEntity inventoryEntity = inventoryRepository.findByProductIdAndTenantId(productId, tenantId)
+            InventoryEntity inventoryEntity = inventoryRepository.findByProductIdAndTenantId(productId, getTenantId())
                     .orElseThrow(() -> new InventoryNotFoundException(productId));
             Integer newProductCount = inventoryEntity.getProductCount() - decreaseProductCount;
             InventoryStatus newStatus = getInventoryStatus(newProductCount, inventoryEntity.getCriticalProductCount());

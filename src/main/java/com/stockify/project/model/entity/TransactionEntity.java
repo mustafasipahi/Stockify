@@ -37,6 +37,10 @@ public class TransactionEntity {
 
     @NotNull
     @Column(nullable = false)
+    private String documentId;
+
+    @NotNull
+    @Column(nullable = false)
     private String documentNumber;
 
     @NotNull

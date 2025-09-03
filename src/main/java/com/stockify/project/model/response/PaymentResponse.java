@@ -18,5 +18,5 @@ public class PaymentResponse {
     private String firstName;
     private String lastName;
     private BigDecimal paymentPrice;
-    private String documentNumber;
+    private String downloadUrl;
 }
