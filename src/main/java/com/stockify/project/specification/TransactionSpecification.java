@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.stockify.project.util.DateUtil.getLocalDateTime;
 import static com.stockify.project.util.TenantContext.getTenantId;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -25,9 +26,9 @@ public class TransactionSpecification {
                 predicates.add(criteriaBuilder.equal(root.get("brokerId"), request.getBrokerId()));
             }
             LocalDateTime now = LocalDateTime.now();
-            LocalDateTime startDate = Optional.ofNullable(request.getStartDate())
+            LocalDateTime startDate = Optional.ofNullable(getLocalDateTime(request.getStartDate()))
                     .orElse(now.minusMonths(1));
-            LocalDateTime endDate = Optional.ofNullable(request.getEndDate())
+            LocalDateTime endDate = Optional.ofNullable(getLocalDateTime(request.getEndDate()))
                     .orElse(now);
             predicates.add(criteriaBuilder.between(root.get("createdDate"), startDate, endDate));
             query.orderBy(criteriaBuilder.desc(root.get("createdDate")));

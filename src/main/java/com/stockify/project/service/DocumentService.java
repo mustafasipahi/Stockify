@@ -29,6 +29,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.util.*;
 
 import static com.stockify.project.util.DateUtil.getDocumentNameDate;
+import static com.stockify.project.util.DateUtil.getTime;
 import static com.stockify.project.util.DocumentUtil.*;
 import static com.stockify.project.util.DocumentUtil.getMetadataValue;
 import static com.stockify.project.util.TenantContext.getTenantId;
@@ -100,7 +101,7 @@ public class DocumentService {
             documentSearchResponse.setName(getMetadataValue(file, "safeFileName", null));
             documentSearchResponse.setDocumentType(getMetadataValue(file, "documentType", null));
             documentSearchResponse.setContentType(getMetadataValue(file, "contentType", null));
-            documentSearchResponse.setUploadDate(getMetadataDate(file, "createdDate"));
+            documentSearchResponse.setUploadDate(getTime(getMetadataDate(file, "createdDate")));
             documentSearchResponse.setDownloadUrl(getDownloadUrl(file.getObjectId().toHexString()));
             responseList.add(documentSearchResponse);
         });

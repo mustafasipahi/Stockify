@@ -8,6 +8,7 @@ import com.stockify.project.util.FinanceUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import static com.stockify.project.util.DateUtil.getTime;
 import static com.stockify.project.util.InventoryStatusUtil.getInventoryStatus;
 
 @Component
@@ -25,8 +26,8 @@ public class InventoryConverter {
                 .productCount(inventoryEntity.getProductCount())
                 .criticalProductCount(inventoryEntity.getCriticalProductCount())
                 .status(getInventoryStatus(inventoryEntity.getProductCount(), inventoryEntity.getCriticalProductCount()))
-                .createdDate(inventoryEntity.getCreatedDate())
-                .lastModifiedDate(inventoryEntity.getLastModifiedDate())
+                .createdDate(getTime(inventoryEntity.getCreatedDate()))
+                .lastModifiedDate(getTime(inventoryEntity.getLastModifiedDate()))
                 .build();
     }
 

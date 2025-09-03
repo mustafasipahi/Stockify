@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+import static com.stockify.project.util.DateUtil.getTime;
 import static com.stockify.project.util.TenantContext.getTenantId;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -44,7 +45,7 @@ public class SalesConverter {
                 .discountPrice(salesEntity.getDiscountPrice())
                 .discountRate(salesEntity.getDiscountRate())
                 .documentNumber(salesEntity.getDocumentNumber())
-                .createdDate(salesEntity.getCreatedDate())
+                .createdDate(getTime(salesEntity.getCreatedDate()))
                 .build();
     }
 }

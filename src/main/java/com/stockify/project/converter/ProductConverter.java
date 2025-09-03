@@ -7,6 +7,8 @@ import com.stockify.project.service.CategoryService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import static com.stockify.project.util.DateUtil.getTime;
+
 @Component
 @AllArgsConstructor
 public class ProductConverter {
@@ -23,8 +25,8 @@ public class ProductConverter {
                 .inventoryCode(productEntity.getInventoryCode())
                 .name(productEntity.getName())
                 .status(productEntity.getStatus())
-                .createdDate(productEntity.getCreatedDate())
-                .lastModifiedDate(productEntity.getLastModifiedDate())
+                .createdDate(getTime(productEntity.getCreatedDate()))
+                .lastModifiedDate(getTime(productEntity.getLastModifiedDate()))
                 .build();
     }
 

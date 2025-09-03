@@ -9,6 +9,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import java.util.Collections;
 import java.util.List;
 
+import static com.stockify.project.util.DateUtil.getTime;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SalesItemConverter {
 
@@ -24,7 +26,7 @@ public class SalesItemConverter {
                         .unitPrice(salesItem.getUnitPrice())
                         .totalPrice(salesItem.getTotalPrice())
                         .productCount(salesItem.getProductCount())
-                        .createdDate(salesItem.getCreatedDate())
+                        .createdDate(getTime(salesItem.getCreatedDate()))
                         .build())
                 .toList();
     }

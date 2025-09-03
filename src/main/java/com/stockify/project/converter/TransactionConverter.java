@@ -6,6 +6,8 @@ import com.stockify.project.model.entity.TransactionEntity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import static com.stockify.project.util.DateUtil.getTime;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TransactionConverter {
 
@@ -16,7 +18,7 @@ public class TransactionConverter {
                 .price(transactionEntity.getPrice())
                 .balance(transactionEntity.getBalance())
                 .type(transactionEntity.getType())
-                .createdDate(transactionEntity.getCreatedDate())
+                .createdDate(getTime(transactionEntity.getCreatedDate()))
                 .build();
     }
 }
