@@ -26,6 +26,11 @@ public class CategoryController {
         categoryService.update(request);
     }
 
+    @DeleteMapping("/delete/{id}")
+    public void delete(@PathVariable Long id) {
+        categoryService.delete(id);
+    }
+
     @GetMapping("/all")
     public List<CategoryDto> getAll() {
         return categoryService.getAll();

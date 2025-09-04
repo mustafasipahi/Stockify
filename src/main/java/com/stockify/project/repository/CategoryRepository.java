@@ -1,5 +1,6 @@
 package com.stockify.project.repository;
 
+import com.stockify.project.enums.CategoryStatus;
 import com.stockify.project.model.entity.CategoryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -12,5 +13,5 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
 
     Optional<CategoryEntity> findByNameAndTenantId(String name, Long tenantId);
 
-    List<CategoryEntity> findAllByTenantIdOrderByNameAsc(Long tenantId);
+    List<CategoryEntity> findAllByStatusAndTenantIdOrderByNameAsc(CategoryStatus status, Long tenantId);
 }

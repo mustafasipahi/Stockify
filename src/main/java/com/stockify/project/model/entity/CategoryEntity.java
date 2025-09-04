@@ -1,5 +1,6 @@
 package com.stockify.project.model.entity;
 
+import com.stockify.project.enums.CategoryStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -27,6 +28,11 @@ public class CategoryEntity {
     @NotNull
     @Column(nullable = false)
     private String name;
+
+    @NotNull
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CategoryStatus status;
 
     @NotNull
     @Column(nullable = false)

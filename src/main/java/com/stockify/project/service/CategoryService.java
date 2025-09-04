@@ -1,6 +1,7 @@
 package com.stockify.project.service;
 
 import com.stockify.project.converter.CategoryConverter;
+import com.stockify.project.enums.CategoryStatus;
 import com.stockify.project.exception.CategoryIdException;
 import com.stockify.project.exception.CategoryNotFoundException;
 import com.stockify.project.model.dto.CategoryDto;
@@ -37,6 +38,7 @@ public class CategoryService {
                 .name(request.getName())
                 .taxRate(request.getTaxRate())
                 .tenantId(getTenantId())
+                .status(CategoryStatus.ACTIVE)
                 .build();
         categoryRepository.save(categoryEntity);
     }
@@ -59,15 +61,28 @@ public class CategoryService {
         categoryRepository.save(categoryEntity);
     }
 
+    @Transactional
+    @CacheEvict(value = CATEGORY_DETAIL, key = "#categoryId")
+    public void delete(Long categoryId) {
+        if (categoryId == null) {
+            throw new CategoryIdException();
+        }
+        CategoryEntity categoryEntity = categoryRepository.findByIdAndTenantId(categoryId, getTenantId())
+                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
+        categoryEntity.setStatus(CategoryStatus.PASSIVE);
+        categoryRepository.save(categoryEntity);
+    }
+
     @Cacheable(value = CATEGORY_DETAIL, key = "#categoryId")
     public CategoryDto detail(Long categoryId) {
         return categoryRepository.findByIdAndTenantId(categoryId, getTenantId())
+                .filter(category -> category.getStatus().equals(CategoryStatus.ACTIVE))
                 .map(CategoryConverter::toDto)
                 .orElseThrow(() -> new CategoryNotFoundException(categoryId));
     }
 
     public List<CategoryDto> getAll() {
-        return categoryRepository.findAllByTenantIdOrderByNameAsc(getTenantId()).stream()
+        return categoryRepository.findAllByStatusAndTenantIdOrderByNameAsc(CategoryStatus.ACTIVE, getTenantId()).stream()
                 .map(CategoryConverter::toDto)
                 .toList();
     }

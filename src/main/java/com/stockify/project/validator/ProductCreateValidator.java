@@ -1,5 +1,6 @@
 package com.stockify.project.validator;
 
+import com.stockify.project.enums.CategoryStatus;
 import com.stockify.project.exception.*;
 import com.stockify.project.model.entity.CategoryEntity;
 import com.stockify.project.model.entity.ProductEntity;
@@ -40,8 +41,12 @@ public class ProductCreateValidator {
         if (request.getCategoryId() == null) {
             throw new CategoryIdException();
         }
-        Optional<CategoryEntity> category = categoryRepository.findByIdAndTenantId(request.getCategoryId(), getTenantId());
-        if (category.isEmpty()) {
+        Optional<CategoryEntity> optionalCategory = categoryRepository.findByIdAndTenantId(request.getCategoryId(), getTenantId());
+        if (optionalCategory.isEmpty()) {
+            throw new CategoryNotFoundException(request.getCategoryId());
+        }
+        CategoryEntity category = optionalCategory.get();
+        if (!category.getStatus().equals(CategoryStatus.ACTIVE)) {
             throw new CategoryNotFoundException(request.getCategoryId());
         }
     }
