@@ -6,6 +6,7 @@ import com.stockify.project.model.entity.UserEntity;
 import com.stockify.project.repository.CompanyInfoRepository;
 import com.stockify.project.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.io.ClassPathResource;
@@ -20,6 +21,7 @@ import javax.sql.DataSource;
 import static com.stockify.project.constant.LoginConstant.*;
 import static com.stockify.project.enums.TenantType.GURME;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DataInitializerService implements ApplicationRunner {
@@ -41,6 +43,7 @@ public class DataInitializerService implements ApplicationRunner {
             Resource resource = new ClassPathResource("initialization.sql");
             ScriptUtils.executeSqlScript(dataSource.getConnection(), resource);
         } catch (Exception e) {
+            log.error("initializeTestData", e);
             throw new StockifyRuntimeException("Database initialization failed");
         }
     }
