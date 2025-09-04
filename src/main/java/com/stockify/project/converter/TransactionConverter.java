@@ -6,6 +6,9 @@ import com.stockify.project.model.entity.TransactionEntity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import static com.stockify.project.util.DateUtil.getTime;
+import static com.stockify.project.util.DocumentUtil.getDownloadUrl;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TransactionConverter {
 
@@ -16,7 +19,8 @@ public class TransactionConverter {
                 .price(transactionEntity.getPrice())
                 .balance(transactionEntity.getBalance())
                 .type(transactionEntity.getType())
-                .createdDate(transactionEntity.getCreatedDate())
+                .downloadUrl(getDownloadUrl(transactionEntity.getDocumentId()))
+                .createdDate(getTime(transactionEntity.getCreatedDate()))
                 .build();
     }
 }

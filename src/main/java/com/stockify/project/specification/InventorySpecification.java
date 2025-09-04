@@ -1,8 +1,9 @@
 package com.stockify.project.specification;
 
 import com.stockify.project.model.entity.InventoryEntity;
+import com.stockify.project.model.entity.ProductEntity;
 import com.stockify.project.model.request.InventorySearchRequest;
-import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
@@ -23,8 +24,16 @@ public class InventorySpecification {
                 predicates.add(root.get("status").in(request.getStatusList()));
             }
             predicates.add(criteriaBuilder.equal(root.get("tenantId"), getTenantId()));
-            query.orderBy(criteriaBuilder.desc(root.get("createdDate")));
+            addSort(root, query, criteriaBuilder);
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
+    private static void addSort(Root<InventoryEntity> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+        Subquery<String> subquery = query.subquery(String.class);
+        Root<ProductEntity> productRoot = subquery.from(ProductEntity.class);
+        subquery.select(productRoot.get("name"));
+        subquery.where(criteriaBuilder.equal(productRoot.get("id"), root.get("productId")));
+        query.orderBy(criteriaBuilder.asc(subquery));
     }
 }

@@ -11,7 +11,6 @@ import com.stockify.project.model.request.ProductSearchRequest;
 import com.stockify.project.model.request.ProductUpdateRequest;
 import com.stockify.project.repository.ProductRepository;
 import com.stockify.project.specification.ProductSpecification;
-import com.stockify.project.util.InventoryCodeGenerator;
 import com.stockify.project.validator.ProductCreateValidator;
 import com.stockify.project.validator.ProductUpdateValidator;
 import lombok.RequiredArgsConstructor;
@@ -34,20 +33,15 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductCreateValidator createValidator;
     private final ProductUpdateValidator updateValidator;
-    private final InventoryCodeGenerator inventoryCodeGenerator;
     private final ProductConverter productConverter;
+    private final InventoryDefaultService inventoryDefaultService;
 
     @Transactional
     public ProductDto save(ProductCreateRequest request) {
         createValidator.validate(request);
-        ProductEntity product = ProductEntity.builder()
-                .categoryId(request.getCategoryId())
-                .inventoryCode(inventoryCodeGenerator.generateInventoryCode())
-                .name(request.getName())
-                .status(ProductStatus.ACTIVE)
-                .tenantId(getTenantId())
-                .build();
+        ProductEntity product = productConverter.toEntity(request);
         ProductEntity savedProduct = productRepository.save(product);
+        inventoryDefaultService.saveDefault(savedProduct.getId());
         return productConverter.toIdDto(savedProduct);
     }
 

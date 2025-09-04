@@ -1,8 +1,6 @@
 package com.stockify.project.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.stockify.project.model.entity.SalesEntity;
-import com.stockify.project.model.entity.SalesItemEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,6 +15,6 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SalesPrepareDto {
 
-    private SalesEntity salesEntity;
-    private List<SalesItemEntity> salesItems;
+    private SalesDto sales;
+    private List<SalesItemDto> salesItems;
 }

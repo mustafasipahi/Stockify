@@ -1,6 +1,5 @@
 package com.stockify.project.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.stockify.project.enums.TransactionType;
 import lombok.AllArgsConstructor;
@@ -9,7 +8,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -23,6 +21,6 @@ public class TransactionDto {
     private BigDecimal price;
     private BigDecimal balance;
     private TransactionType type;
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-    private LocalDateTime createdDate;
+    private String downloadUrl;
+    private Long createdDate;
 }

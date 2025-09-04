@@ -1,5 +1,6 @@
-version: "3.8"
+version: '3.8'
 services:
+
   stockify-app:
     container_name: stockify-app
     image: stockify-app:1
@@ -42,26 +43,14 @@ services:
       - "3306:3306"
     expose:
       - 3306
-    command:
-      [
-        "--character-set-server=utf8mb4",
-        "--collation-server=utf8mb4_turkish_ci",
-        "--innodb_use_native_aio=0",
-        "--explicit_defaults_for_timestamp=1",
-      ]
+    command: [
+      "--character-set-server=utf8mb4",
+      "--collation-server=utf8mb4_turkish_ci",
+      "--innodb_use_native_aio=0",
+      "--explicit_defaults_for_timestamp=1"
+    ]
     healthcheck:
-      test:
-        [
-          "CMD",
-          "mysqladmin",
-          "ping",
-          "-h",
-          "localhost",
-          "-u",
-          "root",
-          "-proot",
-          "--silent",
-        ]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot", "--silent"]
       timeout: 10s
       retries: 15
       interval: 10s
@@ -74,7 +63,7 @@ services:
     image: redis:6.2-alpine
     restart: always
     ports:
-      - "6379:6379"
+      - '6379:6379'
     expose:
       - 6379
     healthcheck:
@@ -109,6 +98,7 @@ volumes:
   mysql_data:
   redis_data:
   mongodb_data:
+
 # docker exec -i stockify-app-mysql mysqladump -u root -p --no-create-info --skip-add-locks --skip-disable-keys --skip-lock-tables --compact stockify_app > src/main/java/com/stockify/project/initialization/dump.sql
 
 # docker exec -it stockify-app-redis redis-cli FLUSHALL

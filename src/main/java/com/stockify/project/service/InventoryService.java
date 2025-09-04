@@ -47,14 +47,7 @@ public class InventoryService {
     })
     public InventoryDto save(InventoryCreateRequest request) {
         inventoryCreateValidator.validate(request);
-        InventoryEntity inventoryEntity = InventoryEntity.builder()
-                .productId(request.getProductId())
-                .price(request.getPrice())
-                .productCount(request.getProductCount())
-                .criticalProductCount(request.getCriticalProductCount())
-                .status(getInventoryStatus(request.getProductCount(), request.getCriticalProductCount()))
-                .tenantId(getTenantId())
-                .build();
+        InventoryEntity inventoryEntity = inventoryConverter.toEntity(request);
         InventoryEntity savedInventoryEntity = inventoryRepository.save(inventoryEntity);
         return inventoryConverter.toIdDto(savedInventoryEntity);
     }
@@ -89,7 +82,7 @@ public class InventoryService {
         return inventoryConverter.toIdDto(updatedInventoryEntity);
     }
 
-    @Cacheable(value = INVENTORY_ALL)
+    //@Cacheable(value = INVENTORY_ALL)
     public List<InventoryDto> getAllInventory() {
         InventorySearchRequest searchRequest = getInventorySearchRequest(Collections.emptyList());
         Specification<InventoryEntity> specification = InventorySpecification.filter(searchRequest);
@@ -132,11 +125,11 @@ public class InventoryService {
             @CacheEvict(value = INVENTORY_CRITICAL, allEntries = true),
             @CacheEvict(value = INVENTORY_OUT_OF, allEntries = true)
     })
-    public void decreaseInventory(Map<Long, Integer> productDecreaseProductCountMap, Long tenantId) {
+    public void decreaseInventory(Map<Long, Integer> productDecreaseProductCountMap) {
         for (Map.Entry<Long, Integer> entry : productDecreaseProductCountMap.entrySet()) {
             Long productId = entry.getKey();
             Integer decreaseProductCount = entry.getValue();
-            InventoryEntity inventoryEntity = inventoryRepository.findByProductIdAndTenantId(productId, tenantId)
+            InventoryEntity inventoryEntity = inventoryRepository.findByProductIdAndTenantId(productId, getTenantId())
                     .orElseThrow(() -> new InventoryNotFoundException(productId));
             Integer newProductCount = inventoryEntity.getProductCount() - decreaseProductCount;
             InventoryStatus newStatus = getInventoryStatus(newProductCount, inventoryEntity.getCriticalProductCount());

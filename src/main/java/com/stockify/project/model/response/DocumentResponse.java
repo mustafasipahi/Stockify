@@ -1,10 +1,7 @@
 package com.stockify.project.model.response;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -18,6 +15,6 @@ public class DocumentResponse {
     private String name;
     private String documentType;
     private String contentType;
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-    private LocalDateTime uploadDate;
+    private Long uploadDate;
+    private String downloadUrl;
 }

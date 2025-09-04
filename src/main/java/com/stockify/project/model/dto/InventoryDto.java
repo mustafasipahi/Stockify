@@ -1,6 +1,5 @@
 package com.stockify.project.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.stockify.project.enums.InventoryStatus;
 import lombok.*;
@@ -8,7 +7,6 @@ import lombok.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -28,8 +26,6 @@ public class InventoryDto implements Serializable {
     private Integer productCount;
     private Integer criticalProductCount;
     private InventoryStatus status;
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-    private LocalDateTime createdDate;
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-    private LocalDateTime lastModifiedDate;
+    private Long createdDate;
+    private Long lastModifiedDate;
 }

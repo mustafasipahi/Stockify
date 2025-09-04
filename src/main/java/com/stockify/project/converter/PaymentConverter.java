@@ -7,25 +7,27 @@ import com.stockify.project.model.response.PaymentResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import static com.stockify.project.util.DocumentUtil.getDownloadUrl;
+import static com.stockify.project.util.TenantContext.getTenantId;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PaymentConverter {
 
-    public static PaymentEntity toEntity(PaymentCreateRequest request, String documentNumber, Long tenantId) {
+    public static PaymentEntity toEntity(PaymentCreateRequest request) {
         return PaymentEntity.builder()
-                .documentNumber(documentNumber)
                 .brokerId(request.getBrokerId())
                 .price(request.getPaymentPrice())
                 .type(request.getPaymentType())
-                .tenantId(tenantId)
+                .tenantId(getTenantId())
                 .build();
     }
 
-    public static PaymentResponse toResponse(PaymentEntity paymentEntity, BrokerDto broker) {
+    public static PaymentResponse toResponse(PaymentEntity paymentEntity, BrokerDto broker, String documentId) {
         return PaymentResponse.builder()
                 .firstName(broker.getFirstName())
                 .lastName(broker.getLastName())
                 .paymentPrice(paymentEntity.getPrice())
-                .documentNumber(paymentEntity.getDocumentNumber())
+                .downloadUrl(getDownloadUrl(documentId))
                 .build();
     }
 }

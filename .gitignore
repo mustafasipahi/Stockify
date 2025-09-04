@@ -1,4 +1,4 @@
-# Maven build directory
+HELP.md
 target/
 .mvn
 mvnw*
@@ -6,22 +6,21 @@ mvnw*
 !**/src/main/**
 !**/src/test/**
 
-# IDE files
-### IntelliJ IDEA ###
-.idea/
-*.iws
-*.iml
-*.ipr
-.project
-.classpath
-.settings/
-
 ### STS ###
 .apt_generated
+.classpath
 .factorypath
+.project
+.settings
 .springBeans
 .sts4-cache
 .metadata
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
 
 ### NetBeans ###
 /nbproject/private/
@@ -34,30 +33,10 @@ build/
 ### VS Code ###
 .vscode/
 
-# Compiled class files
-*.class
-
-# Log files
-*.log
-
-# Package files
-*.jar
-*.war
-*.ear
-*.zip
-*.tar.gz
-*.rar
-
-# virtual machine crash logs
-hs_err_pid*
-
-# Local configuration files
+# Mac OS Files
 .DS_Store
 .AppleDouble
 .LSOverride
-
-# Help file
-HELP.md
 
 # Thumbnails
 ._*

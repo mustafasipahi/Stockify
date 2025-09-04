@@ -34,6 +34,10 @@ public class SalesItemEntity {
 
     @NotNull
     @Column(nullable = false)
+    private Integer productCount;
+
+    @NotNull
+    @Column(nullable = false)
     private BigDecimal unitPrice;
 
     @NotNull
@@ -42,19 +46,15 @@ public class SalesItemEntity {
 
     @NotNull
     @Column(nullable = false)
-    private BigDecimal totalPriceWithTax;
-
-    @NotNull
-    @Column(nullable = false)
-    private Integer productCount;
-
-    @NotNull
-    @Column(nullable = false)
     private BigDecimal taxRate;
 
     @NotNull
     @Column(nullable = false)
     private BigDecimal taxPrice;
+
+    @NotNull
+    @Column(nullable = false)
+    private BigDecimal totalPriceWithTax;
 
     @NotNull
     @Column(nullable = false)

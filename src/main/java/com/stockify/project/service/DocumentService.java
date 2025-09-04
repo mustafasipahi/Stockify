@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
 
 import static com.stockify.project.util.DateUtil.getDocumentNameDate;
+import static com.stockify.project.util.DateUtil.getTime;
 import static com.stockify.project.util.DocumentUtil.*;
 import static com.stockify.project.util.DocumentUtil.getMetadataValue;
 import static com.stockify.project.util.TenantContext.getTenantId;
@@ -41,12 +42,20 @@ public class DocumentService {
     private final GridFsTemplate gridFsTemplate;
     private final GridFSBucket gridFSBucket;
 
+    public DocumentResponse uploadSalesFile() {
+        return new DocumentResponse();
+    }
+
+    public DocumentResponse uploadPaymentFile() {
+        return new DocumentResponse();
+    }
+
     public DocumentResponse uploadFile(MultipartFile file, DocumentUploadRequest request, String username) {
         uploadValidator.validate(file, request);
         try {
             String documentNameDate = getDocumentNameDate();
             String originalFilename = file.getOriginalFilename();
-            String safeFileName = safeFileName(originalFilename + "_" + username + "_" + documentNameDate);
+            String safeFileName = safeFileName(username + "_" + documentNameDate + "_" + originalFilename);
             String safeOriginalFilename = safeFileName(originalFilename);
             DBObject metadata = new BasicDBObject();
             metadata.put("safeFileName", safeFileName);
@@ -59,7 +68,9 @@ public class DocumentService {
             return DocumentResponse.builder()
                     .id(fileId.toHexString())
                     .name(safeFileName)
+                    .documentType(request.getDocumentType().name())
                     .contentType(file.getContentType())
+                    .downloadUrl(getDownloadUrl(fileId.toHexString()))
                     .build();
         } catch (Exception e) {
             throw new DocumentUploadException();
@@ -95,11 +106,11 @@ public class DocumentService {
         List<DocumentResponse> responseList = new ArrayList<>();
         gridFsTemplate.find(query).forEach(file -> {
             DocumentResponse documentSearchResponse = new DocumentResponse();
-            documentSearchResponse.setId(file.getObjectId().toHexString());
             documentSearchResponse.setName(getMetadataValue(file, "safeFileName", null));
             documentSearchResponse.setDocumentType(getMetadataValue(file, "documentType", null));
             documentSearchResponse.setContentType(getMetadataValue(file, "contentType", null));
-            documentSearchResponse.setUploadDate(getMetadataDate(file, "createdDate"));
+            documentSearchResponse.setUploadDate(getTime(getMetadataDate(file, "createdDate")));
+            documentSearchResponse.setDownloadUrl(getDownloadUrl(file.getObjectId().toHexString()));
             responseList.add(documentSearchResponse);
         });
         return responseList;

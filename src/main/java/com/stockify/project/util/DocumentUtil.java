@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -65,5 +66,16 @@ public class DocumentUtil {
             return null;
         }
         return null;
+    }
+
+    public static String getDownloadUrl(String id) {
+        if (StringUtils.isBlank(id)) {
+            return null;
+        }
+        return ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/documents/download/")
+                .path(id)
+                .toUriString();
     }
 }

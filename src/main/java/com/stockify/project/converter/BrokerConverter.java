@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
+import static com.stockify.project.util.DateUtil.getTime;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BrokerConverter {
 
@@ -18,8 +20,8 @@ public class BrokerConverter {
                 .discountRate(brokerEntity.getDiscountRate())
                 .currentBalance(currentBalance)
                 .status(brokerEntity.getStatus())
-                .createdDate(brokerEntity.getCreatedDate())
-                .lastModifiedDate(brokerEntity.getLastModifiedDate())
+                .createdDate(getTime(brokerEntity.getCreatedDate()))
+                .lastModifiedDate(getTime(brokerEntity.getLastModifiedDate()))
                 .build();
     }
 

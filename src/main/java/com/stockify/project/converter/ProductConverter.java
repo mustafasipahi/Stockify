@@ -1,17 +1,34 @@
 package com.stockify.project.converter;
 
+import com.stockify.project.enums.ProductStatus;
 import com.stockify.project.model.dto.CategoryDto;
 import com.stockify.project.model.dto.ProductDto;
 import com.stockify.project.model.entity.ProductEntity;
+import com.stockify.project.model.request.ProductCreateRequest;
 import com.stockify.project.service.CategoryService;
+import com.stockify.project.util.InventoryCodeGenerator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import static com.stockify.project.util.DateUtil.getTime;
+import static com.stockify.project.util.TenantContext.getTenantId;
 
 @Component
 @AllArgsConstructor
 public class ProductConverter {
 
     private final CategoryService categoryService;
+    private final InventoryCodeGenerator inventoryCodeGenerator;
+
+    public ProductEntity toEntity(ProductCreateRequest request) {
+        return ProductEntity.builder()
+                .categoryId(request.getCategoryId())
+                .inventoryCode(inventoryCodeGenerator.generateInventoryCode())
+                .name(request.getName())
+                .status(ProductStatus.ACTIVE)
+                .tenantId(getTenantId())
+                .build();
+    }
 
     public ProductDto toDto(ProductEntity productEntity) {
         CategoryDto category = getCategory(productEntity.getCategoryId());
@@ -23,8 +40,8 @@ public class ProductConverter {
                 .inventoryCode(productEntity.getInventoryCode())
                 .name(productEntity.getName())
                 .status(productEntity.getStatus())
-                .createdDate(productEntity.getCreatedDate())
-                .lastModifiedDate(productEntity.getLastModifiedDate())
+                .createdDate(getTime(productEntity.getCreatedDate()))
+                .lastModifiedDate(getTime(productEntity.getLastModifiedDate()))
                 .build();
     }
 
