@@ -2,10 +2,10 @@ version: '3.8'
 services:
 
   stockify-app:
-    container_name: stockify-app-dev
+    container_name: stockify-app
     build:
       context: ./
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     restart: always
     ports:
       - "8080:8080"
