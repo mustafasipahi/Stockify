@@ -3,17 +3,15 @@ services:
 
   stockify-app:
     container_name: stockify-app
+    image: stockify-app:1
+    restart: always
     build:
       context: ./
       dockerfile: Dockerfile
-    restart: always
+      args:
+        BUILDKIT_INLINE_CACHE: 1
     ports:
       - "8080:8080"
-      - "35729:35729"
-    volumes:
-      - ./src:/stockify_app/src
-      - ./pom.xml:/stockify_app/pom.xml
-      - maven-cache:/root/.m2
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://stockify-app-mysql:3306/stockify_app?autoReconnect=true&useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
@@ -23,8 +21,6 @@ services:
       REDIS_PORT: 6379
       SPRING_DATA_MONGODB_URI: mongodb://stockify-app-mongodb:27017/stockify_files
       JAVA_OPTS: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
-      SPRING_DEVTOOLS_RESTART_ENABLED: "true"
-      SPRING_DEVTOOLS_LIVERELOAD_ENABLED: "true"
     depends_on:
       stockify-app-mysql:
         condition: service_healthy
@@ -32,8 +28,6 @@ services:
         condition: service_healthy
       stockify-app-mongodb:
         condition: service_healthy
-    stdin_open: true
-    tty: true
 
   stockify-app-mysql:
     container_name: stockify-app-mysql
@@ -104,7 +98,6 @@ volumes:
   mysql_data:
   redis_data:
   mongodb_data:
-  maven-cache:
 
 # docker exec -i stockify-app-mysql mysqladump -u root -p --no-create-info --skip-add-locks --skip-disable-keys --skip-lock-tables --compact stockify_app > src/main/java/com/stockify/project/initialization/dump.sql
 
@@ -119,4 +112,3 @@ volumes:
 # docker rmi $(docker images -a -q)
 
 # docker-compose up -d
-# docker-compose up --build
