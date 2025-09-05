@@ -82,7 +82,13 @@ public class InventoryService {
         return inventoryConverter.toIdDto(updatedInventoryEntity);
     }
 
-    //@Cacheable(value = INVENTORY_ALL)
+    public InventoryDto detail(Long inventoryId) {
+        return inventoryRepository.findByIdAndTenantId(inventoryId, getTenantId())
+                .map(inventoryConverter::toDto)
+                .orElseThrow(() -> new InventoryNotFoundException(inventoryId));
+    }
+
+    @Cacheable(value = INVENTORY_ALL)
     public List<InventoryDto> getAllInventory() {
         InventorySearchRequest searchRequest = getInventorySearchRequest(Collections.emptyList());
         Specification<InventoryEntity> specification = InventorySpecification.filter(searchRequest);

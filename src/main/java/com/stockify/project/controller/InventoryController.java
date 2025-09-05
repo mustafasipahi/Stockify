@@ -26,6 +26,11 @@ public class InventoryController {
         return inventoryService.update(request);
     }
 
+    @GetMapping("/detail/{id}")
+    public InventoryDto detail(@PathVariable Long id) {
+        return inventoryService.detail(id);
+    }
+
     @GetMapping("/all")
     public List<InventoryDto> getAllInventory() {
         return inventoryService.getAllInventory();

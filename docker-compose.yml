@@ -107,8 +107,10 @@ volumes:
 # docker ps
 # docker images -a
 # docker network ls
-# docker run --name stock-app -p 8080:8080 stock-app
-# docker image rm stock-app
+# docker run --name stockify-app -p 8080:8080 stockify-app
 # docker rmi $(docker images -a -q)
 
+##############################
+# docker image rm stockify-app:1
 # docker-compose up -d
+##############################
