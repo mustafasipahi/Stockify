@@ -17,13 +17,12 @@ public class CompanyService {
     private final CompanyInfoRepository companyInfoRepository;
 
     @Cacheable(value = COMPANY_DETAIL, key = "#tenantId")
-    public CompanyInfoDto getReceiptInfo(Long tenantId) {
+    public CompanyInfoDto getCompanyInfo(Long tenantId) {
         CompanyInfoEntity companyInfoEntity = companyInfoRepository.findByTenantId(tenantId)
                 .orElseThrow(CompanyInfoNotFoundException::new);
         return CompanyInfoDto.builder()
                 .companyName(companyInfoEntity.getCompanyName())
                 .companyAddress(companyInfoEntity.getCompanyAddress())
-                .cari(companyInfoEntity.getCari())
                 .build();
     }
 }

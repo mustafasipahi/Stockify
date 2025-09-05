@@ -26,7 +26,7 @@ public class DateUtil {
     }
 
     public static String getDocumentNameDate() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy_HHmmss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy_HHmm");
         LocalDateTime now = LocalDateTime.now();
         return now.format(formatter);
     }

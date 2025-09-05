@@ -33,10 +33,6 @@ public class CompanyInfoEntity {
     private String companyAddress;
 
     @NotNull
-    @Column(nullable = false)
-    private String cari;
-
-    @NotNull
     @Column(unique = true, nullable = false)
     private Long tenantId;
 

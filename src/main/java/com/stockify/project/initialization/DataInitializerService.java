@@ -1,6 +1,5 @@
 package com.stockify.project.initialization;
 
-import com.stockify.project.exception.StockifyRuntimeException;
 import com.stockify.project.model.entity.CompanyInfoEntity;
 import com.stockify.project.model.entity.UserEntity;
 import com.stockify.project.repository.CompanyInfoRepository;
@@ -40,11 +39,10 @@ public class DataInitializerService implements ApplicationRunner {
 
     private void initializeTestData() {
         try {
-            Resource resource = new ClassPathResource("initialization.sql");
+            Resource resource = new ClassPathResource("/initialization/initialization.sql");
             ScriptUtils.executeSqlScript(dataSource.getConnection(), resource);
         } catch (Exception e) {
-            log.error("initializeTestData", e);
-            throw new StockifyRuntimeException("Database initialization failed");
+            log.error("Initialize Test Data Error!", e);
         }
     }
 
@@ -52,8 +50,7 @@ public class DataInitializerService implements ApplicationRunner {
         if (companyInfoRepository.findByTenantId(GURME.getTenantId()).isEmpty()) {
             CompanyInfoEntity companyInfoEntity = new CompanyInfoEntity();
             companyInfoEntity.setCompanyName("Gurme Şirketler Grubu Lt.Ş.");
-            companyInfoEntity.setCompanyAddress("Antalyada bir Yerde Gülveren Tarafında");
-            companyInfoEntity.setCari("Cari ne demek bilmiyorum şeysi");
+            companyInfoEntity.setCompanyAddress("Antalyada Bir Yerde Gülveren Tarafında");
             companyInfoEntity.setTenantId(GURME.getTenantId());
             companyInfoRepository.save(companyInfoEntity);
         }

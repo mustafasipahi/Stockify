@@ -110,7 +110,7 @@ volumes:
 # docker run --name stockify-app -p 8080:8080 stockify-app
 # docker rmi $(docker images -a -q)
 
-##############################
+##################################
 # docker image rm stockify-app:1
 # docker-compose up -d
-##############################
+##################################

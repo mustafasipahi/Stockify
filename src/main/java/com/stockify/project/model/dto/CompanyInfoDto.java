@@ -8,7 +8,6 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -22,5 +21,4 @@ public class CompanyInfoDto implements Serializable {
 
     private String companyName;
     private String companyAddress;
-    private String cari;
 }

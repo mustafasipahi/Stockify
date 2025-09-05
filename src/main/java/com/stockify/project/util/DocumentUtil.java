@@ -16,7 +16,20 @@ import java.util.Date;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DocumentUtil {
 
-    public static String safeFileName(String originalFileName) {
+    public static String replaceCharacter(String originalFileName) {
+        if (StringUtils.isEmpty(originalFileName)) {
+            return StringUtils.EMPTY;
+        }
+        return originalFileName
+                .replace("ü", "u").replace("Ü", "U")
+                .replace("ö", "o").replace("Ö", "O")
+                .replace("ç", "c").replace("Ç", "C")
+                .replace("ğ", "g").replace("Ğ", "G")
+                .replace("ş", "s").replace("Ş", "S")
+                .replace("ı", "i").replace("İ", "I");
+    }
+
+    public static String replaceCharacterForFile(String originalFileName) {
         if (StringUtils.isEmpty(originalFileName)) {
             return "unnamed_file";
         }
@@ -29,7 +42,7 @@ public class DocumentUtil {
                 .replace("ı", "i").replace("İ", "I")
                 .replaceAll("[^a-zA-Z0-9._-]", "_")
                 .replaceAll("_{2,}", "_")
-                .replaceAll("^_+|_+$", "");
+                .replaceAll("(^_+)|(_+$)", "");
     }
 
     public static String encodeFileName(String originalFileName) {

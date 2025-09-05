@@ -4,6 +4,7 @@ import com.stockify.project.converter.PaymentConverter;
 import com.stockify.project.enums.BrokerStatus;
 import com.stockify.project.exception.BrokerNotFoundException;
 import com.stockify.project.model.dto.BrokerDto;
+import com.stockify.project.model.dto.PaymentDto;
 import com.stockify.project.model.entity.PaymentEntity;
 import com.stockify.project.model.request.PaymentCreateRequest;
 import com.stockify.project.model.response.DocumentResponse;
@@ -14,16 +15,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
-import static com.stockify.project.constant.DocumentNumberConstants.PAYMENT_DEFAULT;
-import static com.stockify.project.constant.DocumentNumberConstants.PAYMENT_PREFIX;
-
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
+    private final PaymentConverter paymentConverter;
     private final BrokerService brokerService;
     private final TransactionService transactionService;
     private final DocumentService documentService;
@@ -32,12 +29,13 @@ public class PaymentService {
     public PaymentResponse save(PaymentCreateRequest request) {
         PaymentCreateValidator.validate(request);
         BrokerDto broker = getBroker(request.getBrokerId());
-        PaymentEntity paymentEntity = PaymentConverter.toEntity(request);
-        String documentId = uploadDocument(paymentEntity);
+        PaymentDto paymentDto = paymentConverter.toDto(request);
+        PaymentEntity paymentEntity = paymentConverter.toEntity(paymentDto);
+        String documentId = uploadDocument(paymentDto, paymentEntity);
         PaymentEntity savedPaymentEntity = savePaymentEntity(paymentEntity);
         evictBrokerCache(savedPaymentEntity.getBrokerId());
         saveTransaction(savedPaymentEntity);
-        return PaymentConverter.toResponse(savedPaymentEntity, broker, documentId);
+        return paymentConverter.toResponse(savedPaymentEntity, broker, documentId);
     }
 
     private BrokerDto getBroker(Long brokerId) {
@@ -56,21 +54,14 @@ public class PaymentService {
         brokerService.evictBrokerCache(brokerId);
     }
 
-    private String uploadDocument(PaymentEntity paymentEntity) {
-        DocumentResponse documentResponse = documentService.uploadPaymentFile();
+    private String uploadDocument(PaymentDto paymentDto, PaymentEntity paymentEntity) {
+        DocumentResponse documentResponse = documentService.uploadPaymentFile(paymentDto);
         String documentId = documentResponse.getId();
         paymentEntity.setDocumentId(documentId);
-        paymentEntity.setDocumentNumber(getDocumentNumber());
         return documentId;
     }
 
     private void saveTransaction(PaymentEntity savedPaymentEntity) {
         transactionService.createPaymentTransaction(savedPaymentEntity);
-    }
-
-    private String getDocumentNumber() {
-        return Optional.ofNullable(paymentRepository.findMaxDocumentNumberNumeric())
-                .map(lastDocumentNumber -> PAYMENT_PREFIX + (lastDocumentNumber + 1))
-                .orElse(PAYMENT_PREFIX + PAYMENT_DEFAULT);
     }
 }

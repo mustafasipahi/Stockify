@@ -27,8 +27,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.stockify.project.constant.DocumentNumberConstants.*;
-import static com.stockify.project.converter.SalesConverter.*;
 import static com.stockify.project.validator.SalesValidator.validate;
 
 @Service
@@ -37,6 +35,7 @@ public class SalesService {
 
     private final SalesRepository salesRepository;
     private final SalesItemRepository salesItemRepository;
+    private final SalesConverter salesConverter;
     private final InventoryService inventoryService;
     private final BrokerService brokerService;
     private final TransactionService transactionService;
@@ -45,31 +44,32 @@ public class SalesService {
     @Transactional
     public SalesResponse salesCalculate(SalesRequest request) {
         SalesPrepareDto prepareDto = prepareSalesFlow(request);
-        return SalesConverter.toResponse(prepareDto.getSales(), prepareDto.getSalesItems(), null);
+        return salesConverter.toResponse(prepareDto.getSales(), prepareDto.getSalesItems(), null);
     }
 
     @Transactional
     public SalesResponse salesConfirm(SalesRequest request) {
         SalesPrepareDto prepareDto = prepareSalesFlow(request);
-        SalesEntity salesEntity = toSalesEntity(prepareDto.getSales());
-        String documentId = uploadDocument(salesEntity);
+        SalesEntity salesEntity = salesConverter.toSalesEntity(prepareDto.getSales());
+        String documentId = uploadDocument(prepareDto, salesEntity);
         SalesEntity savedSalesEntity = saveSalesEntity(salesEntity);
         saveSalesItemEntity(prepareDto.getSalesItems(), savedSalesEntity.getId());
         decreaseProductInventory(prepareDto.getSalesItems());
         evictBrokerCache(request.getBrokerId());
         saveTransaction(savedSalesEntity);
-        return SalesConverter.toResponse(prepareDto.getSales(), prepareDto.getSalesItems(), documentId);
+        return salesConverter.toResponse(prepareDto.getSales(), prepareDto.getSalesItems(), documentId);
     }
 
     private SalesPrepareDto prepareSalesFlow(SalesRequest request) {
         validate(request);
         List<SalesProductDto> availableProducts = getProducts();
         List<SalesProductRequest> requestedProducts = request.getProducts();
-        BigDecimal discountRate = getDiscountRate(request.getBrokerId());
+        BrokerDto broker = getBroker(request.getBrokerId());
+        BigDecimal discountRate = getDiscountRate(broker);
         List<SalesItemDto> salesItems = validateAndProcessProducts(requestedProducts, availableProducts);
         SalesPriceDto salesPriceDto = calculateTaxAndDiscount(salesItems, discountRate);
-        SalesDto sales = SalesConverter.toSalesDto(request.getBrokerId(), salesPriceDto);
-        return SalesConverter.toPrepareDto(sales, salesItems);
+        SalesDto sales = salesConverter.toSalesDto(request.getBrokerId(), salesPriceDto);
+        return salesConverter.toPrepareDto(sales, salesItems, broker);
     }
 
     public List<SalesProductDto> getProducts() {
@@ -84,10 +84,13 @@ public class SalesService {
                 .toList();
     }
 
-    private BigDecimal getDiscountRate(Long brokerId) {
-        BrokerDto broker = brokerService.detail(brokerId);
+    private BrokerDto getBroker(Long brokerId) {
+        return brokerService.detail(brokerId);
+    }
+
+    private BigDecimal getDiscountRate(BrokerDto broker) {
         if (broker.getStatus() != BrokerStatus.ACTIVE) {
-            throw new BrokerNotFoundException(brokerId);
+            throw new BrokerNotFoundException(broker.getBrokerId());
         }
         return Optional.ofNullable(broker.getDiscountRate())
                 .orElse(BigDecimal.ZERO);
@@ -120,7 +123,8 @@ public class SalesService {
             BigDecimal taxRate = availableProduct.getTaxRate();
             BigDecimal taxPrice = totalPrice.multiply(taxRate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
             BigDecimal totalPriceWithTax = totalPrice.add(taxPrice);
-            SalesItemDto salesItem = toSalesItemDto(productId, productCount, unitPrice, totalPrice, taxRate, taxPrice, totalPriceWithTax, availableProduct.getProductName());
+            SalesItemDto salesItem = salesConverter.toSalesItemDto(productId, productCount, unitPrice, totalPrice, taxRate,
+                    taxPrice, totalPriceWithTax, availableProduct.getProductName());
             salesItems.add(salesItem);
         }
         return salesItems;
@@ -158,7 +162,7 @@ public class SalesService {
         List<SalesItemDto> salesItemDtoList = salesItems.stream()
                 .peek(salesItem -> salesItem.setSalesId(salesId))
                 .toList();
-        salesItemRepository.saveAll(toSalesItemEntity(salesItemDtoList));
+        salesItemRepository.saveAll(salesConverter.toSalesItemEntity(salesItemDtoList));
     }
 
     private void decreaseProductInventory(List<SalesItemDto> salesItems) {
@@ -171,21 +175,14 @@ public class SalesService {
         brokerService.evictBrokerCache(brokerId);
     }
 
-    private String uploadDocument(SalesEntity savedSalesEntity) {
-        DocumentResponse documentResponse = documentService.uploadSalesFile();
+    private String uploadDocument(SalesPrepareDto prepareDto, SalesEntity salesEntity) {
+        DocumentResponse documentResponse = documentService.uploadSalesFile(prepareDto);
         String documentId = documentResponse.getId();
-        savedSalesEntity.setDocumentId(documentId);
-        savedSalesEntity.setDocumentNumber(getDocumentNumber());
+        salesEntity.setDocumentId(documentId);
         return documentId;
     }
 
     private void saveTransaction(SalesEntity salesEntity) {
         transactionService.createSalesTransaction(salesEntity);
-    }
-
-    private String getDocumentNumber() {
-        return Optional.ofNullable(salesRepository.findMaxDocumentNumberNumeric())
-                .map(lastDocumentNumber -> SALES_PREFIX + (lastDocumentNumber + 1))
-                .orElse(SALES_PREFIX + SALES_DEFAULT);
     }
 }
