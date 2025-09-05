@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static com.stockify.project.constant.CacheConstants.PRODUCT_DETAIL;
+import static com.stockify.project.enums.ProductStatus.ACTIVE;
 import static com.stockify.project.util.TenantContext.getTenantId;
 
 @Service
@@ -35,6 +36,7 @@ public class ProductService {
     private final ProductUpdateValidator updateValidator;
     private final ProductConverter productConverter;
     private final InventoryDefaultService inventoryDefaultService;
+    private final ToPassiveService toPassiveService;
 
     @Transactional
     public ProductDto save(ProductCreateRequest request) {
@@ -51,11 +53,15 @@ public class ProductService {
         if (request.getProductId() == null) {
             throw new ProductIdException();
         }
-        ProductEntity productEntity = productRepository.findByIdAndTenantId(request.getProductId(), getTenantId())
+        ProductEntity productEntity = productRepository.findByIdAndStatusAndTenantId(request.getProductId(), ACTIVE, getTenantId())
                 .orElseThrow(() -> new ProductNotFoundException(request.getProductId()));
-        if (StringUtils.isNotBlank(request.getName())) {
+        if (StringUtils.isNotBlank(request.getName()) && !request.getName().equals(productEntity.getName())) {
             updateValidator.validateName(request.getName());
             productEntity.setName(request.getName());
+        }
+        if (request.getCategoryId() != null) {
+            updateValidator.validateCategory(request.getCategoryId());
+            productEntity.setCategoryId(request.getCategoryId());
         }
         ProductEntity updatedProduct = productRepository.save(productEntity);
         return productConverter.toIdDto(updatedProduct);
@@ -64,16 +70,17 @@ public class ProductService {
     @Transactional
     @CacheEvict(value = PRODUCT_DETAIL, key = "#productId")
     public ProductDto delete(Long productId) {
-        ProductEntity productEntity = productRepository.findByIdAndTenantId(productId, getTenantId())
+        ProductEntity productEntity = productRepository.findByIdAndStatusAndTenantId(productId, ACTIVE, getTenantId())
                 .orElseThrow(() -> new ProductNotFoundException(productId));
         productEntity.setStatus(ProductStatus.PASSIVE);
         ProductEntity deletedProduct = productRepository.save(productEntity);
+        toPassiveService.updateToPassiveByProductId(productId);
         return productConverter.toIdDto(deletedProduct);
     }
 
     @Cacheable(value = PRODUCT_DETAIL, key = "#productId")
     public ProductDto detail(Long productId) {
-        return productRepository.findByIdAndTenantId(productId, getTenantId())
+        return productRepository.findByIdAndStatusAndTenantId(productId, ACTIVE, getTenantId())
                 .map(productConverter::toDto)
                 .orElseThrow(() -> new ProductNotFoundException(productId));
     }

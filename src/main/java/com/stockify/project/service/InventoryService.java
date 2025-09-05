@@ -63,7 +63,7 @@ public class InventoryService {
         if (request.getInventoryId() == null) {
             throw new InventoryIdException();
         }
-        InventoryEntity inventoryEntity = inventoryRepository.findByIdAndTenantId(request.getInventoryId(), getTenantId())
+        InventoryEntity inventoryEntity = inventoryRepository.findByIdAndActiveTrueAndTenantId(request.getInventoryId(), getTenantId())
                 .orElseThrow(() -> new InventoryNotFoundException(request.getInventoryId()));
         if (request.getPrice() != null) {
             inventoryUpdateValidator.validatePrice(request.getPrice());
@@ -77,13 +77,16 @@ public class InventoryService {
             inventoryUpdateValidator.validateCriticalProductCount(request.getCriticalProductCount());
             inventoryEntity.setCriticalProductCount(request.getCriticalProductCount());
         }
+        if (request.getActive() != null) {
+            inventoryEntity.setActive(request.getActive());
+        }
         inventoryEntity.setStatus(getInventoryStatus(inventoryEntity.getProductCount(), inventoryEntity.getCriticalProductCount()));
         InventoryEntity updatedInventoryEntity = inventoryRepository.save(inventoryEntity);
         return inventoryConverter.toIdDto(updatedInventoryEntity);
     }
 
     public InventoryDto detail(Long inventoryId) {
-        return inventoryRepository.findByIdAndTenantId(inventoryId, getTenantId())
+        return inventoryRepository.findByIdAndActiveTrueAndTenantId(inventoryId, getTenantId())
                 .map(inventoryConverter::toDto)
                 .orElseThrow(() -> new InventoryNotFoundException(inventoryId));
     }

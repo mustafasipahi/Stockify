@@ -31,7 +31,7 @@ public class InventoryEntity {
     private Long id;
 
     @NotNull
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private Long productId;
 
     @NotNull
@@ -44,6 +44,9 @@ public class InventoryEntity {
 
     @Column
     private Integer criticalProductCount;
+
+    @Column
+    private boolean active;
 
     @NotNull
     @Column(nullable = false)

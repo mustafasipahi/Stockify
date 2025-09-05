@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 public class InventoryUpdateRequest {
 
     private Long inventoryId;
+    private Boolean active;
     private BigDecimal price;
     private Integer productCount;
     private Integer criticalProductCount;

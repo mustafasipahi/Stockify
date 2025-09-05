@@ -23,6 +23,7 @@ public class InventoryConverter {
         return InventoryEntity.builder()
                 .productId(request.getProductId())
                 .price(request.getPrice())
+                .active(true)
                 .productCount(request.getProductCount())
                 .criticalProductCount(request.getCriticalProductCount())
                 .status(getInventoryStatus(request.getProductCount(), request.getCriticalProductCount()))

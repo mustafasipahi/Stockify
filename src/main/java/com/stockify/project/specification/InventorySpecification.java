@@ -23,6 +23,7 @@ public class InventorySpecification {
             if (CollectionUtils.isNotEmpty(request.getStatusList())) {
                 predicates.add(root.get("status").in(request.getStatusList()));
             }
+            predicates.add(criteriaBuilder.equal(root.get("active"), true));
             predicates.add(criteriaBuilder.equal(root.get("tenantId"), getTenantId()));
             addSort(root, query, criteriaBuilder);
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

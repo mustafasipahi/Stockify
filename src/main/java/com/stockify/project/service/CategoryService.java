@@ -30,6 +30,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryCreateValidator createValidator;
     private final CategoryUpdateValidator updateValidator;
+    private final ToPassiveService toPassiveService;
 
     @Transactional
     public void save(CategoryCreateRequest request) {
@@ -51,7 +52,7 @@ public class CategoryService {
         }
         CategoryEntity categoryEntity = categoryRepository.findByIdAndTenantId(request.getCategoryId(), getTenantId())
                 .orElseThrow(() -> new CategoryNotFoundException(request.getCategoryId()));
-        if (StringUtils.isNotBlank(request.getName())) {
+        if (StringUtils.isNotBlank(request.getName()) && !request.getName().equals(categoryEntity.getName())) {
             updateValidator.validateName(request.getName());
             categoryEntity.setName(request.getName());
         }
@@ -71,6 +72,7 @@ public class CategoryService {
                 .orElseThrow(() -> new CategoryNotFoundException(categoryId));
         categoryEntity.setStatus(CategoryStatus.PASSIVE);
         categoryRepository.save(categoryEntity);
+        toPassiveService.updateToPassiveByCategoryId(categoryId);
     }
 
     @Cacheable(value = CATEGORY_DETAIL, key = "#categoryId")

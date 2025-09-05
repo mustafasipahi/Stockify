@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import static com.stockify.project.constant.CacheConstants.*;
 import static com.stockify.project.util.TenantContext.getTenantId;
@@ -28,15 +29,22 @@ public class InventoryDefaultService {
             @CacheEvict(value = INVENTORY_OUT_OF, allEntries = true)
     })
     public void saveDefault(Long productId) {
-        InventoryEntity inventoryEntity = InventoryEntity.builder()
-                .productId(productId)
-                .price(BigDecimal.ZERO)
-                .productCount(0)
-                .criticalProductCount(0)
-                .status(InventoryStatus.OUT_OF_INVENTORY)
-                .tenantId(getTenantId())
-                .build();
+        Optional<InventoryEntity> optionalInventory = inventoryRepository.findById(productId);
+        InventoryEntity inventoryEntity;
+        if (optionalInventory.isPresent()) {
+            inventoryEntity = optionalInventory.get();
+            inventoryEntity.setActive(true);
+        } else {
+            inventoryEntity = InventoryEntity.builder()
+                    .productId(productId)
+                    .active(true)
+                    .price(BigDecimal.ZERO)
+                    .productCount(0)
+                    .criticalProductCount(0)
+                    .status(InventoryStatus.OUT_OF_INVENTORY)
+                    .tenantId(getTenantId())
+                    .build();
+        }
         inventoryRepository.save(inventoryEntity);
     }
-
 }
