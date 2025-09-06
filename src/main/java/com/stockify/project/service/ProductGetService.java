@@ -1,0 +1,37 @@
+package com.stockify.project.service;
+
+import com.stockify.project.converter.ProductConverter;
+import com.stockify.project.exception.ProductNotFoundException;
+import com.stockify.project.model.dto.ProductDto;
+import com.stockify.project.model.entity.ProductEntity;
+import com.stockify.project.model.request.ProductSearchRequest;
+import com.stockify.project.repository.ProductRepository;
+import com.stockify.project.specification.ProductSpecification;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+import static com.stockify.project.util.TenantContext.getTenantId;
+
+@Service
+@RequiredArgsConstructor
+public class ProductGetService {
+
+    private final ProductRepository productRepository;
+    private final ProductConverter productConverter;
+
+    public ProductDto detail(Long productId) {
+        return productRepository.findByIdAndTenantId(productId, getTenantId())
+                .map(productConverter::toDto)
+                .orElseThrow(() -> new ProductNotFoundException(productId));
+    }
+
+    public List<ProductDto> getAll(ProductSearchRequest request) {
+        Specification<ProductEntity> specification = ProductSpecification.filter(request);
+        return productRepository.findAll(specification).stream()
+                .map(productConverter::toDto)
+                .toList();
+    }
+}

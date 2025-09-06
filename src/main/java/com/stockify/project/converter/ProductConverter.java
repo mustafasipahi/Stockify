@@ -5,7 +5,7 @@ import com.stockify.project.model.dto.CategoryDto;
 import com.stockify.project.model.dto.ProductDto;
 import com.stockify.project.model.entity.ProductEntity;
 import com.stockify.project.model.request.ProductCreateRequest;
-import com.stockify.project.service.CategoryService;
+import com.stockify.project.service.CategoryGetService;
 import com.stockify.project.util.InventoryCodeGenerator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -17,7 +17,7 @@ import static com.stockify.project.util.TenantContext.getTenantId;
 @AllArgsConstructor
 public class ProductConverter {
 
-    private final CategoryService categoryService;
+    private final CategoryGetService categoryGetService;
     private final InventoryCodeGenerator inventoryCodeGenerator;
 
     public ProductEntity toEntity(ProductCreateRequest request) {
@@ -52,6 +52,6 @@ public class ProductConverter {
     }
 
     private CategoryDto getCategory(Long categoryId) {
-        return categoryService.detail(categoryId);
+        return categoryGetService.detail(categoryId);
     }
 }

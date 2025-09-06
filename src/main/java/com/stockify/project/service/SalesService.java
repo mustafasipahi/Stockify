@@ -36,9 +36,10 @@ public class SalesService {
     private final SalesRepository salesRepository;
     private final SalesItemRepository salesItemRepository;
     private final SalesConverter salesConverter;
-    private final InventoryService inventoryService;
-    private final BrokerService brokerService;
-    private final TransactionService transactionService;
+    private final InventoryPostService inventoryPostService;
+    private final InventoryGetService inventoryGetService;
+    private final BrokerGetService brokerGetService;
+    private final TransactionPostService transactionPostService;
     private final DocumentService documentService;
 
     @Transactional
@@ -55,7 +56,6 @@ public class SalesService {
         SalesEntity savedSalesEntity = saveSalesEntity(salesEntity);
         saveSalesItemEntity(prepareDto.getSalesItems(), savedSalesEntity.getId());
         decreaseProductInventory(prepareDto.getSalesItems());
-        evictBrokerCache(request.getBrokerId());
         saveTransaction(savedSalesEntity);
         return salesConverter.toResponse(prepareDto.getSales(), prepareDto.getSalesItems(), documentId);
     }
@@ -73,7 +73,7 @@ public class SalesService {
     }
 
     public List<SalesProductDto> getProducts() {
-        return inventoryService.getAvailableInventory().stream()
+        return inventoryGetService.getAvailableInventory().stream()
                 .map(inventory -> SalesProductDto.builder()
                         .productId(inventory.getProduct().getProductId())
                         .productName(inventory.getProduct().getName())
@@ -85,7 +85,7 @@ public class SalesService {
     }
 
     private BrokerDto getBroker(Long brokerId) {
-        return brokerService.detail(brokerId);
+        return brokerGetService.detail(brokerId);
     }
 
     private BigDecimal getDiscountRate(BrokerDto broker) {
@@ -168,11 +168,7 @@ public class SalesService {
     private void decreaseProductInventory(List<SalesItemDto> salesItems) {
         Map<Long, Integer> productDecreaseProductCountMap = salesItems.stream()
                 .collect(Collectors.toMap(SalesItemDto::getProductId, SalesItemDto::getProductCount));
-        inventoryService.decreaseInventory(productDecreaseProductCountMap);
-    }
-
-    private void evictBrokerCache(Long brokerId) {
-        brokerService.evictBrokerCache(brokerId);
+        inventoryPostService.decreaseInventory(productDecreaseProductCountMap);
     }
 
     private String uploadDocument(SalesPrepareDto prepareDto, SalesEntity salesEntity) {
@@ -183,6 +179,6 @@ public class SalesService {
     }
 
     private void saveTransaction(SalesEntity salesEntity) {
-        transactionService.createSalesTransaction(salesEntity);
+        transactionPostService.createSalesTransaction(salesEntity);
     }
 }

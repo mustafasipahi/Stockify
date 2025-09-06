@@ -7,31 +7,23 @@ import com.stockify.project.exception.InventoryNotFoundException;
 import com.stockify.project.model.dto.InventoryDto;
 import com.stockify.project.model.entity.InventoryEntity;
 import com.stockify.project.model.request.InventoryCreateRequest;
-import com.stockify.project.model.request.InventorySearchRequest;
 import com.stockify.project.model.request.InventoryUpdateRequest;
 import com.stockify.project.repository.InventoryRepository;
-import com.stockify.project.specification.InventorySpecification;
 import com.stockify.project.validator.InventoryCreateValidator;
 import com.stockify.project.validator.InventoryUpdateValidator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-import static com.stockify.project.constant.CacheConstants.*;
 import static com.stockify.project.util.InventoryStatusUtil.getInventoryStatus;
 import static com.stockify.project.util.TenantContext.getTenantId;
 
 @Service
 @RequiredArgsConstructor
-public class InventoryService {
+public class InventoryPostService {
 
     private final InventoryRepository inventoryRepository;
     private final InventoryCreateValidator inventoryCreateValidator;
@@ -39,12 +31,19 @@ public class InventoryService {
     private final InventoryConverter inventoryConverter;
 
     @Transactional
-    @Caching(evict = {
-            @CacheEvict(value = INVENTORY_ALL, allEntries = true),
-            @CacheEvict(value = INVENTORY_AVAILABLE, allEntries = true),
-            @CacheEvict(value = INVENTORY_CRITICAL, allEntries = true),
-            @CacheEvict(value = INVENTORY_OUT_OF, allEntries = true)
-    })
+    public void saveDefault(Long productId) {
+        Optional<InventoryEntity> optionalInventory = inventoryRepository.findByIdAndTenantId(productId, getTenantId());
+        InventoryEntity inventoryEntity;
+        if (optionalInventory.isPresent()) {
+            inventoryEntity = optionalInventory.get();
+            inventoryEntity.setActive(true);
+        } else {
+            inventoryEntity = inventoryConverter.toDefaultEntity(productId);
+        }
+        inventoryRepository.save(inventoryEntity);
+    }
+
+    @Transactional
     public InventoryDto save(InventoryCreateRequest request) {
         inventoryCreateValidator.validate(request);
         InventoryEntity inventoryEntity = inventoryConverter.toEntity(request);
@@ -53,17 +52,11 @@ public class InventoryService {
     }
 
     @Transactional
-    @Caching(evict = {
-            @CacheEvict(value = INVENTORY_ALL, allEntries = true),
-            @CacheEvict(value = INVENTORY_AVAILABLE, allEntries = true),
-            @CacheEvict(value = INVENTORY_CRITICAL, allEntries = true),
-            @CacheEvict(value = INVENTORY_OUT_OF, allEntries = true)
-    })
     public InventoryDto update(InventoryUpdateRequest request) {
         if (request.getInventoryId() == null) {
             throw new InventoryIdException();
         }
-        InventoryEntity inventoryEntity = inventoryRepository.findByIdAndActiveTrueAndTenantId(request.getInventoryId(), getTenantId())
+        InventoryEntity inventoryEntity = inventoryRepository.findByIdAndTenantId(request.getInventoryId(), getTenantId())
                 .orElseThrow(() -> new InventoryNotFoundException(request.getInventoryId()));
         if (request.getPrice() != null) {
             inventoryUpdateValidator.validatePrice(request.getPrice());
@@ -85,55 +78,7 @@ public class InventoryService {
         return inventoryConverter.toIdDto(updatedInventoryEntity);
     }
 
-    public InventoryDto detail(Long inventoryId) {
-        return inventoryRepository.findByIdAndActiveTrueAndTenantId(inventoryId, getTenantId())
-                .map(inventoryConverter::toDto)
-                .orElseThrow(() -> new InventoryNotFoundException(inventoryId));
-    }
-
-    @Cacheable(value = INVENTORY_ALL)
-    public List<InventoryDto> getAllInventory() {
-        InventorySearchRequest searchRequest = getInventorySearchRequest(Collections.emptyList());
-        Specification<InventoryEntity> specification = InventorySpecification.filter(searchRequest);
-        return inventoryRepository.findAll(specification).stream()
-                .map(inventoryConverter::toDto)
-                .toList();
-    }
-
-    @Cacheable(value = INVENTORY_AVAILABLE)
-    public List<InventoryDto> getAvailableInventory() {
-        InventorySearchRequest searchRequest = getInventorySearchRequest(List.of(InventoryStatus.AVAILABLE, InventoryStatus.CRITICAL));
-        Specification<InventoryEntity> specification = InventorySpecification.filter(searchRequest);
-        return inventoryRepository.findAll(specification).stream()
-                .map(inventoryConverter::toDto)
-                .toList();
-    }
-
-    @Cacheable(value = INVENTORY_CRITICAL)
-    public List<InventoryDto> getCriticalInventory() {
-        InventorySearchRequest searchRequest = getInventorySearchRequest(List.of(InventoryStatus.CRITICAL));
-        Specification<InventoryEntity> specification = InventorySpecification.filter(searchRequest);
-        return inventoryRepository.findAll(specification).stream()
-                .map(inventoryConverter::toDto)
-                .toList();
-    }
-
-    @Cacheable(value = INVENTORY_OUT_OF)
-    public List<InventoryDto> getOutOfInventory() {
-        InventorySearchRequest searchRequest = getInventorySearchRequest(List.of(InventoryStatus.OUT_OF_INVENTORY));
-        Specification<InventoryEntity> specification = InventorySpecification.filter(searchRequest);
-        return inventoryRepository.findAll(specification).stream()
-                .map(inventoryConverter::toDto)
-                .toList();
-    }
-
     @Transactional
-    @Caching(evict = {
-            @CacheEvict(value = INVENTORY_ALL, allEntries = true),
-            @CacheEvict(value = INVENTORY_AVAILABLE, allEntries = true),
-            @CacheEvict(value = INVENTORY_CRITICAL, allEntries = true),
-            @CacheEvict(value = INVENTORY_OUT_OF, allEntries = true)
-    })
     public void decreaseInventory(Map<Long, Integer> productDecreaseProductCountMap) {
         for (Map.Entry<Long, Integer> entry : productDecreaseProductCountMap.entrySet()) {
             Long productId = entry.getKey();
@@ -146,11 +91,5 @@ public class InventoryService {
             inventoryEntity.setStatus(newStatus);
             inventoryRepository.save(inventoryEntity);
         }
-    }
-
-    private InventorySearchRequest getInventorySearchRequest(List<InventoryStatus> statusList) {
-        return InventorySearchRequest.builder()
-                .statusList(statusList)
-                .build();
     }
 }

@@ -48,13 +48,13 @@ public class DocumentService {
     private final DocumentUploadValidator uploadValidator;
     private final GridFsTemplate gridFsTemplate;
     private final GridFSBucket gridFSBucket;
-    private final CompanyService companyService;
+    private final CompanyGetService companyGetService;
     private final SalesDocumentService salesDocumentService;
 
     public DocumentResponse uploadSalesFile(SalesPrepareDto prepareDto) {
         try {
             Long tenantId = getTenantId();
-            CompanyInfoDto companyInfo = companyService.getCompanyInfo(tenantId);
+            CompanyInfoDto companyInfo = companyGetService.getCompanyInfo(tenantId);
             SalesDocumentResponse salesPDF = salesDocumentService.generatePDF(companyInfo, prepareDto);
             DocumentUploadRequest uploadRequest = new DocumentUploadRequest(prepareDto.getBroker().getBrokerId(), DocumentType.VOUCHER);
             return uploadFile(salesPDF.getFile(), uploadRequest, getUsername());
@@ -65,7 +65,9 @@ public class DocumentService {
     }
 
     public DocumentResponse uploadPaymentFile(PaymentDto paymentDto) {
-        return new DocumentResponse();
+        return DocumentResponse.builder()
+                .id("test")
+                .build();
     }
 
     public DocumentResponse uploadFile(MultipartFile file, DocumentUploadRequest request, String username) {

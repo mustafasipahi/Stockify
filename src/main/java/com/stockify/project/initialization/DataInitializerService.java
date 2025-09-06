@@ -39,8 +39,8 @@ public class DataInitializerService implements ApplicationRunner {
 
     private void initializeTestData() {
         try {
-            Resource resource = new ClassPathResource("/initialization/initialization.sql");
-            ScriptUtils.executeSqlScript(dataSource.getConnection(), resource);
+            //Resource resource = new ClassPathResource("/initialization/initialization.sql");
+            //ScriptUtils.executeSqlScript(dataSource.getConnection(), resource);
         } catch (Exception e) {
             log.error("Initialize Test Data Error!", e);
         }

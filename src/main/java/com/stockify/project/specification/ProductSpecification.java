@@ -32,7 +32,7 @@ public class ProductSpecification {
                 predicates.add(criteriaBuilder.equal(root.get("status"), ProductStatus.ACTIVE));
             }
             predicates.add(criteriaBuilder.equal(root.get("tenantId"), getTenantId()));
-            query.orderBy(criteriaBuilder.asc(root.get("name")));
+            query.orderBy(criteriaBuilder.desc(root.get("createdDate")));
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }

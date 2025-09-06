@@ -1,10 +1,8 @@
 package com.stockify.project.service;
 
-import com.stockify.project.converter.CategoryConverter;
 import com.stockify.project.enums.CategoryStatus;
 import com.stockify.project.exception.CategoryIdException;
 import com.stockify.project.exception.CategoryNotFoundException;
-import com.stockify.project.model.dto.CategoryDto;
 import com.stockify.project.model.entity.CategoryEntity;
 import com.stockify.project.model.request.CategoryCreateRequest;
 import com.stockify.project.model.request.CategoryUpdateRequest;
@@ -13,19 +11,14 @@ import com.stockify.project.validator.CategoryCreateValidator;
 import com.stockify.project.validator.CategoryUpdateValidator;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
-import static com.stockify.project.constant.CacheConstants.CATEGORY_DETAIL;
 import static com.stockify.project.util.TenantContext.getTenantId;
 
 @Service
 @RequiredArgsConstructor
-public class CategoryService {
+public class CategoryPostService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryCreateValidator createValidator;
@@ -45,7 +38,6 @@ public class CategoryService {
     }
 
     @Transactional
-    @CacheEvict(value = CATEGORY_DETAIL, key = "#request.categoryId")
     public void update(CategoryUpdateRequest request) {
         if (request.getCategoryId() == null) {
             throw new CategoryIdException();
@@ -63,7 +55,6 @@ public class CategoryService {
     }
 
     @Transactional
-    @CacheEvict(value = CATEGORY_DETAIL, key = "#categoryId")
     public void delete(Long categoryId) {
         if (categoryId == null) {
             throw new CategoryIdException();
@@ -73,19 +64,5 @@ public class CategoryService {
         categoryEntity.setStatus(CategoryStatus.PASSIVE);
         categoryRepository.save(categoryEntity);
         toPassiveService.updateToPassiveByCategoryId(categoryId);
-    }
-
-    @Cacheable(value = CATEGORY_DETAIL, key = "#categoryId")
-    public CategoryDto detail(Long categoryId) {
-        return categoryRepository.findByIdAndTenantId(categoryId, getTenantId())
-                .filter(category -> category.getStatus().equals(CategoryStatus.ACTIVE))
-                .map(CategoryConverter::toDto)
-                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
-    }
-
-    public List<CategoryDto> getAll() {
-        return categoryRepository.findAllByStatusAndTenantIdOrderByNameAsc(CategoryStatus.ACTIVE, getTenantId()).stream()
-                .map(CategoryConverter::toDto)
-                .toList();
     }
 }

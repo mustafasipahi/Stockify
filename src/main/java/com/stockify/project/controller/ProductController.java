@@ -4,7 +4,8 @@ import com.stockify.project.model.dto.ProductDto;
 import com.stockify.project.model.request.ProductCreateRequest;
 import com.stockify.project.model.request.ProductSearchRequest;
 import com.stockify.project.model.request.ProductUpdateRequest;
-import com.stockify.project.service.ProductService;
+import com.stockify.project.service.ProductGetService;
+import com.stockify.project.service.ProductPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,30 +16,31 @@ import java.util.List;
 @RequestMapping("/product")
 public class ProductController {
 
-    private final ProductService productService;
+    private final ProductPostService productPostService;
+    private final ProductGetService productGetService;
 
     @PostMapping("/save")
     public ProductDto save(@RequestBody ProductCreateRequest request) {
-        return productService.save(request);
+        return productPostService.save(request);
     }
 
     @PutMapping("/update")
     public ProductDto update(@RequestBody ProductUpdateRequest request) {
-        return productService.update(request);
+        return productPostService.update(request);
     }
 
     @DeleteMapping("/delete/{id}")
     public ProductDto delete(@PathVariable Long id) {
-        return productService.delete(id);
+        return productPostService.delete(id);
     }
 
     @GetMapping("/detail/{id}")
     public ProductDto detail(@PathVariable Long id) {
-        return productService.detail(id);
+        return productGetService.detail(id);
     }
 
     @GetMapping("/all")
     public List<ProductDto> getAll(@ModelAttribute ProductSearchRequest request) {
-        return productService.getAll(request);
+        return productGetService.getAll(request);
     }
 }

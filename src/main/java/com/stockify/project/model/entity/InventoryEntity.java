@@ -45,7 +45,7 @@ public class InventoryEntity {
     @Column
     private Integer criticalProductCount;
 
-    @Column
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean active;
 
     @NotNull

@@ -21,8 +21,8 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final PaymentConverter paymentConverter;
-    private final BrokerService brokerService;
-    private final TransactionService transactionService;
+    private final BrokerGetService brokerGetService;
+    private final TransactionPostService transactionPostService;
     private final DocumentService documentService;
 
     @Transactional
@@ -33,13 +33,12 @@ public class PaymentService {
         PaymentEntity paymentEntity = paymentConverter.toEntity(paymentDto);
         String documentId = uploadDocument(paymentDto, paymentEntity);
         PaymentEntity savedPaymentEntity = savePaymentEntity(paymentEntity);
-        evictBrokerCache(savedPaymentEntity.getBrokerId());
         saveTransaction(savedPaymentEntity);
         return paymentConverter.toResponse(savedPaymentEntity, broker, documentId);
     }
 
     private BrokerDto getBroker(Long brokerId) {
-        BrokerDto broker = brokerService.detail(brokerId);
+        BrokerDto broker = brokerGetService.detail(brokerId);
         if (broker.getStatus() != BrokerStatus.ACTIVE) {
             throw new BrokerNotFoundException(brokerId);
         }
@@ -50,10 +49,6 @@ public class PaymentService {
         return paymentRepository.save(paymentEntity);
     }
 
-    private void evictBrokerCache(Long brokerId) {
-        brokerService.evictBrokerCache(brokerId);
-    }
-
     private String uploadDocument(PaymentDto paymentDto, PaymentEntity paymentEntity) {
         DocumentResponse documentResponse = documentService.uploadPaymentFile(paymentDto);
         String documentId = documentResponse.getId();
@@ -62,6 +57,6 @@ public class PaymentService {
     }
 
     private void saveTransaction(PaymentEntity savedPaymentEntity) {
-        transactionService.createPaymentTransaction(savedPaymentEntity);
+        transactionPostService.createPaymentTransaction(savedPaymentEntity);
     }
 }

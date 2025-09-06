@@ -25,6 +25,7 @@ public class InventoryDto implements Serializable {
     private BigDecimal totalPrice;
     private Integer productCount;
     private Integer criticalProductCount;
+    private boolean active;
     private InventoryStatus status;
     private Long createdDate;
     private Long lastModifiedDate;

@@ -17,11 +17,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.stockify.project.constant.CacheConstants.*;
 
 @EnableCaching
 @Configuration
@@ -61,18 +58,6 @@ public class RedisConfiguration {
 
     private Map<String, RedisCacheConfiguration> constructInitialCacheConfigurations() {
         final Map<String, RedisCacheConfiguration> redisCacheConfigurationMap = new HashMap<>();
-        final RedisCacheConfiguration baseCacheTtl = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(cacheProperties.getBaseCacheTtlMinutes()))
-                .disableCachingNullValues();
-        redisCacheConfigurationMap.put(PRODUCT_DETAIL, baseCacheTtl);
-        redisCacheConfigurationMap.put(BROKER_DETAIL, baseCacheTtl);
-        redisCacheConfigurationMap.put(CATEGORY_DETAIL, baseCacheTtl);
-        redisCacheConfigurationMap.put(INVENTORY_ALL, baseCacheTtl);
-        redisCacheConfigurationMap.put(INVENTORY_AVAILABLE, baseCacheTtl);
-        redisCacheConfigurationMap.put(INVENTORY_CRITICAL, baseCacheTtl);
-        redisCacheConfigurationMap.put(INVENTORY_OUT_OF, baseCacheTtl);
-        redisCacheConfigurationMap.put(BROKER_BALANCE, baseCacheTtl);
-        redisCacheConfigurationMap.put(COMPANY_DETAIL, baseCacheTtl);
         return redisCacheConfigurationMap;
     }
 }
