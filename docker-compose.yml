@@ -1,3 +1,6 @@
+# This docker-compose.yml is for LOCAL DEVELOPMENT only
+# Render uses cloud services, not this configuration
+
 version: '3.8'
 services:
 
@@ -8,65 +11,51 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-      args:
-        BUILDKIT_INLINE_CACHE: 1
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://stockify-app-mysql:3306/stockify_app?autoReconnect=true&useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
-      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
-      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
-      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
-      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      # Local development database
+      DATABASE_URL: postgresql://stockify_user:postgres@stockify-app-postgresql:5432/stockify_app
+      CLOUDINARY_CLOUD_NAME: dd8d5yvdv
+      CLOUDINARY_API_KEY: 424539718517918
+      CLOUDINARY_API_SECRET: FriIuvdVVf181Wrmvw-7ZJHMMrQ
+      JWT_SECRET_KEY: wD3U3XjP7nB3cbmJjQYFhfZ6qPzO7whVYaAkM7b9c10=
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       JAVA_OPTS: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
     depends_on:
-      stockify-app-mysql:
+      stockify-app-postgresql:
         condition: service_healthy
 
-  stockify-app-mysql:
-    container_name: stockify-app-mysql
-    image: mysql:5.7
+  # Local PostgreSQL for development
+  stockify-app-postgresql:
+    container_name: stockify-app-postgresql
+    image: postgres:15-alpine
     restart: always
-    platform: linux/x86_64
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: stockify_app
-      MYSQL_USER: stockify
-      MYSQL_PASSWORD: stockify
+      POSTGRES_DB: stockify_app
+      POSTGRES_USER: stockify_user
+      POSTGRES_PASSWORD: postgres
     ports:
-      - "3306:3306"
-    expose:
-      - 3306
-    command: [
-      "--character-set-server=utf8mb4",
-      "--collation-server=utf8mb4_turkish_ci",
-      "--innodb_use_native_aio=0",
-      "--explicit_defaults_for_timestamp=1"
-    ]
+      - "5432:5432"
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot", "--silent"]
+      test: ["CMD-SHELL", "pg_isready -U stockify_user -d stockify_app"]
       timeout: 10s
-      retries: 15
+      retries: 5
       interval: 10s
-      start_period: 60s
+      start_period: 30s
     volumes:
-      - mysql_data:/var/lib/mysql
+      - postgresql_data:/var/lib/postgresql/data
 
 volumes:
-  mysql_data:
+  postgresql_data:
 
-# docker exec -i stockify-app-mysql mysqladump -u root -p --no-create-info --skip-add-locks --skip-disable-keys --skip-lock-tables --compact stockify_app > src/main/java/com/stockify/project/initialization/dump.sql
+# Local development commands:
+# docker-compose up -d          # Start services
+# docker-compose down           # Stop services  
+# docker-compose logs -f app    # View app logs
+# docker-compose down -v        # Remove all data
 
-# docker build -t stockify-app -f Dockerfile .
-# docker ps
-# docker images -a
-# docker network ls
-# docker run --name stockify-app -p 8080:8080 stockify-app
-# docker rmi $(docker images -a -q)
-
-##################################
-# docker image rm stockify-app:1
-# docker-compose up -d
-##################################
+# Production on Render uses:
+# - Cloud PostgreSQL service
+# - Environment variables for connection
+# - No docker-compose needed

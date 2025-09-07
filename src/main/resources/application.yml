@@ -4,8 +4,6 @@ server:
 spring:
   datasource:
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/stockify_app}
-    username: ${DATABASE_USERNAME:postgres}
-    password: ${DATABASE_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
   jpa:
     database: postgresql
@@ -29,14 +27,17 @@ spring:
     serialization:
       write-dates-as-timestamps: false
 
+# Cloudinary Configuration
 cloudinary:
   cloud-name: ${CLOUDINARY_CLOUD_NAME:dd8d5yvdv}
   api-key: ${CLOUDINARY_API_KEY:424539718517918}
   api-secret: ${CLOUDINARY_API_SECRET:FriIuvdVVf181Wrmvw-7ZJHMMrQ}
 
+# JWT Security
 security:
   secretKey: ${JWT_SECRET_KEY:wD3U3XjP7nB3cbmJjQYFhfZ6qPzO7whVYaAkM7b9c10=}
 
+# Application Configuration
 stokify:
   cache:
     baseCacheTtlMinutes: ${BASE_TTL:60}
@@ -55,6 +56,7 @@ stokify:
         - application/vnd.openxmlformats-officedocument.wordprocessingml.document
       max-file-size: 50MB
 
+# Actuator for health checks (Render requirement)
 management:
   endpoints:
     web:
@@ -66,6 +68,7 @@ management:
   server:
     port: 8080
 
+# Logging configuration
 logging:
   level:
     com.stockify.project: INFO
