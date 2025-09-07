@@ -1,5 +1,6 @@
 package com.stockify.project.security.service;
 
+import com.stockify.project.model.dto.TokenCacheDto;
 import com.stockify.project.security.dto.UserTokenInfo;
 import com.stockify.project.security.properties.JWTProperties;
 import com.stockify.project.security.userdetail.UserPrincipal;
@@ -9,13 +10,13 @@ import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import static com.stockify.project.constant.LoginConstant.EXPIRE_DURATION_ONE_DAY;
@@ -27,7 +28,7 @@ import static com.stockify.project.constant.LoginConstant.EXPIRE_DURATION_SEVEN_
 public class JWTTokenService {
 
     private final JWTProperties jwtProperties;
-    private final RedisTemplate<String, String> redisTemplate;
+    private final ConcurrentHashMap<String, TokenCacheDto> tokenCache = new ConcurrentHashMap<>();
 
     public String findUsernameFromToken(String token) {
         return exportToken(token, Claims::getSubject);
@@ -93,6 +94,21 @@ public class JWTTokenService {
                 .build();
     }
 
+    public void storeToken(String username, String token, long expirationTime) {
+        cleanExpiredTokens();
+        TokenCacheDto entry = new TokenCacheDto(token, System.currentTimeMillis() + expirationTime);
+        tokenCache.put(username, entry);
+    }
+
+    public void removeToken(String username) {
+        tokenCache.remove(username);
+    }
+
+    public void cleanExpiredTokens() {
+        long currentTime = System.currentTimeMillis();
+        tokenCache.entrySet().removeIf(entry -> entry.getValue().expirationTime() < currentTime);
+    }
+
     private <T> T exportToken(String token, Function<Claims, T> claimsTFunction) {
         final Claims claims = Jwts.parserBuilder()
                 .setSigningKey(getSecretKey())
@@ -115,8 +131,15 @@ public class JWTTokenService {
     private boolean tokenExist(final String token) {
         try {
             String memberKey = extractUsernameFromToken(token);
-            final String existingToken = redisTemplate.opsForValue().get(memberKey);
-            return StringUtils.isNotEmpty(existingToken) && Objects.equals(existingToken, token);
+            TokenCacheDto cacheEntry = tokenCache.get(memberKey);
+            if (cacheEntry == null) {
+                return false;
+            }
+            if (cacheEntry.expirationTime() < System.currentTimeMillis()) {
+                tokenCache.remove(memberKey);
+                return false;
+            }
+            return Objects.equals(cacheEntry.token(), token);
         } catch (Exception e) {
             log.error("Error checking token existence: {}", e.getMessage());
             return false;

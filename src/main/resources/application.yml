@@ -34,10 +34,6 @@ spring:
     serialization:
       write-dates-as-timestamps: false
 
-redis-config:
-  host: ${REDIS_HOST:localhost}
-  port: ${REDIS_PORT:6379}
-
 security:
   secretKey: wD3U3XjP7nB3cbmJjQYFhfZ6qPzO7whVYaAkM7b9c10=
 

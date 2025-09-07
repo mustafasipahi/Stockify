@@ -9,13 +9,10 @@ import com.stockify.project.security.userdetail.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-
-import java.util.concurrent.TimeUnit;
 
 import static com.stockify.project.constant.LoginConstant.EXPIRE_DURATION_ONE_DAY;
 import static com.stockify.project.constant.LoginConstant.EXPIRE_DURATION_SEVEN_DAY;
@@ -27,7 +24,6 @@ public class AuthenticationService {
 
     private final AuthenticationManager authenticationManager;
     private final JWTTokenService jwtTokenService;
-    private final RedisTemplate<String, String> redisTemplate;
 
     public AuthenticationResponse login(AuthenticationRequest authenticationRequest) {
         try {
@@ -38,12 +34,7 @@ public class AuthenticationService {
             final UserPrincipal userPrincipal = (UserPrincipal) authenticate.getPrincipal();
             boolean rememberMe = authenticationRequest.isRememberMe();
             String token = jwtTokenService.generateToken(userPrincipal, rememberMe);
-            redisTemplate.opsForValue().set(
-                    authenticationRequest.getUsername(),
-                    token,
-                    getTokenExpirationDate(rememberMe),
-                    TimeUnit.MILLISECONDS
-            );
+            jwtTokenService.storeToken(authenticationRequest.getUsername(), token, getTokenExpirationDate(rememberMe));
             return AuthenticationResponse.builder()
                     .token(token)
                     .build();
@@ -68,7 +59,7 @@ public class AuthenticationService {
                         .message("Username not found in token")
                         .build();
             }
-            redisTemplate.delete(username);
+            jwtTokenService.removeToken(username);
             log.info("User {} logged out successfully", username);
             return InvalidateTokenResponse.builder()
                     .success(true)

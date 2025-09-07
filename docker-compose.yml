@@ -17,14 +17,10 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
-      REDIS_HOST: stockify-app-redis
-      REDIS_PORT: 6379
       SPRING_DATA_MONGODB_URI: mongodb://stockify-app-mongodb:27017/stockify_files
       JAVA_OPTS: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
     depends_on:
       stockify-app-mysql:
-        condition: service_healthy
-      stockify-app-redis:
         condition: service_healthy
       stockify-app-mongodb:
         condition: service_healthy
@@ -58,23 +54,6 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
-  stockify-app-redis:
-    container_name: stockify-app-redis
-    image: redis:6.2-alpine
-    restart: always
-    ports:
-      - '6379:6379'
-    expose:
-      - 6379
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      timeout: 3s
-      retries: 5
-      interval: 5s
-      start_period: 10s
-    volumes:
-      - redis_data:/data
-
   stockify-app-mongodb:
     container_name: stockify-app-mongodb
     image: mongo:7.0
@@ -96,12 +75,9 @@ services:
 
 volumes:
   mysql_data:
-  redis_data:
   mongodb_data:
 
 # docker exec -i stockify-app-mysql mysqladump -u root -p --no-create-info --skip-add-locks --skip-disable-keys --skip-lock-tables --compact stockify_app > src/main/java/com/stockify/project/initialization/dump.sql
-
-# docker exec -it stockify-app-redis redis-cli FLUSHALL
 
 # docker build -t stockify-app -f Dockerfile .
 # docker ps
