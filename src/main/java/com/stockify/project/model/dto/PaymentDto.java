@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 public class PaymentDto {
 
     private Long brokerId;
-    private String documentId;
+    private Long documentId;
     private String documentNumber;
     private BigDecimal price;
     private PaymentType type;

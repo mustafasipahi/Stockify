@@ -30,7 +30,7 @@ public class SalesEntity {
 
     @NotNull
     @Column(nullable = false)
-    private String documentId;
+    private Long documentId;
 
     @NotNull
     @Column(nullable = false)

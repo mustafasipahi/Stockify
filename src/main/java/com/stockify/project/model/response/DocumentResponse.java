@@ -11,7 +11,7 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DocumentResponse {
 
-    private String id;
+    private Long id;
     private String name;
     private String documentType;
     private String contentType;

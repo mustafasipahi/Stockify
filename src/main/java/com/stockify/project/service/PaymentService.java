@@ -23,7 +23,7 @@ public class PaymentService {
     private final PaymentConverter paymentConverter;
     private final BrokerGetService brokerGetService;
     private final TransactionPostService transactionPostService;
-    private final DocumentService documentService;
+    private final DocumentPostService documentPostService;
 
     @Transactional
     public PaymentResponse save(PaymentCreateRequest request) {
@@ -31,10 +31,10 @@ public class PaymentService {
         BrokerDto broker = getBroker(request.getBrokerId());
         PaymentDto paymentDto = paymentConverter.toDto(request);
         PaymentEntity paymentEntity = paymentConverter.toEntity(paymentDto);
-        String documentId = uploadDocument(paymentDto, paymentEntity);
+        String downloadUrl = uploadDocument(paymentDto, paymentEntity);
         PaymentEntity savedPaymentEntity = savePaymentEntity(paymentEntity);
         saveTransaction(savedPaymentEntity);
-        return paymentConverter.toResponse(savedPaymentEntity, broker, documentId);
+        return paymentConverter.toResponse(savedPaymentEntity, broker, downloadUrl);
     }
 
     private BrokerDto getBroker(Long brokerId) {
@@ -50,10 +50,10 @@ public class PaymentService {
     }
 
     private String uploadDocument(PaymentDto paymentDto, PaymentEntity paymentEntity) {
-        DocumentResponse documentResponse = documentService.uploadPaymentFile(paymentDto);
-        String documentId = documentResponse.getId();
+        DocumentResponse documentResponse = documentPostService.uploadPaymentFile(paymentDto);
+        Long documentId = documentResponse.getId();
         paymentEntity.setDocumentId(documentId);
-        return documentId;
+        return documentResponse.getDownloadUrl();
     }
 
     private void saveTransaction(PaymentEntity savedPaymentEntity) {

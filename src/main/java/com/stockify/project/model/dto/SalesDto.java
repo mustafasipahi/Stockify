@@ -18,7 +18,7 @@ public class SalesDto {
 
     private Long id;
     private Long brokerId;
-    private String documentId;
+    private Long documentId;
     private String documentNumber;
     private BigDecimal subtotalPrice;
     private BigDecimal discountRate;

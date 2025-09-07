@@ -13,7 +13,6 @@ import java.util.Optional;
 
 import static com.stockify.project.constant.DocumentNumberConstants.PAYMENT_DEFAULT;
 import static com.stockify.project.constant.DocumentNumberConstants.PAYMENT_PREFIX;
-import static com.stockify.project.util.DocumentUtil.getDownloadUrl;
 import static com.stockify.project.util.TenantContext.getTenantId;
 
 @Component
@@ -42,12 +41,12 @@ public class PaymentConverter {
                 .build();
     }
 
-    public PaymentResponse toResponse(PaymentEntity paymentEntity, BrokerDto broker, String documentId) {
+    public PaymentResponse toResponse(PaymentEntity paymentEntity, BrokerDto broker, String downloadUrl) {
         return PaymentResponse.builder()
                 .firstName(broker.getFirstName())
                 .lastName(broker.getLastName())
                 .paymentPrice(paymentEntity.getPrice())
-                .downloadUrl(getDownloadUrl(documentId))
+                .downloadUrl(downloadUrl)
                 .build();
     }
 

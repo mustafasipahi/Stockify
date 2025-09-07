@@ -17,7 +17,6 @@ import java.util.Optional;
 import static com.stockify.project.constant.DocumentNumberConstants.SALES_DEFAULT;
 import static com.stockify.project.constant.DocumentNumberConstants.SALES_PREFIX;
 import static com.stockify.project.util.DateUtil.getTime;
-import static com.stockify.project.util.DocumentUtil.getDownloadUrl;
 import static com.stockify.project.util.TenantContext.getTenantId;
 
 @Component
@@ -96,7 +95,7 @@ public class SalesConverter {
                 .toList();
     }
 
-    public SalesResponse toResponse(SalesDto sales, List<SalesItemDto> salesItems, String documentId) {
+    public SalesResponse toResponse(SalesDto sales, List<SalesItemDto> salesItems, String downloadUrl) {
         return SalesResponse.builder()
                 .salesId(sales.getId())
                 .documentNumber(sales.getDocumentNumber())
@@ -107,7 +106,7 @@ public class SalesConverter {
                 .totalPrice(sales.getTotalPrice())
                 .totalTaxPrice(sales.getTotalTaxPrice())
                 .totalPriceWithTax(sales.getTotalPriceWithTax())
-                .downloadUrl(getDownloadUrl(documentId))
+                .downloadUrl(downloadUrl)
                 .createdDate(getTime(sales.getCreatedDate()))
                 .build();
     }

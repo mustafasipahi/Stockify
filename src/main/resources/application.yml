@@ -7,10 +7,6 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME:root}
     password: ${SPRING_DATASOURCE_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
-  data:
-    mongodb:
-      uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017/stockify_files}
-      auto-index-creation: true
   jpa:
     database: mysql
     database-platform: org.hibernate.dialect.MySQLDialect
@@ -34,6 +30,11 @@ spring:
     serialization:
       write-dates-as-timestamps: false
 
+cloudinary:
+  cloud-name: ${CLOUDINARY_CLOUD_NAME:dd8d5yvdv}
+  api-key: ${CLOUDINARY_API_KEY:424539718517918}
+  api-secret: ${CLOUDINARY_API_SECRET:FriIuvdVVf181Wrmvw-7ZJHMMrQ}
+
 security:
   secretKey: wD3U3XjP7nB3cbmJjQYFhfZ6qPzO7whVYaAkM7b9c10=
 
@@ -42,7 +43,7 @@ stokify:
     baseCacheTtlMinutes: ${BASE_TTL:60}
   files:
     storage:
-      type: gridfs
+      type: cloudinary
       allowed-types:
         - application/pdf
         - image/jpeg
@@ -50,4 +51,7 @@ stokify:
         - image/gif
         - application/vnd.ms-excel
         - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+        - text/plain
+        - application/msword
+        - application/vnd.openxmlformats-officedocument.wordprocessingml.document
       max-file-size: 50MB

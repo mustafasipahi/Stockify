@@ -40,7 +40,7 @@ public class SalesService {
     private final InventoryGetService inventoryGetService;
     private final BrokerGetService brokerGetService;
     private final TransactionPostService transactionPostService;
-    private final DocumentService documentService;
+    private final DocumentPostService documentPostService;
     private final BasketGetService basketGetService;
 
     @Transactional
@@ -53,12 +53,12 @@ public class SalesService {
     public SalesResponse salesConfirm(SalesRequest request) {
         SalesPrepareDto prepareDto = prepareSalesFlow(request);
         SalesEntity salesEntity = salesConverter.toSalesEntity(prepareDto.getSales());
-        String documentId = uploadDocument(prepareDto, salesEntity);
+        String downloadUrl = uploadDocument(prepareDto, salesEntity);
         SalesEntity savedSalesEntity = saveSalesEntity(salesEntity);
         saveSalesItemEntity(prepareDto.getSalesItems(), savedSalesEntity.getId());
         decreaseProductInventory(prepareDto.getSalesItems());
         saveTransaction(savedSalesEntity);
-        return salesConverter.toResponse(prepareDto.getSales(), prepareDto.getSalesItems(), documentId);
+        return salesConverter.toResponse(prepareDto.getSales(), prepareDto.getSalesItems(), downloadUrl);
     }
 
     public List<SalesProductDto> getProducts() {
@@ -178,10 +178,10 @@ public class SalesService {
     }
 
     private String uploadDocument(SalesPrepareDto prepareDto, SalesEntity salesEntity) {
-        DocumentResponse documentResponse = documentService.uploadSalesFile(prepareDto);
-        String documentId = documentResponse.getId();
+        DocumentResponse documentResponse = documentPostService.uploadSalesFile(prepareDto);
+        Long documentId = documentResponse.getId();
         salesEntity.setDocumentId(documentId);
-        return documentId;
+        return documentResponse.getDownloadUrl();
     }
 
     private void saveTransaction(SalesEntity salesEntity) {

@@ -17,12 +17,12 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
-      SPRING_DATA_MONGODB_URI: mongodb://stockify-app-mongodb:27017/stockify_files
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
       JAVA_OPTS: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
     depends_on:
       stockify-app-mysql:
-        condition: service_healthy
-      stockify-app-mongodb:
         condition: service_healthy
 
   stockify-app-mysql:
@@ -54,28 +54,8 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
-  stockify-app-mongodb:
-    container_name: stockify-app-mongodb
-    image: mongo:7.0
-    restart: always
-    ports:
-      - "27017:27017"
-    expose:
-      - 27017
-    environment:
-      MONGO_INITDB_DATABASE: stockify_files
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      timeout: 10s
-      retries: 5
-      interval: 10s
-      start_period: 30s
-    volumes:
-      - mongodb_data:/data/db
-
 volumes:
   mysql_data:
-  mongodb_data:
 
 # docker exec -i stockify-app-mysql mysqladump -u root -p --no-create-info --skip-add-locks --skip-disable-keys --skip-lock-tables --compact stockify_app > src/main/java/com/stockify/project/initialization/dump.sql
 

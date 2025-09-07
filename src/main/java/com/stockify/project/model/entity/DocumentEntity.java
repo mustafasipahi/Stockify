@@ -1,13 +1,12 @@
 package com.stockify.project.model.entity;
 
-import com.stockify.project.enums.TransactionType;
+import com.stockify.project.enums.DocumentType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -17,9 +16,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "transaction")
+@Table(name = "documents")
 @EntityListeners(AuditingEntityListener.class)
-public class TransactionEntity {
+public class    DocumentEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,38 +26,46 @@ public class TransactionEntity {
 
     @NotNull
     @Column(nullable = false)
+    private Long tenantId;
+
+    @NotNull
+    @Column(nullable = false)
     private Long brokerId;
 
-    @Column
-    private Long salesId;
-
-    @Column
-    private Long paymentId;
+    @NotNull
+    @Column(nullable = false, unique = true)
+    private String cloudinaryPublicId;
 
     @NotNull
     @Column(nullable = false)
-    private Long documentId;
+    private String originalFilename;
 
     @NotNull
     @Column(nullable = false)
-    private String documentNumber;
+    private String safeFilename;
 
     @NotNull
     @Column(nullable = false)
-    private BigDecimal price;
+    private String cloudinaryUrl;
 
     @NotNull
     @Column(nullable = false)
-    private BigDecimal balance;
+    private String secureUrl;
 
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TransactionType type;
+    private DocumentType documentType;
+
+    @Column
+    private String contentType;
+
+    @Column
+    private Long fileSize;
 
     @NotNull
     @Column(nullable = false)
-    private Long tenantId;
+    private String uploadedBy;
 
     @CreatedDate
     private LocalDateTime createdDate;
