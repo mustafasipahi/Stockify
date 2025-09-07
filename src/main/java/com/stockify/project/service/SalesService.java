@@ -42,6 +42,7 @@ public class SalesService {
     private final TransactionPostService transactionPostService;
     private final DocumentPostService documentPostService;
     private final BasketGetService basketGetService;
+    private final BasketPostService basketPostService;
 
     @Transactional
     public SalesResponse salesCalculate(SalesRequest request) {
@@ -58,7 +59,13 @@ public class SalesService {
         saveSalesItemEntity(prepareDto.getSalesItems(), savedSalesEntity.getId());
         decreaseProductInventory(prepareDto.getSalesItems());
         saveTransaction(savedSalesEntity);
+        clearBasket(prepareDto.getBroker().getBrokerId());
         return salesConverter.toResponse(prepareDto.getSales(), prepareDto.getSalesItems(), downloadUrl);
+    }
+
+    @Transactional
+    public void salesCancel(SalesRequest request) {
+        clearBasket(request.getBrokerId());
     }
 
     public List<SalesProductDto> getProducts() {
@@ -186,5 +193,9 @@ public class SalesService {
 
     private void saveTransaction(SalesEntity salesEntity) {
         transactionPostService.createSalesTransaction(salesEntity);
+    }
+
+    private void clearBasket(Long brokerId) {
+        basketPostService.clearBasket(brokerId);
     }
 }

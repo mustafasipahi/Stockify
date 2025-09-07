@@ -26,6 +26,11 @@ public class SalesController {
         return salesService.salesConfirm(request);
     }
 
+    @PostMapping("/cancel")
+    public void salesCancel(@RequestBody SalesRequest request) {
+        salesService.salesCancel(request);
+    }
+
     @GetMapping("/products")
     public List<SalesProductDto> getProducts() {
         return salesService.getProducts();

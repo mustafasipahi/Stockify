@@ -25,6 +25,7 @@ public class BasketPostService {
         boolean exists = exists(brokerBasket, request.getProductId());
         if (exists) {
             BasketEntity basketEntity = get(brokerBasket, request.getProductId());
+            assert basketEntity != null;
             if (request.getProductCount() <= 0) {
                 basketRepository.delete(basketEntity);
             } else {
@@ -42,8 +43,15 @@ public class BasketPostService {
         boolean exists = exists(brokerBasket, request.getProductId());
         if (exists) {
             BasketEntity basketEntity = get(brokerBasket, request.getProductId());
+            assert basketEntity != null;
             basketRepository.delete(basketEntity);
         }
+    }
+
+    @Transactional
+    public void clearBasket(Long brokerId) {
+        List<BasketEntity> brokerBasket = basketGetService.getBrokerBasket(brokerId);
+        basketRepository.deleteAll(brokerBasket);
     }
 
     private boolean exists(List<BasketEntity> brokerBasket, Long productId) {
