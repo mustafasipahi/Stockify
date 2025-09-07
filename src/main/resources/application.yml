@@ -3,25 +3,24 @@ server:
 
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/stockify_app?autoReconnect=true&useSSL=false&createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Europe/Istanbul&connectionCollation=utf8mb4_turkish_ci}
-    username: ${SPRING_DATASOURCE_USERNAME:root}
-    password: ${SPRING_DATASOURCE_PASSWORD:root}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/stockify_app}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
   jpa:
-    database: mysql
-    database-platform: org.hibernate.dialect.MySQLDialect
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:validate}
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
     properties:
       hibernate:
-        connection:
-          characterEncoding: UTF-8
-          useUnicode: true
         jdbc:
           time_zone: Europe/Istanbul
+        format_sql: true
+    show-sql: false
   sql:
     init:
-      platform: mysql
+      platform: postgresql
   servlet:
     multipart:
       max-file-size: 50MB
@@ -36,7 +35,7 @@ cloudinary:
   api-secret: ${CLOUDINARY_API_SECRET:FriIuvdVVf181Wrmvw-7ZJHMMrQ}
 
 security:
-  secretKey: wD3U3XjP7nB3cbmJjQYFhfZ6qPzO7whVYaAkM7b9c10=
+  secretKey: ${JWT_SECRET_KEY:wD3U3XjP7nB3cbmJjQYFhfZ6qPzO7whVYaAkM7b9c10=}
 
 stokify:
   cache:
@@ -55,3 +54,21 @@ stokify:
         - application/msword
         - application/vnd.openxmlformats-officedocument.wordprocessingml.document
       max-file-size: 50MB
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+  server:
+    port: 8080
+
+logging:
+  level:
+    com.stockify.project: INFO
+    org.springframework.security: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
