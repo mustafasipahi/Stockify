@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface PaymentRepository extends JpaRepository<PaymentEntity, Long> {
 
-    @Query(value = "SELECT MAX(CAST(SUBSTRING(document_number, 3) AS UNSIGNED)) FROM payment", nativeQuery = true)
+    @Query(value = "SELECT MAX(CAST(SUBSTRING(document_number, 3) AS INTEGER)) FROM payment", nativeQuery = true)
     Integer findMaxDocumentNumberNumeric();
 }
