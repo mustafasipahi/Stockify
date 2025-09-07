@@ -7,16 +7,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TenantContext {
 
-    private static final ThreadLocal<Long> currentTenant = new ThreadLocal<>();
+    private static final ThreadLocal<Long> currentTenantId = new ThreadLocal<>();
     private static final ThreadLocal<String> currentUsername = new ThreadLocal<>();
 
-    public static void setCurrentTenant(UserEntity userEntity) {
-        currentTenant.set(userEntity.getTenantId());
+    public static void setCurrentTenantId(UserEntity userEntity) {
+        currentTenantId.set(userEntity.getTenantId());
         currentUsername.set(userEntity.getUsername());
     }
 
     public static Long getTenantId() {
-        return currentTenant.get();
+        return currentTenantId.get();
     }
 
     public static String getUsername() {
@@ -24,7 +24,7 @@ public class TenantContext {
     }
 
     public static void clear() {
-        currentTenant.remove();
+        currentTenantId.remove();
         currentUsername.remove();
     }
 }

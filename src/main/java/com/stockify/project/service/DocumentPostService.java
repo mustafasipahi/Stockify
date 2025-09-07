@@ -48,7 +48,7 @@ public class DocumentPostService {
             CompanyInfoDto companyInfo = companyGetService.getCompanyInfo(tenantId);
             SalesDocumentResponse salesPDF = salesDocumentService.generatePDF(companyInfo, prepareDto);
             DocumentUploadRequest uploadRequest = new DocumentUploadRequest(prepareDto.getBroker().getBrokerId(), DocumentType.VOUCHER);
-            return uploadFileToClaude(salesPDF.getFile(), uploadRequest, getUsername());
+            return uploadFileToCloud(salesPDF.getFile(), uploadRequest, getUsername());
         } catch (Exception e) {
             log.error("Upload Sales File Error", e);
             throw new DocumentUploadException();
@@ -63,17 +63,17 @@ public class DocumentPostService {
 
     @Transactional
     public DocumentResponse uploadFile(MultipartFile file, DocumentUploadRequest request, String username) {
-        return uploadFileToClaude(file, request, username);
+        return uploadFileToCloud(file, request, username);
     }
 
-    public DocumentResponse uploadFileToClaude(MultipartFile file, DocumentUploadRequest request, String username) {
+    public DocumentResponse uploadFileToCloud(MultipartFile file, DocumentUploadRequest request, String username) {
         uploadValidator.validate(file, request);
         try {
             String documentNameDate = getDocumentNameDate();
             String originalFilename = file.getOriginalFilename();
             String safeFileName = replaceCharacter(username + "_" + documentNameDate + "_" + originalFilename);
             String publicId = generatePublicId(username, request.getBrokerId(), request.getDocumentType());
-            Map<String, Object> uploadParams = buildCloudinaryUploadParams(publicId, request, username, originalFilename);
+            Map<String, Object> uploadParams = buildCloudinaryUploadParams(publicId, request, username, safeFileName);
             Map<String, Object> uploadResult = cloudinary.uploader().upload(file.getBytes(), uploadParams);
             DocumentEntity document = DocumentConverter.toEntity(request, uploadResult, originalFilename, safeFileName, file, username);
             DocumentEntity savedDocument = documentRepository.save(document);
@@ -98,7 +98,7 @@ public class DocumentPostService {
     }
 
     private Map<String, Object> buildCloudinaryUploadParams(String publicId, DocumentUploadRequest request, String username, String originalFilename) {
-        String folderPath = String.format("stockify/%d/documents", getTenantId());
+        String folderPath = String.format("stockify/%s", getUsername());
         Map<String, Object> context = Map.of(
                 "tenant_id", getTenantId().toString(),
                 "broker_id", request.getBrokerId().toString(),
