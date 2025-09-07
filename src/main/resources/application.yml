@@ -73,5 +73,3 @@ logging:
   level:
     com.stockify.project: INFO
     org.springframework.security: INFO
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
