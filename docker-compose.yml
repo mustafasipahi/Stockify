@@ -15,7 +15,7 @@ services:
       - "8080:8080"
     environment:
       # Local development database
-      DATABASE_URL: postgresql://stockify_user:postgres@stockify-app-postgresql:5432/stockify_app
+      DATABASE_URL: jdbc:postgresql://stockify_user:postgres@stockify-app-postgresql:5432/stockify_app
       CLOUDINARY_CLOUD_NAME: dd8d5yvdv
       CLOUDINARY_API_KEY: 424539718517918
       CLOUDINARY_API_SECRET: FriIuvdVVf181Wrmvw-7ZJHMMrQ
