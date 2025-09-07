@@ -1,5 +1,6 @@
 package com.stockify.project.controller;
 
+import com.stockify.project.model.dto.SalesItemDto;
 import com.stockify.project.model.dto.SalesProductDto;
 import com.stockify.project.model.request.SalesRequest;
 import com.stockify.project.model.response.SalesResponse;
@@ -34,5 +35,10 @@ public class SalesController {
     @GetMapping("/products")
     public List<SalesProductDto> getProducts() {
         return salesService.getProducts();
+    }
+
+    @GetMapping("/basket/{brokerId}")
+    public List<SalesItemDto> getBrokerBasket(@PathVariable Long brokerId) {
+        return salesService.getBrokerBasketDetail(brokerId);
     }
 }

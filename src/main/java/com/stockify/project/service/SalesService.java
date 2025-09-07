@@ -80,6 +80,12 @@ public class SalesService {
                 .toList();
     }
 
+    public List<SalesItemDto> getBrokerBasketDetail(Long brokerId) {
+        List<BasketDto> basket = getBrokerBasket(brokerId);
+        List<SalesProductDto> products = getProducts();
+        return validateAndProcessProducts(basket, products);
+    }
+
     private SalesPrepareDto prepareSalesFlow(SalesRequest request) {
         validate(request);
         List<SalesProductDto> availableProducts = getProducts();

@@ -73,7 +73,7 @@ public class DocumentPostService {
             String originalFilename = file.getOriginalFilename();
             String safeFileName = replaceCharacter(username + "_" + documentNameDate + "_" + originalFilename);
             String publicId = generatePublicId(username, request.getBrokerId(), request.getDocumentType());
-            Map<String, Object> uploadParams = buildCloudinaryUploadParams(publicId, request, username, safeFileName);
+            Map<String, Object> uploadParams = buildCloudinaryUploadParams(publicId, request, username, safeFileName, file.getContentType());
             Map<String, Object> uploadResult = cloudinary.uploader().upload(file.getBytes(), uploadParams);
             DocumentEntity document = DocumentConverter.toEntity(request, uploadResult, originalFilename, safeFileName, file, username);
             DocumentEntity savedDocument = documentRepository.save(document);
@@ -97,8 +97,19 @@ public class DocumentPostService {
         }
     }
 
-    private Map<String, Object> buildCloudinaryUploadParams(String publicId, DocumentUploadRequest request, String username, String originalFilename) {
-        String folderPath = String.format("stockify/%s", getUsername());
+    private String generatePublicId(String username, Long brokerId, DocumentType documentType) {
+        return String.format("%s_%s_%s_%s_%s",
+                getTenantId(),
+                username,
+                brokerId,
+                documentType.name(),
+                UUID.randomUUID().toString().substring(0, 8));
+    }
+
+    private Map<String, Object> buildCloudinaryUploadParams(String publicId, DocumentUploadRequest request, String username,
+                                                            String originalFilename, String contentType) {
+        String folderPath = String.format("stockify/%s", getTenantId());
+        String resourceType = determineResourceType(contentType);
         Map<String, Object> context = Map.of(
                 "tenant_id", getTenantId().toString(),
                 "broker_id", request.getBrokerId().toString(),
@@ -109,17 +120,17 @@ public class DocumentPostService {
         return Map.of(
                 "public_id", publicId,
                 "folder", folderPath,
-                "resource_type", "auto",
+                "resource_type", resourceType,
                 "context", context
         );
     }
 
-    private String generatePublicId(String username, Long brokerId, DocumentType documentType) {
-        return String.format("%s_%s_%s_%s_%s",
-                getTenantId(),
-                username,
-                brokerId,
-                documentType.name(),
-                UUID.randomUUID().toString().substring(0, 8));
+    private String determineResourceType(String contentType) {
+        if (contentType != null && contentType.startsWith("image/")) {
+            return "image";
+        } else if (contentType != null && contentType.startsWith("video/")) {
+            return "video";
+        }
+        return "raw";
     }
 }
