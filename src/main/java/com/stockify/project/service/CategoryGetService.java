@@ -25,7 +25,7 @@ public class CategoryGetService {
     }
 
     public List<CategoryDto> getAll() {
-        return categoryRepository.findAllByStatusAndTenantIdOrderByNameAsc(CategoryStatus.ACTIVE, getTenantId()).stream()
+        return categoryRepository.findAllByStatusAndTenantIdOrderByCreatedDateDesc(CategoryStatus.ACTIVE, getTenantId()).stream()
                 .map(CategoryConverter::toDto)
                 .toList();
     }

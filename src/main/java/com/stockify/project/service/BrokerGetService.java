@@ -32,7 +32,7 @@ public class BrokerGetService {
 
     public List<BrokerDto> getAllBrokers() {
         Long tenantId = getTenantId();
-        return brokerRepository.findAllByStatusAndTenantIdOrderByFirstNameAsc(BrokerStatus.ACTIVE, tenantId).stream()
+        return brokerRepository.findAllByStatusAndTenantIdOrderByCreatedDateDesc(BrokerStatus.ACTIVE, tenantId).stream()
                 .map(brokerEntity -> {
                     BigDecimal brokerCurrentBalance = getBrokerCurrentBalance(brokerEntity.getId(), tenantId);
                     return BrokerConverter.toDto(brokerEntity, brokerCurrentBalance);

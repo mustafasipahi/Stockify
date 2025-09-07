@@ -13,5 +13,5 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
 
     Optional<CategoryEntity> findByNameAndTenantId(String name, Long tenantId);
 
-    List<CategoryEntity> findAllByStatusAndTenantIdOrderByNameAsc(CategoryStatus status, Long tenantId);
+    List<CategoryEntity> findAllByStatusAndTenantIdOrderByCreatedDateDesc(CategoryStatus status, Long tenantId);
 }

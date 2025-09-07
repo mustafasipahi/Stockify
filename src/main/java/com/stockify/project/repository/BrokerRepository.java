@@ -13,5 +13,5 @@ public interface BrokerRepository extends JpaRepository<BrokerEntity, Long> {
 
     Optional<BrokerEntity> findByFirstNameAndLastNameAndTenantId(String firstName, String lastName, Long tenantId);
 
-    List<BrokerEntity> findAllByStatusAndTenantIdOrderByFirstNameAsc(BrokerStatus status, Long tenantId);
+    List<BrokerEntity> findAllByStatusAndTenantIdOrderByCreatedDateDesc(BrokerStatus status, Long tenantId);
 }
