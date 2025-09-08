@@ -3,9 +3,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:stockify_app}
-    username: ${DATABASE_USERNAME:postgres}
-    password: ${DATABASE_PASSWORD:postgres}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     database: postgresql
@@ -31,18 +31,16 @@ spring:
 
 # Cloudinary Configuration
 cloudinary:
-  cloud-name: ${CLOUDINARY_CLOUD_NAME:dd8d5yvdv}
-  api-key: ${CLOUDINARY_API_KEY:424539718517918}
-  api-secret: ${CLOUDINARY_API_SECRET:FriIuvdVVf181Wrmvw-7ZJHMMrQ}
+  cloud-name: ${CLOUDINARY_CLOUD_NAME}
+  api-key: ${CLOUDINARY_API_KEY}
+  api-secret: ${CLOUDINARY_API_SECRET}
 
 # JWT Security
 security:
-  secretKey: ${JWT_SECRET_KEY:wD3U3XjP7nB3cbmJjQYFhfZ6qPzO7whVYaAkM7b9c10=}
+  secretKey: ${JWT_SECRET_KEY}
 
 # Application Configuration
-stokify:
-  cache:
-    baseCacheTtlMinutes: ${BASE_TTL:60}
+stockify:
   files:
     storage:
       type: cloudinary

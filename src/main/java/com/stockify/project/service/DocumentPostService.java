@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
-import java.util.UUID;
 
 import static com.stockify.project.util.DateUtil.getDocumentNameDate;
 import static com.stockify.project.util.DocumentUtil.replaceCharacter;
@@ -45,10 +44,11 @@ public class DocumentPostService {
     public DocumentResponse uploadSalesFile(SalesPrepareDto prepareDto) {
         try {
             Long tenantId = getTenantId();
+            String username = getUsername();
             CompanyInfoDto companyInfo = companyGetService.getCompanyInfo(tenantId);
             SalesDocumentResponse salesPDF = salesDocumentService.generatePDF(companyInfo, prepareDto);
             DocumentUploadRequest uploadRequest = new DocumentUploadRequest(prepareDto.getBroker().getBrokerId(), DocumentType.VOUCHER);
-            return uploadFileToCloud(salesPDF.getFile(), uploadRequest, getUsername());
+            return uploadFileToCloud(salesPDF.getFile(), uploadRequest, username);
         } catch (Exception e) {
             log.error("Upload Sales File Error", e);
             throw new DocumentUploadException();
@@ -66,14 +66,14 @@ public class DocumentPostService {
         return uploadFileToCloud(file, request, username);
     }
 
+    @SuppressWarnings("unchecked")
     public DocumentResponse uploadFileToCloud(MultipartFile file, DocumentUploadRequest request, String username) {
         uploadValidator.validate(file, request);
         try {
             String documentNameDate = getDocumentNameDate();
             String originalFilename = file.getOriginalFilename();
-            String safeFileName = replaceCharacter(username + "_" + documentNameDate + "_" + originalFilename);
-            String publicId = generatePublicId(username, request.getBrokerId(), request.getDocumentType());
-            Map<String, Object> uploadParams = buildCloudinaryUploadParams(publicId, request, username, safeFileName, file.getContentType());
+            String safeFileName = replaceCharacter(username + "_" + request.getBrokerId() + "_" + documentNameDate + "_" + originalFilename);
+            Map<String, Object> uploadParams = buildCloudinaryUploadParams(safeFileName, request, username, originalFilename, file.getContentType());
             Map<String, Object> uploadResult = cloudinary.uploader().upload(file.getBytes(), uploadParams);
             DocumentEntity document = DocumentConverter.toEntity(request, uploadResult, originalFilename, safeFileName, file, username);
             DocumentEntity savedDocument = documentRepository.save(document);
@@ -95,15 +95,6 @@ public class DocumentPostService {
             log.error("Delete File Error", e);
             throw new DocumentUploadException();
         }
-    }
-
-    private String generatePublicId(String username, Long brokerId, DocumentType documentType) {
-        return String.format("%s_%s_%s_%s_%s",
-                getTenantId(),
-                username,
-                brokerId,
-                documentType.name(),
-                UUID.randomUUID().toString().substring(0, 8));
     }
 
     private Map<String, Object> buildCloudinaryUploadParams(String publicId, DocumentUploadRequest request, String username,

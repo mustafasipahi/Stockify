@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 @Component
-@ConfigurationProperties(prefix = "stokify.files.storage")
+@ConfigurationProperties(prefix = "stockify.files.storage")
 public class FileStorageProperties {
 
     private String type;
