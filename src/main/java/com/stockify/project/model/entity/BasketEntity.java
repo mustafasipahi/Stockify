@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "basket", indexes = {
-        @Index(name = "idx_basket_broker_tenant_created", columnList = "broker_id,tenant_id,created_date")
+        @Index(name = "idx_basket_broker_tenant_created", columnList = "brokerId,tenantId,createdDate")
 })
 @EntityListeners(AuditingEntityListener.class)
 public class BasketEntity {

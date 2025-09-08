@@ -19,8 +19,8 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "broker", indexes = {
-        @Index(name = "idx_broker_name_tenant", columnList = "first_name,last_name,tenant_id"),
-        @Index(name = "idx_broker_status_tenant_created", columnList = "status,tenant_id,created_date")
+        @Index(name = "idx_broker_name_tenant", columnList = "firstName,lastName,tenantId"),
+        @Index(name = "idx_broker_status_tenant_created", columnList = "status,tenantId,createdDate")
 })
 @EntityListeners(AuditingEntityListener.class)
 public class BrokerEntity {

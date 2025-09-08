@@ -18,8 +18,8 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "category", indexes = {
-        @Index(name = "idx_category_name_tenant", columnList = "name,tenant_id"),
-        @Index(name = "idx_category_status_tenant_created", columnList = "status,tenant_id,created_date")
+        @Index(name = "idx_category_name_tenant", columnList = "name,tenantId"),
+        @Index(name = "idx_category_status_tenant_created", columnList = "status,tenantId,createdDate")
 })
 @EntityListeners(AuditingEntityListener.class)
 public class CategoryEntity {

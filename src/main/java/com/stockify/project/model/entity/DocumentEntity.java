@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "documents", indexes = {
-        @Index(name = "idx_document_broker_tenant_created", columnList = "broker_id,tenant_id,created_date"),
-        @Index(name = "idx_document_tenant_created", columnList = "tenant_id,created_date")
+        @Index(name = "idx_document_broker_tenant_created", columnList = "brokerId,tenantId,createdDate"),
+        @Index(name = "idx_document_tenant_created", columnList = "tenantId,createdDate")
 })
 @EntityListeners(AuditingEntityListener.class)
 public class    DocumentEntity {
@@ -26,10 +26,6 @@ public class    DocumentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @NotNull
-    @Column(nullable = false)
-    private Long tenantId;
 
     @NotNull
     @Column(nullable = false)
@@ -69,6 +65,10 @@ public class    DocumentEntity {
     @NotNull
     @Column(nullable = false)
     private String uploadedBy;
+
+    @NotNull
+    @Column(nullable = false)
+    private Long tenantId;
 
     @CreatedDate
     private LocalDateTime createdDate;
