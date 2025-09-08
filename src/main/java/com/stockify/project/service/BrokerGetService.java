@@ -22,6 +22,13 @@ public class BrokerGetService {
     private final BrokerRepository brokerRepository;
     private final TransactionGetService transactionGetService;
 
+    public BrokerDto info(Long brokerId) {
+        Long tenantId = getTenantId();
+        return brokerRepository.findByIdAndTenantId(brokerId, tenantId)
+                .map(brokerEntity -> BrokerConverter.toDto(brokerEntity, null))
+                .orElseThrow(() -> new BrokerNotFoundException(brokerId));
+    }
+
     public BrokerDto detail(Long brokerId) {
         Long tenantId = getTenantId();
         BigDecimal brokerCurrentBalance = getBrokerCurrentBalance(brokerId, tenantId);

@@ -45,8 +45,8 @@ public class SalesConverter {
                 .build();
     }
 
-    public SalesItemDto toSalesItemDto(Long productId, Integer productCount, BigDecimal unitPrice, BigDecimal totalPrice,
-                                       BigDecimal taxRate, BigDecimal taxPrice, BigDecimal totalPriceWithTax, String productName) {
+    public static SalesItemDto toSalesItemDto(Long productId, Integer productCount, BigDecimal unitPrice, BigDecimal totalPrice,
+                                              BigDecimal taxRate, BigDecimal taxPrice, BigDecimal totalPriceWithTax, String productName) {
         return SalesItemDto.builder()
                 .productId(productId)
                 .productName(productName)

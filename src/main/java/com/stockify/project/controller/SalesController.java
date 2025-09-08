@@ -33,8 +33,8 @@ public class SalesController {
     }
 
     @GetMapping("/products")
-    public List<SalesProductDto> getProducts() {
-        return salesService.getProducts();
+    public List<SalesProductDto> getSalesInventory() {
+        return salesService.getSalesInventory();
     }
 
     @GetMapping("/basket/{brokerId}")

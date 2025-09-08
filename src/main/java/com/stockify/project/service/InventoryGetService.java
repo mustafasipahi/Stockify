@@ -5,6 +5,7 @@ import com.stockify.project.enums.InventoryStatus;
 import com.stockify.project.enums.ProductStatus;
 import com.stockify.project.exception.InventoryNotFoundException;
 import com.stockify.project.model.dto.InventoryDto;
+import com.stockify.project.model.dto.SalesProductDto;
 import com.stockify.project.model.entity.InventoryEntity;
 import com.stockify.project.model.request.InventorySearchRequest;
 import com.stockify.project.repository.InventoryRepository;
@@ -64,6 +65,18 @@ public class InventoryGetService {
         return inventoryRepository.findAll(specification).stream()
                 .map(inventoryConverter::toDto)
                 .filter(this::isValid)
+                .toList();
+    }
+
+    public List<SalesProductDto> getSalesInventory() {
+        return getAvailableInventory().stream()
+                .map(inventory -> SalesProductDto.builder()
+                        .productId(inventory.getProduct().getProductId())
+                        .productName(inventory.getProduct().getName())
+                        .productCount(inventory.getProductCount())
+                        .price(inventory.getPrice())
+                        .taxRate(inventory.getProduct().getTaxRate())
+                        .build())
                 .toList();
     }
 

@@ -17,12 +17,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Set;
 
 import static com.stockify.project.util.DocumentUtil.encodeFileName;
 import static com.stockify.project.util.TenantContext.getTenantId;
+import static java.util.Base64.getEncoder;
 
 @Slf4j
 @Service
@@ -58,13 +63,35 @@ public class DocumentGetService {
         if (isImage) {
             return document.getSecureUrl();
         }
-        String publicId = document.getCloudinaryPublicId();
-        return cloudinary.url()
-                .resourceType("raw")
-                .type("authenticated")
-                .secure(true)
-                .signed(true)
-                .generate(publicId);
+        return generateAdminDownloadUrl(document.getCloudinaryPublicId());
+    }
+
+    private String generateAdminDownloadUrl(String publicId) {
+        try {
+            String cloudName = cloudinary.config.cloudName;
+            String apiKey = cloudinary.config.apiKey;
+            String apiSecret = cloudinary.config.apiSecret;
+            URL endpoint = new URL("https://api.cloudinary.com/v1_1/" + cloudName + "/resources/download");
+            HttpURLConnection conn = (HttpURLConnection) endpoint.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+            String basic = getEncoder().encodeToString((apiKey + ":" + apiSecret).getBytes());
+            conn.setRequestProperty("Authorization", "Basic " + basic);
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            String body = "public_id=" + URLEncoder.encode(publicId, java.nio.charset.StandardCharsets.UTF_8)
+                    + "&resource_type=raw&type=authenticated";
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(body.getBytes());
+            }
+            try (InputStream is = conn.getInputStream()) {
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                com.fasterxml.jackson.databind.JsonNode node = mapper.readTree(is);
+                return node.get("url").asText();
+            }
+        } catch (Exception e) {
+            log.error("Generate Admin Download URL Error", e);
+            throw new DocumentDownloadException();
+        }
     }
 
     public List<DocumentResponse> getAllDocument(Long brokerId) {

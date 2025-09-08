@@ -3,9 +3,6 @@ package com.stockify.project.service;
 import com.stockify.project.converter.SalesConverter;
 import com.stockify.project.enums.BrokerStatus;
 import com.stockify.project.exception.BrokerNotFoundException;
-import com.stockify.project.exception.InsufficientInventoryException;
-import com.stockify.project.exception.InventoryCountException;
-import com.stockify.project.exception.ProductNotFoundException;
 import com.stockify.project.model.dto.*;
 import com.stockify.project.model.entity.SalesEntity;
 import com.stockify.project.model.request.SalesRequest;
@@ -19,13 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.stockify.project.validator.BasketValidator.validateAndProcessProducts;
 import static com.stockify.project.validator.SalesValidator.validate;
 import static com.stockify.project.validator.SalesValidator.validateBasket;
 
@@ -58,8 +54,8 @@ public class SalesService {
         SalesEntity savedSalesEntity = saveSalesEntity(salesEntity);
         saveSalesItemEntity(prepareDto.getSalesItems(), savedSalesEntity.getId());
         decreaseProductInventory(prepareDto.getSalesItems());
-        saveTransaction(savedSalesEntity);
         clearBasket(prepareDto.getBroker().getBrokerId());
+        saveTransaction(savedSalesEntity);
         return salesConverter.toResponse(prepareDto.getSales(), prepareDto.getSalesItems(), downloadUrl);
     }
 
@@ -68,32 +64,24 @@ public class SalesService {
         clearBasket(request.getBrokerId());
     }
 
-    public List<SalesProductDto> getProducts() {
-        return inventoryGetService.getAvailableInventory().stream()
-                .map(inventory -> SalesProductDto.builder()
-                        .productId(inventory.getProduct().getProductId())
-                        .productName(inventory.getProduct().getName())
-                        .productCount(inventory.getProductCount())
-                        .price(inventory.getPrice())
-                        .taxRate(inventory.getProduct().getTaxRate())
-                        .build())
-                .toList();
+    public List<SalesProductDto> getSalesInventory() {
+        return inventoryGetService.getSalesInventory();
     }
 
     public List<SalesItemDto> getBrokerBasketDetail(Long brokerId) {
         List<BasketDto> basket = getBrokerBasket(brokerId);
-        List<SalesProductDto> products = getProducts();
-        return validateAndProcessProducts(basket, products);
+        List<SalesProductDto> products = getSalesInventory();
+        return validateAndProcessProducts(basket, products, false);
     }
 
     private SalesPrepareDto prepareSalesFlow(SalesRequest request) {
         validate(request);
-        List<SalesProductDto> availableProducts = getProducts();
+        List<SalesProductDto> availableProducts = getSalesInventory();
         List<BasketDto> basket = getBrokerBasket(request.getBrokerId());
         validateBasket(basket);
         BrokerDto broker = getBroker(request.getBrokerId());
         BigDecimal discountRate = getDiscountRate(broker);
-        List<SalesItemDto> salesItems = validateAndProcessProducts(basket, availableProducts);
+        List<SalesItemDto> salesItems = validateAndProcessProducts(basket, availableProducts, false);
         SalesPriceDto salesPriceDto = calculateTaxAndDiscount(salesItems, discountRate);
         SalesDto sales = salesConverter.toSalesDto(request.getBrokerId(), salesPriceDto);
         return salesConverter.toPrepareDto(sales, salesItems, broker);
@@ -115,39 +103,7 @@ public class SalesService {
                 .orElse(BigDecimal.ZERO);
     }
 
-    private List<SalesItemDto> validateAndProcessProducts(List<BasketDto> basket,
-                                                          List<SalesProductDto> availableProducts) {
-        Map<Long, SalesProductDto> productMap = availableProducts.stream()
-                .collect(Collectors.toMap(SalesProductDto::getProductId, Function.identity()));
-        List<SalesItemDto> salesItems = new ArrayList<>();
 
-        for (BasketDto basketItem : basket) {
-            SalesProductDto availableProduct = productMap.get(basketItem.getProductId());
-            if (availableProduct == null) {
-                throw new ProductNotFoundException(basketItem.getProductId());
-            }
-            if (basketItem.getProductCount() == null || basketItem.getProductCount() <= 0) {
-                throw new InventoryCountException();
-            }
-            if (availableProduct.getProductCount() < basketItem.getProductCount()) {
-                throw new InsufficientInventoryException(
-                        availableProduct.getProductName(),
-                        availableProduct.getProductCount(),
-                        basketItem.getProductCount());
-            }
-            Long productId = basketItem.getProductId();
-            Integer productCount = basketItem.getProductCount();
-            BigDecimal unitPrice = availableProduct.getPrice();
-            BigDecimal totalPrice = unitPrice.multiply(BigDecimal.valueOf(productCount));
-            BigDecimal taxRate = availableProduct.getTaxRate();
-            BigDecimal taxPrice = totalPrice.multiply(taxRate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-            BigDecimal totalPriceWithTax = totalPrice.add(taxPrice);
-            SalesItemDto salesItem = salesConverter.toSalesItemDto(productId, productCount, unitPrice, totalPrice, taxRate,
-                    taxPrice, totalPriceWithTax, availableProduct.getProductName());
-            salesItems.add(salesItem);
-        }
-        return salesItems;
-    }
 
     private SalesPriceDto calculateTaxAndDiscount(List<SalesItemDto> salesItems, BigDecimal discountRate) {
         BigDecimal subtotalPrice = salesItems.stream()
