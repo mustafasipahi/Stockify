@@ -16,7 +16,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "company_info")
+@Table(name = "company_info", indexes = {
+        @Index(name = "idx_company_info_tenant_unique", columnList = "tenant_id", unique = true)
+})
 @EntityListeners(AuditingEntityListener.class)
 public class CompanyInfoEntity {
 

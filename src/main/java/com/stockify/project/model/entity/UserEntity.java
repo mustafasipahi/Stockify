@@ -16,7 +16,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "users")
+@Table(name = "users", indexes = {
+        @Index(name = "idx_users_username_unique", columnList = "username", unique = true),
+        @Index(name = "idx_users_tenant_created", columnList = "tenant_id,created_date")
+})
 @EntityListeners(AuditingEntityListener.class)
 public class UserEntity implements Serializable {
 

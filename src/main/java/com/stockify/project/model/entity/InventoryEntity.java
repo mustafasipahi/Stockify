@@ -21,7 +21,10 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Audited
-@Table(name = "inventory")
+@Table(name = "inventory", indexes = {
+        @Index(name = "idx_inventory_product_unique", columnList = "product_id", unique = true),
+        @Index(name = "idx_inventory_tenant_status", columnList = "tenant_id,status")
+})
 @AuditTable(value = "inventory_audit")
 @EntityListeners(AuditingEntityListener.class)
 public class InventoryEntity {
