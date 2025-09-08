@@ -1,6 +1,8 @@
 package com.stockify.project.service;
 
 import com.cloudinary.Cloudinary;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stockify.project.converter.DocumentConverter;
 import com.stockify.project.exception.DocumentDownloadException;
 import com.stockify.project.exception.DocumentNotFoundException;
@@ -84,8 +86,8 @@ public class DocumentGetService {
                 os.write(body.getBytes());
             }
             try (InputStream is = conn.getInputStream()) {
-                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-                com.fasterxml.jackson.databind.JsonNode node = mapper.readTree(is);
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode node = mapper.readTree(is);
                 return node.get("url").asText();
             }
         } catch (Exception e) {
