@@ -1,5 +1,6 @@
 package com.stockify.project.service;
 
+import com.cloudinary.Cloudinary;
 import com.stockify.project.converter.DocumentConverter;
 import com.stockify.project.exception.DocumentDownloadException;
 import com.stockify.project.exception.DocumentNotFoundException;
@@ -29,12 +30,13 @@ import static com.stockify.project.util.TenantContext.getTenantId;
 public class DocumentGetService {
 
     private final DocumentRepository documentRepository;
+    private final Cloudinary cloudinary;
 
     public ResponseEntity<InputStreamResource> downloadFile(Long documentId) {
         try {
             DocumentEntity document = documentRepository.findByIdAndTenantId(documentId, getTenantId())
                     .orElseThrow(DocumentNotFoundException::new);
-            URL url = new URL(document.getSecureUrl());
+            URL url = new URL(resolveDownloadUrl(document));
             byte[] fileData = url.openStream().readAllBytes();
             InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(fileData));
             String encodedFileName = encodeFileName(document.getSafeFilename());
@@ -48,6 +50,21 @@ public class DocumentGetService {
             log.error("Download File Error", e);
             throw new DocumentDownloadException();
         }
+    }
+
+    private String resolveDownloadUrl(DocumentEntity document) {
+        String contentType = document.getContentType();
+        boolean isImage = contentType != null && contentType.startsWith("image/");
+        if (isImage) {
+            return document.getSecureUrl();
+        }
+        String publicId = document.getCloudinaryPublicId();
+        return cloudinary.url()
+                .resourceType("raw")
+                .type("authenticated")
+                .secure(true)
+                .signed(true)
+                .generate(publicId);
     }
 
     public List<DocumentResponse> getAllDocument(Long brokerId) {

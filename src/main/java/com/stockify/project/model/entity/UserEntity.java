@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "users", indexes = {
-        @Index(name = "idx_users_username_unique", columnList = "username", unique = true),
+        @Index(name = "idx_users_username_unique", columnList = "username"),
         @Index(name = "idx_users_tenant_created", columnList = "tenantId,createdDate")
 })
 @EntityListeners(AuditingEntityListener.class)

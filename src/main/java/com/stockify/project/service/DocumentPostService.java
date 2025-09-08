@@ -112,6 +112,7 @@ public class DocumentPostService {
                 "public_id", publicId,
                 "folder", folderPath,
                 "resource_type", resourceType,
+                "type", resourceType.equals("raw") ? "authenticated" : "upload",
                 "context", context
         );
     }
