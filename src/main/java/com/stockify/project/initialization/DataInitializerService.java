@@ -8,14 +8,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.sql.DataSource;
 
 import static com.stockify.project.constant.LoginConstant.*;
 import static com.stockify.project.enums.TenantType.GURME;
@@ -28,22 +23,11 @@ public class DataInitializerService implements ApplicationRunner {
     private final UserRepository userRepository;
     private final CompanyInfoRepository companyInfoRepository;
     private final PasswordEncoder passwordEncoder;
-    private final DataSource dataSource;
 
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        initializeTestData();
         createGurme();
-    }
-
-    private void initializeTestData() {
-        try {
-            //Resource resource = new ClassPathResource("/initialization/initialization.sql");
-            //ScriptUtils.executeSqlScript(dataSource.getConnection(), resource);
-        } catch (Exception e) {
-            log.error("Initialize Test Data Error!", e);
-        }
     }
 
     private void createGurme() {
