@@ -1,6 +1,6 @@
 package com.stockify.project.model.other;
 
-import jakarta.validation.constraints.NotNull;
+import org.springframework.lang.NonNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,17 +33,17 @@ public class ByteArrayMultipartFile implements MultipartFile {
     }
 
     @Override
-    public byte @NotNull [] getBytes() {
+    public @NonNull byte[] getBytes() {
         return content;
     }
 
     @Override
-    public @NotNull InputStream getInputStream() {
+    public @NonNull InputStream getInputStream() {
         return new ByteArrayInputStream(content);
     }
 
     @Override
-    public void transferTo(@NotNull File dest) throws IOException, IllegalStateException {
+    public void transferTo(@NonNull File dest) throws IOException, IllegalStateException {
         try (FileOutputStream fos = new FileOutputStream(dest)) {
             fos.write(content);
         }
