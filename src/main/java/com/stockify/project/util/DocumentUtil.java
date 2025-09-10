@@ -46,7 +46,7 @@ public class DocumentUtil {
         if (!fileName.toLowerCase().endsWith(".pdf")) {
             fileName = fileName + ".pdf";
         }
-        return replaceCharacter(fileName);
+        return replaceCharacterForFile(fileName);
     }
 
     public static String getDownloadUrl(Long id) {

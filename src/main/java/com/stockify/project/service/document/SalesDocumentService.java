@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static com.stockify.project.util.DocumentUtil.replaceCharacterForFile;
+import static com.stockify.project.util.DocumentUtil.replaceCharacter;
 
 @Slf4j
 @Service
@@ -64,12 +64,12 @@ public class SalesDocumentService {
         String html = template;
 
         // Temel bilgiler - Türkçe karakterleri Latin'e çevir
-        html = html.replace("{{brand}}", replaceCharacterForFile(companyInfoDto.getCompanyName()));
-        html = html.replace("{{address}}", replaceCharacterForFile(companyInfoDto.getCompanyAddress()));
+        html = html.replace("{{brand}}", replaceCharacter(companyInfoDto.getCompanyName()));
+        html = html.replace("{{address}}", replaceCharacter(companyInfoDto.getCompanyAddress()));
         html = html.replace("{{customer}}", broker.getFirstName() + " " + broker.getLastName());
         html = html.replace("{{issued_date}}", now.format(DATE_FORMAT));
         html = html.replace("{{issued_time}}", now.format(TIME_FORMAT));
-        html = html.replace("{{doc_no}}", replaceCharacterForFile(sales.getDocumentNumber()));
+        html = html.replace("{{doc_no}}", replaceCharacter(sales.getDocumentNumber()));
 
         // Items tablosu
         StringBuilder itemsHtml = new StringBuilder();
@@ -79,11 +79,10 @@ public class SalesDocumentService {
             // Ürün adı ve miktar
             itemsHtml.append("<td class=\"col-product\">");
             itemsHtml.append("<div class=\"item-name\">")
-                    .append(replaceCharacterForFile(salesItem.getProductName()))
+                    .append(replaceCharacter(salesItem.getProductName()))
                     .append("</div>");
             itemsHtml.append("<div class=\"item-qty\">")
                     .append(QTY_FORMAT.format(salesItem.getProductCount()))
-                    .append(" ").append(salesItem.getProductCount())
                     .append("</div>");
             itemsHtml.append("</td>");
 
