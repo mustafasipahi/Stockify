@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:stockify_app}
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/stockify_app}
     username: ${DATABASE_USERNAME:postgres}
     password: ${DATABASE_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
@@ -29,21 +29,21 @@ spring:
     serialization:
       write-dates-as-timestamps: false
 
-# Cloudinary Configuration
-cloudinary:
-  cloud-name: ${CLOUDINARY_CLOUD_NAME}
-  api-key: ${CLOUDINARY_API_KEY}
-  api-secret: ${CLOUDINARY_API_SECRET}
+supabase:
+  url: ${SUPABASE_URL:test}
+  anon-key: ${SUPABASE_ANON_KEY:test}
+  service-role-key: ${SUPABASE_SERVICE_ROLE_KEY:test}
+  bucket: ${SUPABASE_BUCKET:test}
+  api-base: ${SUPABASE_STORAGE_API_BASE:${SUPABASE_URL}/storage/v1}
 
 # JWT Security
 security:
-  secretKey: ${JWT_SECRET_KEY}
+  secretKey: ${JWT_SECRET_KEY:test}
 
 # Application Configuration
 stockify:
   files:
     storage:
-      type: cloudinary
       allowed-types:
         - application/pdf
         - image/jpeg
