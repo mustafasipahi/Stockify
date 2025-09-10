@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
         @Index(name = "idx_document_tenant_created", columnList = "tenantId,createdDate")
 })
 @EntityListeners(AuditingEntityListener.class)
-public class    DocumentEntity {
+public class DocumentEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,39 +32,26 @@ public class    DocumentEntity {
     private Long brokerId;
 
     @NotNull
-    @Column(nullable = false, unique = true)
-    private String cloudinaryPublicId;
-
-    @NotNull
     @Column(nullable = false)
     private String originalFilename;
 
     @NotNull
     @Column(nullable = false)
-    private String safeFilename;
-
-    @NotNull
-    @Column(nullable = false)
-    private String cloudinaryUrl;
-
-    @NotNull
-    @Column(nullable = false)
-    private String secureUrl;
+    private String fileName;
 
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DocumentType documentType;
 
-    @Column
-    private String contentType;
-
-    @Column
-    private Long fileSize;
-
-    @NotNull
     @Column(nullable = false)
-    private String uploadedBy;
+    private String bucket;
+
+    @Column(nullable = false)
+    private String path;
+
+    @Column(nullable = false)
+    private String fullPath;
 
     @NotNull
     @Column(nullable = false)

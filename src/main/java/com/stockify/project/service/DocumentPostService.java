@@ -1,14 +1,11 @@
 package com.stockify.project.service;
-
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
 import com.stockify.project.converter.DocumentConverter;
 import com.stockify.project.enums.DocumentType;
-import com.stockify.project.exception.DocumentNotFoundException;
 import com.stockify.project.exception.DocumentUploadException;
 import com.stockify.project.model.dto.CompanyInfoDto;
 import com.stockify.project.model.dto.PaymentDto;
 import com.stockify.project.model.dto.SalesPrepareDto;
+
 import com.stockify.project.model.entity.DocumentEntity;
 import com.stockify.project.model.request.DocumentUploadRequest;
 import com.stockify.project.model.response.DocumentResponse;
@@ -25,7 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Map;
 
 import static com.stockify.project.util.DateUtil.getDocumentNameDate;
-import static com.stockify.project.util.DocumentUtil.replaceCharacter;
+import static com.stockify.project.util.DocumentUtil.createDocumentName;
 import static com.stockify.project.util.TenantContext.getTenantId;
 import static com.stockify.project.util.TenantContext.getUsername;
 
@@ -38,17 +35,16 @@ public class DocumentPostService {
     private final DocumentRepository documentRepository;
     private final CompanyGetService companyGetService;
     private final SalesDocumentService salesDocumentService;
-    private final Cloudinary cloudinary;
+    private final PdfPostService pdfPostService;
 
     @Transactional
     public DocumentResponse uploadSalesFile(SalesPrepareDto prepareDto) {
         try {
             Long tenantId = getTenantId();
-            String username = getUsername();
             CompanyInfoDto companyInfo = companyGetService.getCompanyInfo(tenantId);
             SalesDocumentResponse salesPDF = salesDocumentService.generatePDF(companyInfo, prepareDto);
             DocumentUploadRequest uploadRequest = new DocumentUploadRequest(prepareDto.getBroker().getBrokerId(), DocumentType.VOUCHER);
-            return uploadFileToCloud(salesPDF.getFile(), uploadRequest, username);
+            return uploadFileToCloud(salesPDF.getFile(), uploadRequest);
         } catch (Exception e) {
             log.error("Upload Sales File Error", e);
             throw new DocumentUploadException();
@@ -62,67 +58,33 @@ public class DocumentPostService {
     }
 
     @Transactional
-    public DocumentResponse uploadFile(MultipartFile file, DocumentUploadRequest request, String username) {
-        return uploadFileToCloud(file, request, username);
+    public DocumentResponse uploadFile(MultipartFile file, DocumentUploadRequest request) {
+        return uploadFileToCloud(file, request);
     }
 
-    @SuppressWarnings("unchecked")
-    public DocumentResponse uploadFileToCloud(MultipartFile file, DocumentUploadRequest request, String username) {
+    public DocumentResponse uploadFileToCloud(MultipartFile file, DocumentUploadRequest request) {
         uploadValidator.validate(file, request);
         try {
             String documentNameDate = getDocumentNameDate();
             String originalFilename = file.getOriginalFilename();
-            String safeFileName = replaceCharacter(username + "_" + request.getBrokerId() + "_" + documentNameDate + "_" + originalFilename);
-            Map<String, Object> uploadParams = buildCloudinaryUploadParams(safeFileName, request, username, originalFilename, file.getContentType());
-            Map<String, Object> uploadResult = cloudinary.uploader().upload(file.getBytes(), uploadParams);
-            DocumentEntity document = DocumentConverter.toEntity(request, uploadResult, originalFilename, safeFileName, file, username);
+            String fileName = createDocumentName(
+                    request.getBrokerId(),
+                    request.getDocumentType(),
+                    documentNameDate,
+                    originalFilename);
+            Map<String, String> stringObjectMap = pdfPostService.uploadPdf(file, fileName);
+            DocumentEntity document = DocumentConverter.toEntity(
+                    request,
+                    originalFilename,
+                    stringObjectMap.getOrDefault("bucket", null),
+                    stringObjectMap.getOrDefault("objectName", null),
+                    stringObjectMap.getOrDefault("path", null),
+                    stringObjectMap.getOrDefault("fullPath", null));
             DocumentEntity savedDocument = documentRepository.save(document);
             return DocumentConverter.toResponse(savedDocument);
         } catch (Exception e) {
             log.error("Upload File Error", e);
             throw new DocumentUploadException();
         }
-    }
-
-    @Transactional
-    public void deleteDocument(Long documentId) {
-        try {
-            DocumentEntity document = documentRepository.findByIdAndTenantId(documentId, getTenantId())
-                    .orElseThrow(DocumentNotFoundException::new);
-            cloudinary.uploader().destroy(document.getCloudinaryPublicId(), ObjectUtils.emptyMap());
-            documentRepository.deleteByIdAndTenantId(documentId, getTenantId());
-        } catch (Exception e) {
-            log.error("Delete File Error", e);
-            throw new DocumentUploadException();
-        }
-    }
-
-    private Map<String, Object> buildCloudinaryUploadParams(String publicId, DocumentUploadRequest request, String username,
-                                                            String originalFilename, String contentType) {
-        String folderPath = String.format("stockify/%s", getTenantId());
-        String resourceType = determineResourceType(contentType);
-        Map<String, Object> context = Map.of(
-                "tenant_id", getTenantId().toString(),
-                "broker_id", request.getBrokerId().toString(),
-                "document_type", request.getDocumentType().name(),
-                "uploaded_by", username,
-                "original_filename", originalFilename
-        );
-        return Map.of(
-                "public_id", publicId,
-                "folder", folderPath,
-                "resource_type", resourceType,
-                "type", resourceType.equals("raw") ? "authenticated" : "upload",
-                "context", context
-        );
-    }
-
-    private String determineResourceType(String contentType) {
-        if (contentType != null && contentType.startsWith("image/")) {
-            return "image";
-        } else if (contentType != null && contentType.startsWith("video/")) {
-            return "video";
-        }
-        return "raw";
     }
 }

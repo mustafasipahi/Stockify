@@ -8,4 +8,6 @@ public class StockifyConstants {
 
     public static final String BEARER = "Bearer";
     public static final String X_TOKEN = "X-Token";
+
+    public static final String PATH = "/";
 }

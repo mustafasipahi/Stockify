@@ -12,9 +12,6 @@ import lombok.*;
 public class DocumentResponse {
 
     private Long id;
-    private String name;
-    private String documentType;
-    private String contentType;
-    private Long uploadDate;
+    private String fileName;
     private String downloadUrl;
 }

@@ -1,11 +1,12 @@
 package com.stockify.project.util;
 
+import com.stockify.project.enums.DocumentType;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import static com.stockify.project.util.TenantContext.getUsername;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DocumentUtil {
@@ -39,10 +40,23 @@ public class DocumentUtil {
                 .replaceAll("(^_+)|(_+$)", "");
     }
 
-    public static String encodeFileName(String originalFileName) {
-        if (StringUtils.isEmpty(originalFileName)) {
+    public static String createDocumentName(Long brokerId, DocumentType documentType,
+                                            String documentNameDate, String originalFilename) {
+        String fileName = getUsername() + "_" + brokerId + "_" + documentType + "_" + documentNameDate + "_" + originalFilename;
+        if (!fileName.toLowerCase().endsWith(".pdf")) {
+            fileName = fileName + ".pdf";
+        }
+        return replaceCharacter(fileName);
+    }
+
+    public static String getDownloadUrl(Long id) {
+        if (id == null) {
             return null;
         }
-        return URLEncoder.encode(originalFileName, StandardCharsets.UTF_8);
+        return ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/documents/download/")
+                .path(String.valueOf(id))
+                .toUriString();
     }
 }

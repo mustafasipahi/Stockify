@@ -50,8 +50,8 @@ public class TransactionGetService {
         Map<Long, DocumentResponse> documents = documentGetService.getAllDocument(documentIds).stream()
                 .collect(Collectors.toMap(DocumentResponse::getId, Function.identity()));
         return transactions.map(transaction -> {
-            DocumentResponse doc = documents.get(transaction.getDocumentId());
-            String downloadUrl = (doc != null) ? doc.getDownloadUrl() : null;
+            DocumentResponse response = documents.get(transaction.getDocumentId());
+            String downloadUrl = (response != null) ? response.getDownloadUrl() : null;
             return TransactionConverter.toDto(transaction, broker, downloadUrl);
         });
     }

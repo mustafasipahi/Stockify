@@ -5,14 +5,15 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Getter
 @Setter
 @Component
-@ConfigurationProperties(prefix = "stockify.files.storage")
-public class FileStorageProperties {
+@ConfigurationProperties(prefix = "supabase")
+public class SupabaseProperties {
 
-    private List<String> allowedTypes;
-    private String maxFileSize;
+    private String url;
+    private String anonKey;
+    private String serviceRoleKey;
+    private String bucket;
+    private String apiBase;
 }
