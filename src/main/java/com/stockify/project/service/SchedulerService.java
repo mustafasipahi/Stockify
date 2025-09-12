@@ -1,11 +1,13 @@
 package com.stockify.project.service;
 
+import com.stockify.project.model.entity.BasketEntity;
 import com.stockify.project.repository.BasketRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -16,7 +18,8 @@ public class SchedulerService {
 
     public void removeUnusedBasket() {
         LocalDateTime now = LocalDateTime.now().minusDays(1);
-        int deletedResponseCount = basketRepository.deleteBasketsByCreatedDateBefore(now);
-        log.info("Deleted unused response count: {}", deletedResponseCount);
+        List<BasketEntity> basketEntityList = basketRepository.findAllByCreatedDateBefore(now.minusDays(1));
+        basketEntityList.forEach(entity -> basketRepository.deleteById(entity.getId()));
+        log.info("Deleted unused response count: {}", basketEntityList.size());
     }
 }
