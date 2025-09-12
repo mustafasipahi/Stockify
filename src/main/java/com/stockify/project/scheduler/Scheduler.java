@@ -13,8 +13,7 @@ public class Scheduler {
 
     private final SchedulerService schedulerService;
 
-    //@Scheduled(cron = "0 0 9 * * ?")
-    @Scheduled(cron = "0 */1 * * * ?")
+    @Scheduled(cron = "0 0 9 * * ?")
     public void removeUnusedBasket() {
         log.info("removeUnusedBasket starting...");
         schedulerService.removeUnusedBasket();
