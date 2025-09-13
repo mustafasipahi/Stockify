@@ -17,6 +17,7 @@ public class BrokerConverter {
                 .brokerId(brokerEntity.getId())
                 .firstName(brokerEntity.getFirstName())
                 .lastName(brokerEntity.getLastName())
+                .email(brokerEntity.getEmail())
                 .discountRate(brokerEntity.getDiscountRate())
                 .currentBalance(currentBalance)
                 .status(brokerEntity.getStatus())

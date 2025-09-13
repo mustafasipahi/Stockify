@@ -24,6 +24,7 @@ public class BrokerDto implements Serializable {
     private Long brokerId;
     private String firstName;
     private String lastName;
+    private String email;
     private BigDecimal currentBalance;
     private BigDecimal discountRate;
     private BrokerStatus status;

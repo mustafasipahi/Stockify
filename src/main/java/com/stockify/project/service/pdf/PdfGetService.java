@@ -1,4 +1,4 @@
-package com.stockify.project.service;
+package com.stockify.project.service.pdf;
 
 import com.stockify.project.configuration.properties.SupabaseProperties;
 import com.stockify.project.enums.TenantType;

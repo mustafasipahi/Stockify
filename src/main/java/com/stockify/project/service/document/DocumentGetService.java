@@ -1,4 +1,4 @@
-package com.stockify.project.service;
+package com.stockify.project.service.document;
 import com.stockify.project.converter.DocumentConverter;
 import com.stockify.project.exception.DocumentDownloadException;
 
@@ -6,6 +6,7 @@ import com.stockify.project.exception.DocumentNotFoundException;
 import com.stockify.project.model.entity.DocumentEntity;
 import com.stockify.project.model.response.DocumentResponse;
 import com.stockify.project.repository.DocumentRepository;
+import com.stockify.project.service.pdf.PdfGetService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
@@ -50,13 +51,13 @@ public class DocumentGetService {
         Sort sort = Sort.by(Sort.Direction.DESC, "createdDate");
         List<DocumentEntity> documents = documentRepository.findByBrokerIdAndTenantId(brokerId, getTenantId(), sort);
         return documents.stream()
-                .map(DocumentConverter::toResponse)
+                .map(documentEntity -> DocumentConverter.toResponse(documentEntity, null))
                 .toList();
     }
 
     public List<DocumentResponse> getAllDocument(Set<Long> documentIds) {
         return documentRepository.findAllByIdInAndTenantId(documentIds, getTenantId()).stream()
-                .map(DocumentConverter::toResponse)
+                .map(documentEntity -> DocumentConverter.toResponse(documentEntity, null))
                 .toList();
     }
 

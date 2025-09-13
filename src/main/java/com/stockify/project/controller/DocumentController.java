@@ -2,8 +2,8 @@ package com.stockify.project.controller;
 
 import com.stockify.project.model.request.DocumentUploadRequest;
 import com.stockify.project.model.response.DocumentResponse;
-import com.stockify.project.service.DocumentGetService;
-import com.stockify.project.service.DocumentPostService;
+import com.stockify.project.service.document.DocumentGetService;
+import com.stockify.project.service.document.DocumentPostService;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;

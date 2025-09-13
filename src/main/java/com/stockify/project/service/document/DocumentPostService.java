@@ -1,4 +1,4 @@
-package com.stockify.project.service;
+package com.stockify.project.service.document;
 import com.stockify.project.converter.DocumentConverter;
 import com.stockify.project.enums.DocumentType;
 import com.stockify.project.exception.DocumentUploadException;
@@ -11,7 +11,8 @@ import com.stockify.project.model.request.DocumentUploadRequest;
 import com.stockify.project.model.response.DocumentResponse;
 import com.stockify.project.model.response.SalesDocumentResponse;
 import com.stockify.project.repository.DocumentRepository;
-import com.stockify.project.service.document.SalesDocumentService;
+import com.stockify.project.service.CompanyGetService;
+import com.stockify.project.service.pdf.PdfPostService;
 import com.stockify.project.validator.DocumentUploadValidator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +24,6 @@ import java.util.Map;
 
 import static com.stockify.project.util.DateUtil.getDocumentNameDate;
 import static com.stockify.project.util.DocumentUtil.createDocumentName;
-import static com.stockify.project.util.TenantContext.getTenantId;
-import static com.stockify.project.util.TenantContext.getUsername;
 
 @Slf4j
 @Service
@@ -40,9 +39,7 @@ public class DocumentPostService {
     @Transactional
     public DocumentResponse uploadSalesFile(SalesPrepareDto prepareDto) {
         try {
-            Long tenantId = getTenantId();
-            CompanyInfoDto companyInfo = companyGetService.getCompanyInfo(tenantId);
-            SalesDocumentResponse salesPDF = salesDocumentService.generatePDF(companyInfo, prepareDto);
+            SalesDocumentResponse salesPDF = salesDocumentService.generatePDF(prepareDto);
             DocumentUploadRequest uploadRequest = new DocumentUploadRequest(prepareDto.getBroker().getBrokerId(), DocumentType.VOUCHER);
             return uploadFileToCloud(salesPDF.getFile(), uploadRequest);
         } catch (Exception e) {
@@ -53,7 +50,7 @@ public class DocumentPostService {
 
     public DocumentResponse uploadPaymentFile(PaymentDto paymentDto) {
         return DocumentResponse.builder()
-                .id(1234L)
+                .documentId(1234L)
                 .build();
     }
 
@@ -81,7 +78,7 @@ public class DocumentPostService {
                     stringObjectMap.getOrDefault("path", null),
                     stringObjectMap.getOrDefault("fullPath", null));
             DocumentEntity savedDocument = documentRepository.save(document);
-            return DocumentConverter.toResponse(savedDocument);
+            return DocumentConverter.toResponse(savedDocument, file);
         } catch (Exception e) {
             log.error("Upload File Error", e);
             throw new DocumentUploadException();

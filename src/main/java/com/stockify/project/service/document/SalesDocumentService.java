@@ -38,9 +38,9 @@ public class SalesDocumentService {
     private static final String DEFAULT_BRAND_NAME = "Stockify";
     private static final String DEFAULT_BRAND_URL = "//www.stockify.com";
 
-    public SalesDocumentResponse generatePDF(CompanyInfoDto companyInfoDto, SalesPrepareDto prepareDto) throws IOException {
+    public SalesDocumentResponse generatePDF(SalesPrepareDto prepareDto) throws IOException {
         String htmlTemplate = readHtmlTemplate();
-        String filledHtml = fillTemplate(htmlTemplate, companyInfoDto, prepareDto);
+        String filledHtml = fillTemplate(htmlTemplate, prepareDto);
         return generate(filledHtml);
     }
 
@@ -56,16 +56,17 @@ public class SalesDocumentService {
         }
     }
 
-    private String fillTemplate(String template, CompanyInfoDto companyInfoDto, SalesPrepareDto prepareDto) {
+    private String fillTemplate(String template, SalesPrepareDto prepareDto) {
         SalesDto sales = prepareDto.getSales();
         List<SalesItemDto> salesItems = prepareDto.getSalesItems();
         BrokerDto broker = prepareDto.getBroker();
+        CompanyInfoDto companyInfo = prepareDto.getCompanyInfo();
         LocalDateTime now = LocalDateTime.now();
         String html = template;
 
         // Temel bilgiler - Türkçe karakterleri Latin'e çevir
-        html = html.replace("{{brand}}", replaceCharacter(companyInfoDto.getCompanyName()));
-        html = html.replace("{{address}}", replaceCharacter(companyInfoDto.getCompanyAddress()));
+        html = html.replace("{{brand}}", replaceCharacter(companyInfo.getCompanyName()));
+        html = html.replace("{{address}}", replaceCharacter(companyInfo.getCompanyAddress()));
         html = html.replace("{{customer}}", broker.getFirstName() + " " + broker.getLastName());
         html = html.replace("{{issued_date}}", now.format(DATE_FORMAT));
         html = html.replace("{{issued_time}}", now.format(TIME_FORMAT));

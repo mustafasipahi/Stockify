@@ -39,6 +39,7 @@ public class BrokerPostService {
         BrokerEntity brokerEntity = BrokerEntity.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
+                .email(request.getEmail())
                 .discountRate(Optional.ofNullable(request.getDiscountRate())
                         .orElse(BigDecimal.ZERO))
                 .status(BrokerStatus.ACTIVE)
@@ -69,6 +70,9 @@ public class BrokerPostService {
         if (request.getDiscountRate() != null) {
             brokerUpdateValidator.validateDiscountRate(request.getDiscountRate());
             brokerEntity.setDiscountRate(request.getDiscountRate());
+        }
+        if (StringUtils.isNotBlank(request.getEmail())) {
+            brokerEntity.setEmail(request.getEmail());
         }
         BrokerEntity updatedBrokerEntity = brokerRepository.save(brokerEntity);
         return BrokerConverter.toIdDto(updatedBrokerEntity);

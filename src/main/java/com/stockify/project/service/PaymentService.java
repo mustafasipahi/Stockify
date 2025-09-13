@@ -10,6 +10,7 @@ import com.stockify.project.model.request.PaymentCreateRequest;
 import com.stockify.project.model.response.DocumentResponse;
 import com.stockify.project.model.response.PaymentResponse;
 import com.stockify.project.repository.PaymentRepository;
+import com.stockify.project.service.document.DocumentPostService;
 import com.stockify.project.validator.PaymentCreateValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -51,7 +52,7 @@ public class PaymentService {
 
     private String uploadDocument(PaymentDto paymentDto, PaymentEntity paymentEntity) {
         DocumentResponse documentResponse = documentPostService.uploadPaymentFile(paymentDto);
-        Long documentId = documentResponse.getId();
+        Long documentId = documentResponse.getDocumentId();
         paymentEntity.setDocumentId(documentId);
         return documentResponse.getDownloadUrl();
     }

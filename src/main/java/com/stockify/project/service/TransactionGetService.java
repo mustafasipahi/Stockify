@@ -11,6 +11,7 @@ import com.stockify.project.model.request.TransactionSearchRequest;
 import com.stockify.project.model.response.DocumentResponse;
 import com.stockify.project.repository.BrokerRepository;
 import com.stockify.project.repository.TransactionRepository;
+import com.stockify.project.service.document.DocumentGetService;
 import com.stockify.project.specification.TransactionSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -48,7 +49,7 @@ public class TransactionGetService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
         Map<Long, DocumentResponse> documents = documentGetService.getAllDocument(documentIds).stream()
-                .collect(Collectors.toMap(DocumentResponse::getId, Function.identity()));
+                .collect(Collectors.toMap(DocumentResponse::getDocumentId, Function.identity()));
         return transactions.map(transaction -> {
             DocumentResponse response = documents.get(transaction.getDocumentId());
             String downloadUrl = (response != null) ? response.getDownloadUrl() : null;

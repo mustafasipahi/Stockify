@@ -10,6 +10,8 @@ import com.stockify.project.model.response.DocumentResponse;
 import com.stockify.project.model.response.SalesResponse;
 import com.stockify.project.repository.SalesItemRepository;
 import com.stockify.project.repository.SalesRepository;
+import com.stockify.project.service.document.DocumentPostService;
+import com.stockify.project.service.email.SalesEmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +41,8 @@ public class SalesService {
     private final DocumentPostService documentPostService;
     private final BasketGetService basketGetService;
     private final BasketPostService basketPostService;
+    private final SalesEmailService salesEmailService;
+    private final CompanyGetService companyGetService;
 
     @Transactional
     public SalesResponse salesCalculate(SalesRequest request) {
@@ -49,14 +53,17 @@ public class SalesService {
     @Transactional
     public SalesResponse salesConfirm(SalesRequest request) {
         SalesPrepareDto prepareDto = prepareSalesFlow(request);
+        addCompanyInfo(prepareDto);
         SalesEntity salesEntity = salesConverter.toSalesEntity(prepareDto.getSales());
-        String downloadUrl = uploadDocument(prepareDto, salesEntity);
+        DocumentResponse documentResponse = uploadDocument(prepareDto);
+        salesEntity.setDocumentId(documentResponse.getDocumentId());
         SalesEntity savedSalesEntity = saveSalesEntity(salesEntity);
         saveSalesItemEntity(prepareDto.getSalesItems(), savedSalesEntity.getId());
         decreaseProductInventory(prepareDto.getSalesItems());
         clearBasket(prepareDto.getBroker().getBrokerId());
         saveTransaction(savedSalesEntity);
-        return salesConverter.toResponse(prepareDto.getSales(), prepareDto.getSalesItems(), downloadUrl);
+        sendEmail(prepareDto, documentResponse);
+        return salesConverter.toResponse(prepareDto.getSales(), prepareDto.getSalesItems(), documentResponse.getDownloadUrl());
     }
 
     @Transactional
@@ -146,18 +153,24 @@ public class SalesService {
         inventoryPostService.decreaseInventory(productDecreaseProductCountMap);
     }
 
-    private String uploadDocument(SalesPrepareDto prepareDto, SalesEntity salesEntity) {
-        DocumentResponse documentResponse = documentPostService.uploadSalesFile(prepareDto);
-        Long documentId = documentResponse.getId();
-        salesEntity.setDocumentId(documentId);
-        return documentResponse.getDownloadUrl();
+    private void addCompanyInfo(SalesPrepareDto prepareDto) {
+        CompanyInfoDto companyInfo = companyGetService.getCompanyInfo();
+        prepareDto.setCompanyInfo(companyInfo);
+    }
+
+    private DocumentResponse uploadDocument(SalesPrepareDto prepareDto) {
+        return documentPostService.uploadSalesFile(prepareDto);
+    }
+
+    private void clearBasket(Long brokerId) {
+        basketPostService.clearBasket(brokerId);
     }
 
     private void saveTransaction(SalesEntity salesEntity) {
         transactionPostService.createSalesTransaction(salesEntity);
     }
 
-    private void clearBasket(Long brokerId) {
-        basketPostService.clearBasket(brokerId);
+    private void sendEmail(SalesPrepareDto salesPrepareDto, DocumentResponse documentResponse) {
+        salesEmailService.sendEmail(salesPrepareDto, documentResponse);
     }
 }

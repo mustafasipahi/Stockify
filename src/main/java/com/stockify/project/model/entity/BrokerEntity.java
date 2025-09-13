@@ -38,6 +38,9 @@ public class BrokerEntity {
     private String lastName;
 
     @Column
+    private String email;
+
+    @Column
     private BigDecimal discountRate;
 
     @NotNull

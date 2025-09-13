@@ -5,6 +5,7 @@ import com.stockify.project.model.request.DocumentUploadRequest;
 import com.stockify.project.model.response.DocumentResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import static com.stockify.project.util.DocumentUtil.getDownloadUrl;
 import static com.stockify.project.util.TenantContext.getTenantId;
@@ -26,10 +27,11 @@ public class DocumentConverter {
                 .build();
     }
 
-    public static DocumentResponse toResponse(DocumentEntity document) {
+    public static DocumentResponse toResponse(DocumentEntity document, MultipartFile file) {
         return DocumentResponse.builder()
-                .id(document.getId())
+                .documentId(document.getId())
                 .fileName(document.getFileName())
+                .file(file)
                 .downloadUrl(getDownloadUrl(document.getId()))
                 .build();
     }

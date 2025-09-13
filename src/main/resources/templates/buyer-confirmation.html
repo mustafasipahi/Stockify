@@ -1,0 +1,42 @@
+<html>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+<div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h2 style="color: #28a745;">✅ Siparişiniz Onaylandı</h2>
+
+    <p>Değerli Müşterimiz,</p>
+    <p>Siparişiniz başarıyla tamamlanmıştır. Detaylar aşağıda yer almaktadır.</p>
+
+    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <h3>Sipariş Detayları:</h3>
+        <p><strong>Fatura No:</strong> {{DOCUMENT_NUMBER}}</p>
+        <p><strong>Tarih:</strong> {{SALE_DATE}}</p>
+    </div>
+
+    <div style="background-color: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <h3>Satın Aldığınız Ürünler:</h3>
+        {{PRODUCT_LIST}}
+    </div>
+
+    <div style="background-color: #f0f8f0; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <h3>Ödeme Özeti:</h3>
+        <p><strong>Ara Toplam:</strong> ₺{{SUBTOTAL_PRICE}}</p>
+        <p><strong>İndirim:</strong> -₺{{DISCOUNT_PRICE}}</p>
+        <p><strong>KDV:</strong> ₺{{TOTAL_TAX_PRICE}}</p>
+        <p style="font-size: 18px; color: #28a745;"><strong>TOPLAM:</strong> ₺{{TOTAL_PRICE_WITH_TAX}}</p>
+    </div>
+
+    <div style="background-color: #e3f2fd; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <h3>Satış Danışmanınız:</h3>
+        <p><strong>Ad Soyad:</strong> {{BROKER_NAME}}</p>
+        <p><strong>Broker ID:</strong> {{BROKER_ID}}</p>
+    </div>
+
+    <p>Ekteki PDF dosyasında detaylı faturanızı bulabilirsiniz.</p>
+    <p>Herhangi bir sorunuz olması durumunda bizimle iletişime geçebilirsiniz.</p>
+
+    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 14px; color: #666;">
+        <p>Teşekkürler,<br>{{COMPANY_NAME}}</p>
+    </div>
+</div>
+</body>
+</html>

@@ -16,5 +16,6 @@ public class BrokerUpdateRequest {
     private Long brokerId;
     private String firstName;
     private String lastName;
+    private String email;
     private BigDecimal discountRate;
 }
