@@ -43,6 +43,7 @@ public class DataInitializerService implements ApplicationRunner {
             user.setUsername(GURME_ADMIN_USER_NAME_1);
             user.setPassword(passwordEncoder.encode(GURME_ADMIN_USER_PASSWORD_1));
             user.setTenantId(GURME.getTenantId());
+            user.setEmail("");
             userRepository.save(user);
         }
         if (userRepository.findByUsername(GURME_ADMIN_USER_NAME_2).isEmpty()) {
@@ -50,6 +51,7 @@ public class DataInitializerService implements ApplicationRunner {
             user.setUsername(GURME_ADMIN_USER_NAME_2);
             user.setPassword(passwordEncoder.encode(GURME_ADMIN_USER_PASSWORD_2));
             user.setTenantId(GURME.getTenantId());
+            user.setEmail("");
             userRepository.save(user);
         }
     }
