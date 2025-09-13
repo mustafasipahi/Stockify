@@ -21,7 +21,6 @@ public class CompanyGetService {
         return CompanyInfoDto.builder()
                 .companyName(companyInfoEntity.getCompanyName())
                 .companyAddress(companyInfoEntity.getCompanyAddress())
-                .email(companyInfoEntity.getEmail())
                 .build();
     }
 }

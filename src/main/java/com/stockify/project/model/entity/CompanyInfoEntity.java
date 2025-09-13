@@ -34,9 +34,6 @@ public class CompanyInfoEntity {
     @Column(nullable = false)
     private String companyAddress;
 
-    @Column
-    private String email;
-
     @NotNull
     @Column(unique = true, nullable = false)
     private Long tenantId;

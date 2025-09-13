@@ -1,7 +1,6 @@
 package com.stockify.project.service.email;
 
 import com.stockify.project.model.dto.BrokerDto;
-import com.stockify.project.model.dto.CompanyInfoDto;
 import com.stockify.project.model.dto.SalesPrepareDto;
 import com.stockify.project.model.response.DocumentResponse;
 import jakarta.mail.MessagingException;
@@ -24,6 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+
+import static com.stockify.project.util.TenantContext.getEmail;
 
 @Slf4j
 @Service
@@ -55,24 +56,25 @@ public class SalesEmailService {
     }
 
     private void sendNotificationsInternal(SalesPrepareDto salesPrepareDto, DocumentResponse documentResponse) {
-        CompanyInfoDto companyInfo = salesPrepareDto.getCompanyInfo();
         BrokerDto broker = salesPrepareDto.getBroker();
-        if (isValidEmail(companyInfo.getEmail())) {
+        String userEmail = getEmail();
+        if (isValidEmail(userEmail)) {
             try {
-                sendSellerNotification(salesPrepareDto, companyInfo.getEmail(), documentResponse.getFile());
-                log.info("Sent SellerNotification email to {}", maskEmail(companyInfo.getEmail()));
+                sendSellerNotification(salesPrepareDto, userEmail, documentResponse.getFile());
+                log.info("Sent SellerNotification email to {}", maskEmail(userEmail));
             } catch (Exception e) {
-                log.error("Send SellerNotification Error! Email: {}", maskEmail(companyInfo.getEmail()), e);
+                log.error("Send SellerNotification Error! Email: {}", maskEmail(userEmail), e);
             }
         } else {
             log.info("Company Email is invalid");
         }
-        if (isValidEmail(broker.getEmail())) {
+        String brokerEmail = broker.getEmail();
+        if (isValidEmail(brokerEmail)) {
             try {
-                sendBuyerNotification(salesPrepareDto, broker.getEmail(), documentResponse.getFile());
-                log.info("Sent BuyerNotification email to {}", maskEmail(broker.getEmail()));
+                sendBuyerNotification(salesPrepareDto, brokerEmail, documentResponse.getFile());
+                log.info("Sent BuyerNotification email to {}", maskEmail(brokerEmail));
             } catch (Exception e) {
-                log.error("Send BuyerNotification Error! Email: {}", maskEmail(broker.getEmail()), e);
+                log.error("Send BuyerNotification Error! Email: {}", maskEmail(brokerEmail), e);
             }
         } else {
             log.error("Broker Email is invalid");

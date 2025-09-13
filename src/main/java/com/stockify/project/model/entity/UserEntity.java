@@ -35,6 +35,9 @@ public class UserEntity implements Serializable {
     @Column(nullable = false)
     private String password;
 
+    @Column
+    private String email;
+
     @NotNull
     @Column(nullable = false)
     private Long tenantId;
