@@ -171,6 +171,6 @@ public class SalesService {
     }
 
     private void sendEmail(SalesPrepareDto salesPrepareDto, DocumentResponse documentResponse) {
-        salesEmailService.sendEmail(salesPrepareDto, documentResponse);
+        salesEmailService.sendSalesNotifications(salesPrepareDto, documentResponse);
     }
 }
