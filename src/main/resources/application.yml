@@ -48,15 +48,15 @@ spring:
         debug: false
 
 supabase:
-  url: ${SUPABASE_URL:test}
-  anon-key: ${SUPABASE_ANON_KEY:test}
-  service-role-key: ${SUPABASE_SERVICE_ROLE_KEY:test}
-  bucket: ${SUPABASE_BUCKET:test}
+  url: ${SUPABASE_URL}
+  anon-key: ${SUPABASE_ANON_KEY}
+  service-role-key: ${SUPABASE_SERVICE_ROLE_KEY}
+  bucket: ${SUPABASE_BUCKET}
   api-base: ${SUPABASE_STORAGE_API_BASE:${SUPABASE_URL}/storage/v1}
 
 # JWT Security
 security:
-  secretKey: ${JWT_SECRET_KEY:test}
+  secretKey: ${JWT_SECRET_KEY}
 
 # Application Configuration
 stockify:

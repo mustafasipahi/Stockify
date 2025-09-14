@@ -31,8 +31,8 @@ import static com.stockify.project.util.TenantContext.getEmail;
 @RequiredArgsConstructor
 public class SalesEmailService {
 
-    private static final String SELLER_TEMPLATE_PATH = "templates/seller-notification.html";
-    private static final String BUYER_TEMPLATE_PATH = "templates/buyer-confirmation.html";
+    private static final String SELLER_TEMPLATE_PATH = "templates/sales_seller_email.html";
+    private static final String BUYER_TEMPLATE_PATH = "templates/sales_buyer_email.html";
     private static final String DATE_FORMAT = "dd/MM/yyyy HH:mm";
     private static final String COMPANY_NAME = "Stokify";
 
