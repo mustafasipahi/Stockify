@@ -1,299 +1,388 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <style>
-    @page {
-      margin: 2mm;
-      size: 58mm 200mm;
-    }
+    <meta charset="utf-8"/>
+    <title>Satis Fisi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <style>
+        /* Termal yazıcı fiş formatı - 80mm genişlik */
+        @page {
+            size: {{page_size}};
+            margin: 0;
+        }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      font-family: 'Courier New', monospace;
-      font-size: 6px;
-      color: black;
-      background: white;
-      line-height: 1.2;
-      width: 100%;
-    }
+        html, body {
+            padding: 0;
+            margin: 0;
+            background: #ffffff;
+            width: 100%;
+            height: 100%;
+        }
 
-    .receipt {
-      width: 100%;
-      padding: 1mm;
-    }
+        body {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 6pt;
+            line-height: 1.1;
+            color: #000;
+        }
 
-    .bold { font-weight: bold; }
+        .receipt {
+            width: 100%;
+            padding: 1.5mm 1mm;
+            background: #fff;
+        }
 
-    .brand {
-      font-weight: bold;
-      text-align: center;
-      font-size: 8px;
-      margin-bottom: 2mm;
-    }
+        .center {
+            text-align: center;
+        }
 
-    .address {
-      text-align: center;
-      font-size: 5px;
-      margin-bottom: 3mm;
-      line-height: 1.1;
-    }
+        .left {
+            text-align: left;
+        }
 
-    .title {
-      font-weight: bold;
-      text-align: center;
-      font-size: 8px;
-      margin: 3mm 0;
-      padding: 2mm 0;
-      border-top: 1px dashed black;
-      border-bottom: 1px dashed black;
-    }
+        .right {
+            text-align: right;
+        }
 
-    .info-section {
-      margin: 2mm 0;
-    }
+        .muted {
+            opacity: 0.85;
+        }
 
-    .info-line {
-      margin: 1mm 0;
-      font-size: 6px;
-    }
+        /* Başlıklar */
+        .brand {
+            font-weight: 700;
+            text-transform: uppercase;
+            text-align: center;
+            font-size: 7pt;
+            line-height: 1.05;
+            margin-bottom: 0.8mm;
+        }
 
-    .info-flex {
-      margin: 1mm 0;
-      font-size: 6px;
-    }
+        .address {
+            text-align: center;
+            font-size: 5.5pt;
+            line-height: 1.2;
+            white-space: pre-line;
+            margin-bottom: 1mm;
+        }
 
-    .separator {
-      border-top: 1px dashed black;
-      margin: 2mm 0;
-      height: 1px;
-    }
+        .title {
+            font-weight: 700;
+            text-transform: uppercase;
+            text-align: center;
+            font-size: 6.5pt;
+            margin: 1mm 0;
+            letter-spacing: 0.15pt;
+        }
 
-    .items-table {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: fixed;
-      margin: 2mm 0;
-    }
+        /* Çizgiler */
+        .hr {
+            border: 0;
+            border-top: 1px dashed #333;
+            height: 0;
+            margin: 1mm 0;
+            opacity: 0.9;
+        }
 
-    .items-table th {
-      font-size: 5px;
-      font-weight: bold;
-      padding: 1mm 0.5mm;
-      text-align: center;
-      border-bottom: 1px solid black;
-      background-color: #f5f5f5;
-    }
+        /* Anahtar-Değer çiftleri */
+        .info-section {
+            margin: 1mm 0;
+        }
 
-    .items-table td {
-      font-size: 5px;
-      padding: 1mm 0.5mm;
-      vertical-align: top;
-      border-bottom: 1px dotted #ccc;
-    }
+        .kv {
+            display: table;
+            width: 100%;
+            margin: 0.2mm 0;
+            font-size: 6pt;
+            line-height: 1.2;
+            table-layout: fixed;
+        }
 
-    .col-product { width: 35%; text-align: left; }
-    .col-vat { width: 13%; text-align: center; }
-    .col-discount { width: 13%; text-align: center; }
-    .col-price { width: 19%; text-align: right; }
-    .col-total { width: 20%; text-align: right; }
+        .kv .k {
+            display: table-cell;
+            font-weight: 700;
+            width: 28mm;
+        }
 
-    .summary-section {
-      margin: 2mm 0;
-      border-top: 2px solid black;
-      padding-top: 1mm;
-    }
+        .kv .v {
+            display: table-cell;
+            word-wrap: break-word;
+        }
 
-    .summary-line {
-      width: 100%;
-      font-size: 6px;
-      margin: 0.5mm 0;
-      padding: 0.5mm 2mm;
-    }
+        .kv .v-strong {
+            font-weight: 700;
+        }
 
-    .summary-line table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+        /* Ürün tablosu */
+        table.items {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 5pt;
+            margin: 1mm 0;
+            table-layout: fixed;
+        }
 
-    .summary-line td:first-child {
-      width: 35mm;
-      text-align: left;
-    }
+        table.items thead th {
+            font-weight: 700;
+            padding: 0.6mm 0.3mm;
+            text-align: left;
+            border-bottom: 1px solid #333;
+            font-size: 5pt;
+            text-transform: uppercase;
+        }
 
-    .summary-line td:last-child {
-      text-align: right;
-    }
+        table.items thead th:nth-child(1) {
+            width: 35%;
+        }
 
-    .total-line {
-      width: 100%;
-      font-weight: bold;
-      font-size: 6px;
-      border-top: 1px solid black;
-      border-bottom: 2px solid black;
-      padding: 1mm 2mm;
-      margin: 1mm 0;
-    }
+        table.items thead th:nth-child(2) {
+            width: 12%;
+            text-align: center;
+        }
 
-    .total-line table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+        table.items thead th:nth-child(3) {
+            width: 12%;
+            text-align: center;
+        }
 
-    .total-line td:first-child {
-      width: 35mm;
-      text-align: left;
-    }
+        table.items thead th:nth-child(4) {
+            width: 20%;
+            text-align: right;
+        }
 
-    .total-line td:last-child {
-      text-align: right;
-    }
+        table.items thead th:nth-child(5) {
+            width: 21%;
+            text-align: right;
+        }
 
-    .balance-section {
-      margin: 2mm 0;
-      border-top: 1px dashed black;
-      padding-top: 1mm;
-    }
+        table.items tbody td {
+            padding: 0.8mm 0.3mm;
+            vertical-align: top;
+            border-bottom: 0.5px dotted #ccc;
+        }
 
-    .footer {
-      text-align: center;
-      font-size: 6px;
-      margin: 3mm 0;
-      padding: 1mm 0;
-      border-top: 1px dashed black;
-      font-style: italic;
-    }
+        table.items tbody td:nth-child(1) {
+            text-align: left;
+        }
 
-    .brand-footer {
-      font-size: 5px;
-      margin-top: 2mm;
-      padding-top: 1mm;
-      border-top: 1px dashed black;
-      width: 100%;
-    }
+        table.items tbody td:nth-child(2),
+        table.items tbody td:nth-child(3) {
+            text-align: center;
+        }
 
-    .brand-footer table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+        table.items tbody td:nth-child(4),
+        table.items tbody td:nth-child(5) {
+            text-align: right;
+        }
 
-    .brand-footer td:first-child {
-      text-align: left;
-      font-weight: bold;
-    }
+        .sku {
+            display: block;
+            font-weight: 700;
+            text-transform: uppercase;
+            line-height: 1.1;
+        }
 
-    .brand-footer td:last-child {
-      text-align: right;
-    }
-  </style>
-  <title></title>
+        .qty {
+            display: block;
+            font-size: 4.5pt;
+            margin-top: 0.2mm;
+            opacity: 0.9;
+        }
+
+        /* Özet tablosu */
+        table.summary {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1mm 0;
+            font-size: 6pt;
+        }
+
+        table.summary tr {
+            line-height: 1.4;
+        }
+
+        table.summary td {
+            padding: 0.2mm 0;
+        }
+
+        table.summary td.label {
+            width: 60%;
+            text-align: left;
+            padding-left: 25mm;
+            font-weight: 600;
+        }
+
+        table.summary td.value {
+            width: 40%;
+            text-align: right;
+            font-weight: 700;
+        }
+
+        table.summary tr:last-child td {
+            font-weight: 700;
+            font-size: 7pt;
+            padding-top: 0.6mm;
+        }
+
+        /* Bakiye bilgileri */
+        .balance-section {
+            margin: 2mm 0;
+        }
+
+        .balance-section .kv {
+            margin: 1mm 0;
+        }
+
+        /* Footer */
+        .footnote {
+            text-align: center;
+            font-size: 5pt;
+            margin: 1mm 0;
+            opacity: 0.85;
+        }
+
+        .brandline {
+            display: table;
+            width: 100%;
+            font-size: 5pt;
+            margin-top: 1mm;
+            font-weight: 600;
+            table-layout: fixed;
+        }
+
+        .brandline .left,
+        .brandline .right {
+            display: table-cell;
+            width: 50%;
+        }
+
+        .brandline .left {
+            text-align: left;
+        }
+
+        .brandline .right {
+            text-align: right;
+            opacity: 0.9;
+        }
+
+        /* Sayfa sonu kontrolleri */
+        tr, td, th, .kv, .info-section {
+            page-break-inside: avoid;
+        }
+
+        table {
+            page-break-inside: auto;
+        }
+
+        .receipt > * {
+            page-break-inside: avoid;
+        }
+    </style>
 </head>
 <body>
 <div class="receipt">
-  <div class="brand">{{brand}}</div>
-  <div class="address">{{address}}</div>
+    <!-- Şirket Başlığı -->
+    <div class="brand">{{brand}}</div>
+    <div class="address muted">{{address}}</div>
 
-  <div class="title">SATIS FISI</div>
+    <!-- Fiş Başlığı -->
+    <div class="title">SATIS FISI</div>
 
-  <div class="info-section">
-    <div class="info-line">
-      <span class="bold">Cari:</span> {{customer}}
+    <!-- Müşteri ve Belge Bilgileri -->
+    <div class="info-section">
+        <div class="kv">
+            <div class="k">Cari</div>
+            <div class="v">: {{customer}}</div>
+        </div>
+        <div class="kv">
+            <div class="k">Tarih</div>
+            <div class="v">: {{issued_date}}</div>
+        </div>
+        <div class="kv">
+            <div class="k">Saat</div>
+            <div class="v">: {{issued_time}}</div>
+        </div>
+        <div class="kv">
+            <div class="k">Belge No</div>
+            <div class="v">: {{doc_no}}</div>
+        </div>
     </div>
-    <div class="info-flex">
-      <span><span class="bold">Tarih:</span> {{issued_date}} {{issued_time}}</span>
-    </div>
-    <div class="info-line">
-      <span class="bold">Belge No:</span> {{doc_no}}
-    </div>
-  </div>
 
-  <div class="separator"></div>
+    <div class="hr"></div>
 
-  <table class="items-table">
-    <thead>
-    <tr>
-      <th class="col-product">URUN</th>
-      <th class="col-vat">%KDV</th>
-      <th class="col-discount">%ISK</th>
-      <th class="col-price">B.FIYAT</th>
-      <th class="col-total">TUTAR</th>
-    </tr>
-    </thead>
-    <tbody>
-    {{items}}
-    </tbody>
-  </table>
-
-  <div class="summary-section">
-    <div class="summary-line">
-      <table>
+    <!-- Ürün Tablosu -->
+    <table class="items">
+        <thead>
         <tr>
-          <td>Ara Toplam:</td>
-          <td>{{subtotal}}</td>
+            <th>{{th_stock}}</th>
+            <th>{{th_vat}}</th>
+            <th>{{th_discount}}</th>
+            <th>{{th_unit_price}}</th>
+            <th>{{th_amount}}</th>
         </tr>
-      </table>
-    </div>
-    <div class="summary-line">
-      <table>
-        <tr>
-          <td>İskonto:</td>
-          <td>{{discount}}</td>
-        </tr>
-      </table>
-    </div>
-    <div class="summary-line">
-      <table>
-        <tr>
-          <td>Net Toplam:</td>
-          <td>{{total}}</td>
-        </tr>
-      </table>
-    </div>
-    <div class="summary-line">
-      <table>
-        <tr>
-          <td>KDV:</td>
-          <td>{{vat}}</td>
-        </tr>
-      </table>
-    </div>
-    <div class="total-line">
-      <table>
-        <tr>
-          <td>GENEL TOPLAM:</td>
-          <td>{{grand}}</td>
-        </tr>
-      </table>
-    </div>
-  </div>
-
-  <div class="balance-section">
-    <div style="text-align: left; font-size: 6px; margin: 0.5mm 0;">
-      <span class="bold">Eski Bakiye:</span>
-      <span class="bold">{{old_balance}}</span>
-    </div>
-    <div style="text-align: left; font-size: 6px; margin: 0.5mm 0;">
-      <span class="bold">Güncel Bakiye:</span>
-      <span class="bold">{{current_balance}}</span>
-    </div>
-  </div>
-
-  <div class="footer">{{footnote}}</div>
-
-  <div class="brand-footer">
-    <table>
-      <tr>
-        <td>{{brand_short}}</td>
-        <td>{{brand_url}}</td>
-      </tr>
+        </thead>
+        <tbody>
+        {{items}}
+        </tbody>
     </table>
-  </div>
+
+    <div class="hr"></div>
+
+    <!-- Özet Tablosu -->
+    <table class="summary">
+        <tr>
+            <td class="label">{{lbl_subtotal}}</td>
+            <td class="value">{{subtotal}}</td>
+        </tr>
+        <tr>
+            <td class="label">{{lbl_discount}}</td>
+            <td class="value">{{discount}}</td>
+        </tr>
+        <tr>
+            <td class="label">{{lbl_total}}</td>
+            <td class="value">{{total}}</td>
+        </tr>
+        <tr>
+            <td class="label">{{lbl_vat}}</td>
+            <td class="value">{{vat}}</td>
+        </tr>
+        <tr>
+            <td class="label">{{lbl_grand}}</td>
+            <td class="value">{{grand}}</td>
+        </tr>
+    </table>
+
+    <div class="hr"></div>
+
+    <!-- Bakiye Bilgileri -->
+    <div class="balance-section">
+        <div class="kv">
+            <div class="k">Eski Bakiye</div>
+            <div class="v v-strong">: {{old_balance}}</div>
+        </div>
+        <div class="kv">
+            <div class="k">Guncel Bakiye</div>
+            <div class="v v-strong">: {{current_balance}}</div>
+        </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <!-- Footer -->
+    <div class="footnote muted">{{footnote}}</div>
+
+    <div class="hr"></div>
+
+    <div class="brandline">
+        <div class="left">{{brand_short}}</div>
+        <div class="right">{{brand_url}}</div>
+    </div>
 </div>
 </body>
 </html>

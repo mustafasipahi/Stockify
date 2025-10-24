@@ -34,9 +34,22 @@ public class SalesDocumentService {
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
     private static final String DEFAULT_FILENAME = "sales.pdf";
     private static final String DEFAULT_CONTENT_TYPE = "application/pdf";
-    private static final String DEFAULT_NOTE = "Teşekkürler";
+    private static final String DEFAULT_NOTE = "Tesekkurler";
     private static final String DEFAULT_BRAND_NAME = "Stockify";
-    private static final String DEFAULT_BRAND_URL = "//www.stockify.com";
+    private static final String DEFAULT_BRAND_URL = "www.stockify.com";
+    private static final String DEFAULT_UNIT = "Adet";
+
+    // Fiş boyutları (80mm termal yazıcı standartı)
+    private static final double RECEIPT_WIDTH_MM = 80.0;
+    private static final double MM_TO_PT = 2.834645669; // 1mm = 2.834645669pt
+
+    // Yükseklik hesaplama sabitleri
+    private static final int BASE_HEIGHT_MM = 50;  // Başlık, footer için temel yükseklik
+    private static final int HEADER_HEIGHT_MM = 35; // Şirket bilgileri, tarih vs.
+    private static final int ITEM_HEIGHT_MM = 12;   // Her ürün satırı için
+    private static final int SUMMARY_HEIGHT_MM = 35; // Özet tablo
+    private static final int FOOTER_HEIGHT_MM = 15;  // Dipnot ve marka
+    private static final int PADDING_MM = 5;         // Ekstra güvenlik boşluğu
 
     public SalesDocumentResponse generatePDF(SalesPrepareDto prepareDto) throws IOException {
         String htmlTemplate = readHtmlTemplate();
@@ -64,36 +77,55 @@ public class SalesDocumentService {
         LocalDateTime now = LocalDateTime.now();
         String html = template;
 
-        // Temel bilgiler - Türkçe karakterleri Latin'e çevir
+        // Dinamik sayfa yüksekliğini hesapla
+        String pageSizeCSS = calculatePageSize(salesItems.size());
+        html = html.replace("{{page_size}}", pageSizeCSS);
+
+        // Şirket ve müşteri bilgileri
         html = html.replace("{{brand}}", replaceCharacter(companyInfo.getCompanyName()));
         html = html.replace("{{address}}", replaceCharacter(companyInfo.getCompanyAddress()));
-        html = html.replace("{{customer}}", broker.getFirstName() + " " + broker.getLastName());
+        html = html.replace("{{customer}}", replaceCharacter(broker.getFirstName() + " " + broker.getLastName()));
         html = html.replace("{{issued_date}}", now.format(DATE_FORMAT));
         html = html.replace("{{issued_time}}", now.format(TIME_FORMAT));
         html = html.replace("{{doc_no}}", replaceCharacter(sales.getDocumentNumber()));
 
-        // Items tablosu
+        // Tablo başlıkları
+        html = html.replace("{{th_stock}}", "URUN");
+        html = html.replace("{{th_vat}}", "%KDV");
+        html = html.replace("{{th_discount}}", "%ISK");
+        html = html.replace("{{th_unit_price}}", "B.FIYAT");
+        html = html.replace("{{th_amount}}", "TUTAR");
+
+        // Etiketler
+        html = html.replace("{{lbl_subtotal}}", "Ara Toplam");
+        html = html.replace("{{lbl_discount}}", "Iskonto");
+        html = html.replace("{{lbl_total}}", "Net Toplam");
+        html = html.replace("{{lbl_vat}}", "KDV");
+        html = html.replace("{{lbl_grand}}", "GENEL TOPLAM");
+
+        // Ürün satırlarını oluştur
         StringBuilder itemsHtml = new StringBuilder();
         for (SalesItemDto salesItem : salesItems) {
             itemsHtml.append("<tr>");
 
             // Ürün adı ve miktar
-            itemsHtml.append("<td class=\"col-product\">");
-            itemsHtml.append("<div class=\"item-name\">")
+            itemsHtml.append("<td>");
+            itemsHtml.append("<span class=\"sku\">")
                     .append(replaceCharacter(salesItem.getProductName()))
-                    .append("</div>");
-            itemsHtml.append("<div class=\"item-qty\">")
+                    .append("</span>");
+            itemsHtml.append("<span class=\"qty\">")
                     .append(QTY_FORMAT.format(salesItem.getProductCount()))
-                    .append("</div>");
+                    .append(" ").append(DEFAULT_UNIT)
+                    .append("</span>");
             itemsHtml.append("</td>");
 
             // KDV%
-            itemsHtml.append("<td class=\"col-vat\">%")
+            itemsHtml.append("<td>%")
                     .append(salesItem.getTaxRate().setScale(0, RoundingMode.DOWN))
                     .append("</td>");
 
             // İskonto%
-            itemsHtml.append("<td class=\"col-discount\">");
+            itemsHtml.append("<td>");
             if (sales.getDiscountRate().compareTo(BigDecimal.ZERO) > 0) {
                 itemsHtml.append("%")
                         .append(sales.getDiscountRate().setScale(0, RoundingMode.DOWN));
@@ -103,13 +135,14 @@ public class SalesDocumentService {
             itemsHtml.append("</td>");
 
             // Birim Fiyat
-            itemsHtml.append("<td class=\"col-price\">").append(MONEY_FORMAT.format(salesItem.getUnitPrice())).append("</td>");
+            itemsHtml.append("<td>").append(MONEY_FORMAT.format(salesItem.getUnitPrice())).append("</td>");
 
             // Toplam Tutar
-            itemsHtml.append("<td class=\"col-total\">").append(MONEY_FORMAT.format(salesItem.getTotalPriceWithTax())).append("</td>");
+            itemsHtml.append("<td>").append(MONEY_FORMAT.format(salesItem.getTotalPriceWithTax())).append("</td>");
 
             itemsHtml.append("</tr>");
         }
+
         html = html.replace("{{items}}", itemsHtml.toString());
 
         // Tutarlar
@@ -124,7 +157,7 @@ public class SalesDocumentService {
         html = html.replace("{{old_balance}}", MONEY_FORMAT.format(brokerBalance) + " TL");
         html = html.replace("{{current_balance}}", MONEY_FORMAT.format(brokerBalance.add(sales.getTotalPriceWithTax())) + " TL");
 
-        // Dipnot ve marka bilgileri
+        // Dipnot ve marka
         html = html.replace("{{footnote}}", DEFAULT_NOTE);
         html = html.replace("{{brand_short}}", DEFAULT_BRAND_NAME);
         html = html.replace("{{brand_url}}", DEFAULT_BRAND_URL);
@@ -132,10 +165,38 @@ public class SalesDocumentService {
         return html;
     }
 
+    /**
+     * Ürün sayısına göre dinamik sayfa boyutu hesaplar
+     */
+    private String calculatePageSize(int itemCount) {
+        // Toplam yüksekliği mm cinsinden hesapla
+        int totalHeightMM = HEADER_HEIGHT_MM +
+                (itemCount * ITEM_HEIGHT_MM) +
+                SUMMARY_HEIGHT_MM +
+                FOOTER_HEIGHT_MM +
+                PADDING_MM;
+
+        // Minimum yükseklik kontrolü
+        totalHeightMM = Math.max(totalHeightMM, BASE_HEIGHT_MM);
+
+        // mm'yi pt'ye çevir
+        double widthPt = RECEIPT_WIDTH_MM * MM_TO_PT;
+        double heightPt = totalHeightMM * MM_TO_PT;
+
+        // Locale bağımsız formatla - CSS için nokta kullan
+        String widthStr = String.format(java.util.Locale.US, "%.2f", widthPt);
+        String heightStr = String.format(java.util.Locale.US, "%.2f", heightPt);
+
+        log.info("Fiş boyutu hesaplandı - Ürün sayısı: {}, Boyut: {}mm x {}mm ({}pt x {}pt)",
+                itemCount, RECEIPT_WIDTH_MM, totalHeightMM, widthStr, heightStr);
+
+        return widthStr + "pt " + heightStr + "pt";
+    }
+
     private SalesDocumentResponse generate(String html) {
         try {
             byte[] pdfBytes = createPDFAsBytes(html);
-            MultipartFile pdfFile = new ByteArrayMultipartFile(pdfBytes, DEFAULT_FILENAME , DEFAULT_CONTENT_TYPE);
+            MultipartFile pdfFile = new ByteArrayMultipartFile(pdfBytes, DEFAULT_FILENAME, DEFAULT_CONTENT_TYPE);
             return SalesDocumentResponse.builder()
                     .file(pdfFile)
                     .build();
