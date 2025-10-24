@@ -44,12 +44,12 @@ public class SalesDocumentService {
     private static final double MM_TO_PT = 2.834645669; // 1mm = 2.834645669pt
 
     // Yükseklik hesaplama sabitleri
-    private static final int BASE_HEIGHT_MM = 50;  // Başlık, footer için temel yükseklik
-    private static final int HEADER_HEIGHT_MM = 35; // Şirket bilgileri, tarih vs.
-    private static final int ITEM_HEIGHT_MM = 12;   // Her ürün satırı için
-    private static final int SUMMARY_HEIGHT_MM = 35; // Özet tablo
-    private static final int FOOTER_HEIGHT_MM = 15;  // Dipnot ve marka
-    private static final int PADDING_MM = 5;         // Ekstra güvenlik boşluğu
+    private static final int BASE_HEIGHT_MM = 40;  // Başlık, footer için temel yükseklik
+    private static final int HEADER_HEIGHT_MM = 30; // Şirket bilgileri, tarih vs.
+    private static final int ITEM_HEIGHT_MM = 10;   // Her ürün satırı için
+    private static final int SUMMARY_HEIGHT_MM = 30; // Özet tablo
+    private static final int FOOTER_HEIGHT_MM = 12;  // Dipnot ve marka
+    private static final int PADDING_MM = 0;         // Ekstra güvenlik boşluğu
 
     public SalesDocumentResponse generatePDF(SalesPrepareDto prepareDto) throws IOException {
         String htmlTemplate = readHtmlTemplate();
