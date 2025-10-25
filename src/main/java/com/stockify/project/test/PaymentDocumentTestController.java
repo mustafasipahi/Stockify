@@ -21,8 +21,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Slf4j
-@RestController
-@RequestMapping("/payment/api/test")
+//@RestController
+//@RequestMapping("/payment/stream/api/test")
 @RequiredArgsConstructor
 public class PaymentDocumentTestController {
 

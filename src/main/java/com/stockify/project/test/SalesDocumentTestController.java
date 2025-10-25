@@ -22,7 +22,7 @@ import java.util.List;
 
 @Slf4j
 //@RestController
-//@RequestMapping("/sales/api/test")
+//@RequestMapping("/sales/stream/api/test")
 @RequiredArgsConstructor
 public class SalesDocumentTestController {
 
