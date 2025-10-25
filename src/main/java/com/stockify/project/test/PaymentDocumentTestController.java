@@ -91,7 +91,6 @@ public class PaymentDocumentTestController {
                 .price(new BigDecimal("15000.00"))
                 .type(PaymentType.CASH) // veya başka bir PaymentType
                 .createdDate(LocalDateTime.now())
-                .tenantId(1L)
                 .build();
     }
 }

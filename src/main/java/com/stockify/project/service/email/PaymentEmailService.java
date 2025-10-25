@@ -1,7 +1,7 @@
 package com.stockify.project.service.email;
 
 import com.stockify.project.model.dto.BrokerDto;
-import com.stockify.project.model.dto.SalesPrepareDto;
+import com.stockify.project.model.dto.PaymentDto;
 import com.stockify.project.model.response.DocumentResponse;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -22,17 +22,16 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 import static com.stockify.project.util.TenantContext.getEmail;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SalesEmailService {
+public class PaymentEmailService {
 
-    private static final String SELLER_TEMPLATE_PATH = "templates/sales_seller_email.html";
-    private static final String BUYER_TEMPLATE_PATH = "templates/sales_buyer_email.html";
+    private static final String RECEIVER_TEMPLATE_PATH = "templates/payment_receiver_email.html";
+    private static final String PAYER_TEMPLATE_PATH = "templates/payment_payer_email.html";
     private static final String DATE_FORMAT = "dd/MM/yyyy HH:mm";
     private static final String COMPANY_NAME = "Stokify";
 
@@ -41,58 +40,58 @@ public class SalesEmailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    public void sendSalesNotifications(SalesPrepareDto salesPrepareDto, DocumentResponse documentResponse) {
-        if (salesPrepareDto == null || documentResponse == null) {
-            log.warn("Invalid Request - salesPrepareDto or documentResponse null");
+    public void sendPaymentNotifications(PaymentDto paymentDto, DocumentResponse documentResponse) {
+        if (paymentDto == null || documentResponse == null) {
+            log.warn("Invalid Request - paymentDto or documentResponse null");
             return;
         }
         CompletableFuture.runAsync(() -> {
             try {
-                sendNotificationsInternal(salesPrepareDto, documentResponse);
+                sendNotificationsInternal(paymentDto, documentResponse);
             } catch (Exception e) {
-                log.error("Sales CompletableFuture RunAsync Error!", e);
+                log.error("Payment CompletableFuture RunAsync Error!", e);
             }
         });
     }
 
-    private void sendNotificationsInternal(SalesPrepareDto salesPrepareDto, DocumentResponse documentResponse) {
-        BrokerDto broker = salesPrepareDto.getBroker();
-        String userEmail = getEmail();
+    private void sendNotificationsInternal(PaymentDto paymentDto, DocumentResponse documentResponse) {
+        BrokerDto broker = paymentDto.getBroker();
+        String userEmail = "mustafasipahi193@gmail.com";
         if (isValidEmail(userEmail)) {
             try {
-                sendSellerNotification(salesPrepareDto, userEmail, documentResponse.getFile());
-                log.info("Sent SellerNotification email to {}", maskEmail(userEmail));
+                sendReceiverNotification(paymentDto, userEmail, documentResponse.getFile());
+                log.info("Sent ReceiverNotification email to {}", maskEmail(userEmail));
             } catch (Exception e) {
-                log.error("Send SellerNotification Error! Email: {}", maskEmail(userEmail), e);
+                log.error("Send ReceiverNotification Error! Email: {}", maskEmail(userEmail), e);
             }
         } else {
             log.info("Company Email is invalid");
         }
-        String brokerEmail = broker.getEmail();
+        String brokerEmail = "mustafasipahi193@gmail.com";
         if (isValidEmail(brokerEmail)) {
             try {
-                sendBuyerNotification(salesPrepareDto, brokerEmail, documentResponse.getFile());
-                log.info("Sent BuyerNotification email to {}", maskEmail(brokerEmail));
+                sendPayerNotification(paymentDto, brokerEmail, documentResponse.getFile());
+                log.info("Sent PayerNotification email to {}", maskEmail(brokerEmail));
             } catch (Exception e) {
-                log.error("Send BuyerNotification Error! Email: {}", maskEmail(brokerEmail), e);
+                log.error("Send PayerNotification Error! Email: {}", maskEmail(brokerEmail), e);
             }
         } else {
             log.error("Broker Email is invalid");
         }
     }
 
-    private void sendSellerNotification(SalesPrepareDto salesData, String sellerEmail, MultipartFile file) throws MessagingException {
-        String subject = createSellerSubject(salesData);
-        String htmlContent = createEmailContent(SELLER_TEMPLATE_PATH, salesData);
-        String fileName = createSellerFileName(salesData);
-        sendEmailWithAttachment(sellerEmail, subject, htmlContent, file, fileName);
+    private void sendReceiverNotification(PaymentDto paymentDto, String receiverEmail, MultipartFile file) throws MessagingException {
+        String subject = createReceiverSubject(paymentDto);
+        String htmlContent = createEmailContent(RECEIVER_TEMPLATE_PATH, paymentDto);
+        String fileName = createReceiverFileName(paymentDto);
+        sendEmailWithAttachment(receiverEmail, subject, htmlContent, file, fileName);
     }
 
-    private void sendBuyerNotification(SalesPrepareDto salesData, String buyerEmail, MultipartFile file) throws MessagingException {
-        String subject = createBuyerSubject(salesData);
-        String htmlContent = createEmailContent(BUYER_TEMPLATE_PATH, salesData);
-        String fileName = createBuyerFileName(salesData);
-        sendEmailWithAttachment(buyerEmail, subject, htmlContent, file, fileName);
+    private void sendPayerNotification(PaymentDto paymentDto, String payerEmail, MultipartFile file) throws MessagingException {
+        String subject = createPayerSubject(paymentDto);
+        String htmlContent = createEmailContent(PAYER_TEMPLATE_PATH, paymentDto);
+        String fileName = createPayerFileName(paymentDto);
+        sendEmailWithAttachment(payerEmail, subject, htmlContent, file, fileName);
     }
 
     private void sendEmailWithAttachment(String to, String subject, String htmlContent,
@@ -112,10 +111,10 @@ public class SalesEmailService {
         }
     }
 
-    private String createEmailContent(String templatePath, SalesPrepareDto salesData) throws MessagingException {
+    private String createEmailContent(String templatePath, PaymentDto paymentDto) throws MessagingException {
         try {
             String htmlTemplate = loadTemplate(templatePath);
-            Map<String, String> templateVariables = buildTemplateVariables(salesData);
+            Map<String, String> templateVariables = buildTemplateVariables(paymentDto);
             return replacePlaceholders(htmlTemplate, templateVariables);
         } catch (IOException e) {
             log.error("Load Template Error!", e);
@@ -131,23 +130,18 @@ public class SalesEmailService {
         return new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
     }
 
-    private Map<String, String> buildTemplateVariables(SalesPrepareDto salesData) {
+    private Map<String, String> buildTemplateVariables(PaymentDto paymentDto) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
-        String brokerName = buildBrokerName(salesData.getBroker());
-        String productList = buildProductList(salesData);
+        String brokerName = buildBrokerName(paymentDto.getBroker());
 
         Map<String, String> variables = new HashMap<>();
         variables.put("{{BROKER_NAME}}", brokerName);
-        variables.put("{{DOCUMENT_NUMBER}}", salesData.getSales().getDocumentNumber());
-        variables.put("{{SALE_DATE}}", salesData.getSales().getCreatedDate().format(formatter));
-        variables.put("{{BROKER_ID}}", salesData.getSales().getBrokerId().toString());
-        variables.put("{{PRODUCT_LIST}}", productList);
-        variables.put("{{SUBTOTAL_PRICE}}", formatPrice(salesData.getSales().getSubtotalPrice()));
-        variables.put("{{DISCOUNT_RATE}}", formatDiscountRate(salesData.getSales().getDiscountRate()));
-        variables.put("{{DISCOUNT_PRICE}}", formatPrice(salesData.getSales().getDiscountPrice()));
-        variables.put("{{TOTAL_PRICE}}", formatPrice(salesData.getSales().getTotalPrice()));
-        variables.put("{{TOTAL_TAX_PRICE}}", formatPrice(salesData.getSales().getTotalTaxPrice()));
-        variables.put("{{TOTAL_PRICE_WITH_TAX}}", formatPrice(salesData.getSales().getTotalPriceWithTax()));
+        variables.put("{{DOCUMENT_NUMBER}}", paymentDto.getDocumentNumber());
+        variables.put("{{PAYMENT_DATE}}", paymentDto.getCreatedDate().format(formatter));
+        variables.put("{{BROKER_ID}}", paymentDto.getBroker().getBrokerId().toString());
+        variables.put("{{PAYMENT_AMOUNT}}", formatPrice(paymentDto.getPrice()));
+        variables.put("{{PAYMENT_METHOD}}", paymentDto.getType().getName());
+        variables.put("{{DESCRIPTION}}", StringUtils.defaultString(null, "Açıklama bulunmuyor"));
         variables.put("{{COMPANY_NAME}}", COMPANY_NAME);
 
         return variables;
@@ -161,15 +155,6 @@ public class SalesEmailService {
         return result;
     }
 
-    private String buildProductList(SalesPrepareDto salesData) {
-        return salesData.getSalesItems().stream()
-                .map(item -> String.format("• %s (Adet: %d) - ₺%s",
-                        item.getProductName(),
-                        item.getProductCount(),
-                        formatPrice(item.getTotalPriceWithTax())))
-                .collect(Collectors.joining("<br>"));
-    }
-
     private String buildBrokerName(BrokerDto broker) {
         return String.join(" ",
                 StringUtils.defaultString(broker.getFirstName(), ""),
@@ -177,28 +162,24 @@ public class SalesEmailService {
         ).trim();
     }
 
-    private String createSellerSubject(SalesPrepareDto salesData) {
-        return "Satış Gerçekleşti - Fatura #" + salesData.getSales().getDocumentNumber();
+    private String createReceiverSubject(PaymentDto paymentDto) {
+        return "Ödeme Alındı - Makbuz #" + paymentDto.getDocumentNumber();
     }
 
-    private String createBuyerSubject(SalesPrepareDto salesData) {
-        return "Siparişiniz Onaylandı - Fatura #" + salesData.getSales().getDocumentNumber();
+    private String createPayerSubject(PaymentDto paymentDto) {
+        return "Ödemeniz Onaylandı - Makbuz #" + paymentDto.getDocumentNumber();
     }
 
-    private String createSellerFileName(SalesPrepareDto salesData) {
-        return "Satis_Faturasi_" + salesData.getSales().getDocumentNumber() + ".pdf";
+    private String createReceiverFileName(PaymentDto paymentDto) {
+        return "Odeme_Makbuzu_" + paymentDto.getDocumentNumber() + ".pdf";
     }
 
-    private String createBuyerFileName(SalesPrepareDto salesData) {
-        return "Fatura_" + salesData.getSales().getDocumentNumber() + ".pdf";
+    private String createPayerFileName(PaymentDto paymentDto) {
+        return "Makbuz_" + paymentDto.getDocumentNumber() + ".pdf";
     }
 
     private String formatPrice(java.math.BigDecimal price) {
         return price != null ? String.format("%,.2f", price) : "0,00";
-    }
-
-    private String formatDiscountRate(java.math.BigDecimal rate) {
-        return rate != null ? String.format("%.1f", rate) : "0,0";
     }
 
     private boolean isValidEmail(String email) {

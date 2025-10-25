@@ -110,8 +110,6 @@ public class SalesService {
                 .orElse(BigDecimal.ZERO);
     }
 
-
-
     private SalesPriceDto calculateTaxAndDiscount(List<SalesItemDto> salesItems, BigDecimal discountRate) {
         BigDecimal subtotalPrice = salesItems.stream()
                 .map(SalesItemDto::getTotalPrice)
