@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <title>Tahsilat Makbuzu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <style>
+        /* A5 Landscape - A4'ün yarısı yan boyut (210mm x 148mm) */
+        @page {
+            size: 210mm 148mm;
+            margin: 0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            padding: 0;
+            margin: 0;
+            background: #ffffff;
+            width: 100%;
+            height: auto;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+            background: #ffffff;
+            width: 100%;
+            height: auto;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9pt;
+            line-height: 1.2;
+            color: #000;
+        }
+
+        .receipt {
+            width: 100%;
+            padding: 5mm;
+            background: #fff;
+            display: block;
+        }
+
+        /* Header Section - Logo, Firma Bilgileri, Başlık */
+        .header-section {
+            display: table;
+            width: 100%;
+            margin-bottom: 2mm;
+        }
+
+        .header-left {
+            display: table-cell;
+            width: 60%;
+            vertical-align: top;
+        }
+
+        .header-right {
+            display: table-cell;
+            width: 40%;
+            vertical-align: top;
+            text-align: right;
+        }
+
+        /* Logo ve Telefon */
+        .logo-section {
+            display: table;
+            width: 100%;
+            margin-bottom: 1mm;
+        }
+
+        .logo-left {
+            display: table-cell;
+            width: 90px;
+            vertical-align: top;
+        }
+
+        .logo-right {
+            display: table-cell;
+            width: 120mm;
+            vertical-align: top;
+            padding-left: 4mm;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            border: 1pt solid #333;
+            display: block;
+            text-align: center;
+            line-height: 80px;
+            font-size: 12pt;
+            font-weight: 700;
+        }
+
+        .phone {
+            font-size: 8pt;
+            margin-top: 1mm;
+            font-weight: 600;
+        }
+
+        .company-name {
+            font-weight: 700;
+            font-size: 12pt;
+            line-height: 1.1;
+            margin-bottom: 1mm;
+        }
+
+        .company-address {
+            font-size: 8pt;
+            line-height: 1.3;
+            max-width: 120mm;
+        }
+
+        /* Başlık - Tahsilat Makbuzu */
+        .doc-title {
+            font-weight: 700;
+            font-size: 13pt;
+            line-height: 1.1;
+            margin-bottom: 1mm;
+        }
+
+        .doc-number {
+            font-size: 10pt;
+        }
+
+        .doc-number-label {
+            font-size: 9pt;
+        }
+
+        .doc-number-value {
+            font-weight: 700;
+            font-size: 12pt;
+        }
+
+        /* Çizgiler */
+        .hr {
+            border: 0;
+            border-top: 1pt solid #333;
+            height: 0;
+            margin: 1.5mm 0;
+        }
+
+        /* Ödeme Bilgileri ve Tarih */
+        .payment-info-section {
+            display: table;
+            width: 100%;
+            margin: 1mm 0;
+        }
+
+        .payment-info-left {
+            display: table-cell;
+            width: 75%;
+            vertical-align: top;
+        }
+
+        .payment-info-right {
+            display: table-cell;
+            width: 25%;
+            vertical-align: top;
+            text-align: right;
+        }
+
+        .info-row {
+            font-size: 10pt;
+            line-height: 1.4;
+            margin: 0.3mm 0;
+        }
+
+        .info-label {
+            font-weight: 700;
+        }
+
+        .amount-big {
+            font-size: 11pt;
+            font-weight: 700;
+        }
+
+        .date-text {
+            font-size: 10pt;
+            font-weight: 600;
+        }
+
+        /* Boş Tablo - Elle Doldurulacak */
+        table.payment-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9pt;
+            margin: 1mm 0;
+        }
+
+        table.payment-table th {
+            font-weight: 700;
+            padding: 1.5mm 1mm;
+            text-align: center;
+            border: 1pt solid #333;
+            font-size: 9pt;
+            background: #f5f5f5;
+        }
+
+        table.payment-table td {
+            padding: 3mm 1mm;
+            vertical-align: top;
+            border: 1pt solid #333;
+            text-align: center;
+            font-size: 9pt;
+            height: 8mm;
+        }
+
+        /* Sütun genişlikleri */
+        table.payment-table colgroup col:nth-child(1) { width: 25%; }
+        table.payment-table colgroup col:nth-child(2) { width: 20%; }
+        table.payment-table colgroup col:nth-child(3) { width: 15%; }
+        table.payment-table colgroup col:nth-child(4) { width: 20%; }
+        table.payment-table colgroup col:nth-child(5) { width: 20%; }
+
+        /* Footer - İmza Alanı */
+        .footer {
+            margin-top: 1mm;
+        }
+
+        .signature-section {
+            display: table;
+            width: 100%;
+            margin-top: 1mm;
+        }
+
+        .signature-box {
+            display: table-cell;
+            width: 50%;
+            text-align: center;
+            vertical-align: top;
+        }
+
+        .signature-label {
+            font-size: 10pt;
+            font-weight: 700;
+            margin-bottom: 1mm;
+        }
+
+        .signature-line {
+            border-top: 1pt solid #333;
+            margin: 8mm 10mm 1mm 10mm;
+        }
+
+        /* Sayfa sonu kontrolleri */
+        tr, td, th, .info-row {
+            page-break-inside: avoid;
+        }
+
+        table {
+            page-break-inside: auto;
+        }
+
+        .receipt > * {
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+<div class="receipt">
+    <!-- Header Section -->
+    <div class="header-section">
+        <!-- Sol: Logo + Telefon + Firma Bilgileri -->
+        <div class="header-left">
+            <div class="logo-section">
+                <div class="logo-left">
+                    <div class="logo">LOGO</div>
+                    <div class="phone">{{company_phone}}</div>
+                </div>
+                <div class="logo-right">
+                    <div class="company-name">{{company_name}}</div>
+                    <div class="company-address">{{company_address}}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sağ: Tahsilat Makbuzu Başlık -->
+        <div class="header-right">
+            <div class="doc-title">{{document_title}}</div>
+            <div class="doc-number">
+                <span class="doc-number-label">No:</span>
+                <span class="doc-number-value">{{document_number}}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <!-- Ödeme Bilgileri ve Tarih -->
+    <div class="payment-info-section">
+        <!-- Sol: Ödeme Bilgileri -->
+        <div class="payment-info-left">
+            <div class="info-row">
+                <span class="info-label">Ödeme Miktarı:</span>
+                <span class="amount-big">{{payment_amount}} {{currency}}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Ödeme Yapan:</span>
+                {{payer_name}}
+            </div>
+            <div class="info-row">
+                <span class="info-label">Yalnız:</span>
+                {{amount_in_words}}
+            </div>
+            <div class="info-row">
+                <span class="info-label">Ödeme Yöntemi:</span>
+                {{payment_type}}
+            </div>
+        </div>
+
+        <!-- Sağ: Tarih -->
+        <div class="payment-info-right">
+            <div class="date-text">{{payment_date}}</div>
+        </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <!-- Boş Tablo - 4 Satır, 5 Sütun -->
+    <table class="payment-table">
+        <colgroup>
+            <col/>
+            <col/>
+            <col/>
+            <col/>
+            <col/>
+        </colgroup>
+        <thead>
+        <tr>
+            <th>BANKA ADI</th>
+            <th>HESAP NO</th>
+            <th>VADESİ</th>
+            <th>ÇEK NO</th>
+            <th>TUTAR</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="hr"></div>
+
+    <!-- Footer - İmza Alanı -->
+    <div class="footer">
+        <div class="signature-section">
+            <div class="signature-box">
+                <div class="signature-label">Tahsil Eden</div>
+                <div class="signature-line"></div>
+            </div>
+            <div class="signature-box">
+                <div class="signature-label">Ödeme Yapan</div>
+                <div class="signature-line"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

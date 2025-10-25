@@ -8,6 +8,7 @@ import com.stockify.project.model.dto.SalesPrepareDto;
 import com.stockify.project.model.entity.DocumentEntity;
 import com.stockify.project.model.request.DocumentUploadRequest;
 import com.stockify.project.model.response.DocumentResponse;
+import com.stockify.project.model.response.PaymentDocumentResponse;
 import com.stockify.project.model.response.SalesDocumentResponse;
 import com.stockify.project.repository.DocumentRepository;
 import com.stockify.project.service.pdf.PdfPostService;
@@ -31,6 +32,7 @@ public class DocumentPostService {
     private final DocumentUploadValidator uploadValidator;
     private final DocumentRepository documentRepository;
     private final SalesDocumentService salesDocumentService;
+    private final PaymentDocumentService paymentDocumentService;
     private final PdfPostService pdfPostService;
 
     @Transactional
@@ -45,10 +47,16 @@ public class DocumentPostService {
         }
     }
 
+    @Transactional
     public DocumentResponse uploadPaymentFile(PaymentDto paymentDto) {
-        return DocumentResponse.builder()
-                .documentId(1234L)
-                .build();
+        try {
+            PaymentDocumentResponse paymentPDF = paymentDocumentService.generatePDF(paymentDto);
+            DocumentUploadRequest uploadRequest = new DocumentUploadRequest(paymentDto.getBroker().getBrokerId(), DocumentType.RECEIPT);
+            return uploadFileToCloud(paymentPDF.getFile(), uploadRequest);
+        } catch (Exception e) {
+            log.error("Upload Payment File Error", e);
+            throw new DocumentUploadException();
+        }
     }
 
     @Transactional

@@ -21,9 +21,9 @@ public class PaymentConverter {
 
     private final PaymentRepository paymentRepository;
 
-    public PaymentDto toDto(PaymentCreateRequest request) {
+    public PaymentDto toDto(PaymentCreateRequest request, BrokerDto broker) {
         return PaymentDto.builder()
-                .brokerId(request.getBrokerId())
+                .broker(broker)
                 .price(request.getPaymentPrice())
                 .type(request.getPaymentType())
                 .build();
@@ -34,7 +34,7 @@ public class PaymentConverter {
         paymentDto.setDocumentNumber(documentNumber);
         return PaymentEntity.builder()
                 .documentNumber(documentNumber)
-                .brokerId(paymentDto.getBrokerId())
+                .brokerId(paymentDto.getBroker().getBrokerId())
                 .price(paymentDto.getPrice())
                 .type(paymentDto.getType())
                 .tenantId(getTenantId())

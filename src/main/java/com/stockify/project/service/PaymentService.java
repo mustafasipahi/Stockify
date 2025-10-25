@@ -30,7 +30,7 @@ public class PaymentService {
     public PaymentResponse save(PaymentCreateRequest request) {
         PaymentCreateValidator.validate(request);
         BrokerDto broker = getBroker(request.getBrokerId());
-        PaymentDto paymentDto = paymentConverter.toDto(request);
+        PaymentDto paymentDto = paymentConverter.toDto(request, broker);
         PaymentEntity paymentEntity = paymentConverter.toEntity(paymentDto);
         String downloadUrl = uploadDocument(paymentDto, paymentEntity);
         PaymentEntity savedPaymentEntity = savePaymentEntity(paymentEntity);

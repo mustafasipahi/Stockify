@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PaymentDto {
 
-    private Long brokerId;
+    private BrokerDto broker;
     private Long documentId;
     private String documentNumber;
     private BigDecimal price;
