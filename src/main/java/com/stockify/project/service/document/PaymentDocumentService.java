@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 
 import static com.stockify.project.util.DocumentUtil.replaceCharacter;
 
@@ -30,6 +31,7 @@ public class PaymentDocumentService {
     private static final String DEFAULT_FILENAME = "payment.pdf";
     private static final String DEFAULT_CONTENT_TYPE = "application/pdf";
     private static final String DEFAULT_CURRENCY = "TL";
+    private static final String LOGO_DIRECTORY = "static/logos/";
 
     public PaymentDocumentResponse generatePDF(PaymentDto paymentDto) throws IOException {
         String htmlTemplate = readHtmlTemplate();
@@ -59,6 +61,12 @@ public class PaymentDocumentService {
         html = html.replace("{{document_title}}", "TAHSILAT MAKBUZU");
         html = html.replace("{{document_number}}", replaceCharacter(paymentDto.getDocumentNumber() != null ? paymentDto.getDocumentNumber() : ""));
 
+        // Logo - Base64 olarak embed et
+        String logoBase64 = getCompanyLogoAsBase64(paymentDto);
+        html = html.replace("{{company_logo}}", logoBase64);
+        // Logo varsa göster, yoksa gizle
+        html = html.replace("{{logo_display}}", logoBase64.isEmpty() ? "display:none;" : "");
+
         // Ödeme bilgileri
         html = html.replace("{{payment_amount}}", MONEY_FORMAT.format(paymentDto.getPrice()));
         html = html.replace("{{payment_date}}", paymentDto.getCreatedDate() != null ? paymentDto.getCreatedDate().format(DATE_FORMAT) : "");
@@ -85,6 +93,55 @@ public class PaymentDocumentService {
         html = html.replace("{{amount_in_words}}", convertToWords(paymentDto.getPrice()));
 
         return html;
+    }
+
+    /**
+     * Şirket logosunu Base64 formatında döndürür
+     * PaymentDto içinden company bilgisi alınır ve ona göre logo yüklenir
+     * Örnek: resources/static/logos/company_1.png
+     */
+    private String getCompanyLogoAsBase64(PaymentDto paymentDto) {
+        try {
+            // PaymentDto'dan company ID veya broker ID'ye göre logo belirle
+            String logoFileName = "Gurme.png";
+
+            // Logo dosyasını classpath'ten oku
+            ClassPathResource logoResource = new ClassPathResource(LOGO_DIRECTORY + logoFileName);
+
+            if (!logoResource.exists()) {
+                log.warn("Logo file not found: {}, using default", logoFileName);
+                return ""; // Boş string döndür, HTML'de LOGO yazısı görünsün
+            }
+
+            byte[] logoBytes = logoResource.getInputStream().readAllBytes();
+            String base64Logo = Base64.getEncoder().encodeToString(logoBytes);
+
+            // Dosya uzantısına göre MIME type belirle
+            String mimeType = determineMimeType(logoFileName);
+
+            return "data:" + mimeType + ";base64," + base64Logo;
+
+        } catch (IOException e) {
+            log.error("Error reading company logo", e);
+            return ""; // Hata durumunda boş döndür
+        }
+    }
+
+    /**
+     * Dosya uzantısına göre MIME type döndürür
+     */
+    private String determineMimeType(String fileName) {
+        String lowerFileName = fileName.toLowerCase();
+        if (lowerFileName.endsWith(".png")) {
+            return "image/png";
+        } else if (lowerFileName.endsWith(".jpg") || lowerFileName.endsWith(".jpeg")) {
+            return "image/jpeg";
+        } else if (lowerFileName.endsWith(".gif")) {
+            return "image/gif";
+        } else if (lowerFileName.endsWith(".svg")) {
+            return "image/svg+xml";
+        }
+        return "image/png"; // Default
     }
 
     /**
