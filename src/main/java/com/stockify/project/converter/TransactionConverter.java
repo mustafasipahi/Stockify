@@ -18,6 +18,7 @@ public class TransactionConverter {
                 .price(transactionEntity.getPrice())
                 .balance(transactionEntity.getBalance())
                 .type(transactionEntity.getType())
+                .paymentType(transactionEntity.getPaymentType())
                 .downloadUrl(downloadUrl)
                 .createdDate(getTime(transactionEntity.getCreatedDate()))
                 .build();

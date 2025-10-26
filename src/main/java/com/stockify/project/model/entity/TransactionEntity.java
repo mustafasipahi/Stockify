@@ -1,5 +1,6 @@
 package com.stockify.project.model.entity;
 
+import com.stockify.project.enums.PaymentType;
 import com.stockify.project.enums.TransactionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -58,6 +59,10 @@ public class TransactionEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TransactionType type;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private PaymentType paymentType;
 
     @NotNull
     @Column(nullable = false)

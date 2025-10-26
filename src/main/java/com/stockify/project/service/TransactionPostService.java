@@ -44,6 +44,7 @@ public class TransactionPostService {
                 .brokerId(paymentEntity.getBrokerId())
                 .documentId(paymentEntity.getDocumentId())
                 .type(TransactionType.PAYMENT)
+                .paymentType(paymentEntity.getType())
                 .paymentId(paymentEntity.getId())
                 .documentNumber(paymentEntity.getDocumentNumber())
                 .price(paymentEntity.getPrice())

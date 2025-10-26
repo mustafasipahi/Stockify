@@ -1,6 +1,7 @@
 package com.stockify.project.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.stockify.project.enums.PaymentType;
 import com.stockify.project.enums.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +22,7 @@ public class TransactionDto {
     private BigDecimal price;
     private BigDecimal balance;
     private TransactionType type;
+    private PaymentType paymentType;
     private String downloadUrl;
     private Long createdDate;
 }
