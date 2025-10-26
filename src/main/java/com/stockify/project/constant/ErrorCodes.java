@@ -38,6 +38,9 @@ public class ErrorCodes {
     public static final int DOCUMENT_NOT_FOUND = 1030;
     public static final int BASKET_EMPTY = 1031;
     public static final int PDF_ERROR = 1032;
+    public static final int BROKER_EMAIL_REQUIRED = 1033;
+    public static final int BROKER_VKN_REQUIRED = 1034;
+    public static final int USER_NOT_FOUND = 1035;
 
     public static final int UNKNOWN_ERROR = 9999;
 }

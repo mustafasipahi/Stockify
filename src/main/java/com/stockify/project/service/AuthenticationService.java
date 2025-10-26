@@ -37,6 +37,7 @@ public class AuthenticationService {
             jwtTokenService.storeToken(authenticationRequest.getUsername(), token, getTokenExpirationDate(rememberMe));
             return AuthenticationResponse.builder()
                     .token(token)
+                    .role(userPrincipal.getUserEntity().getRole().getRoleName())
                     .build();
         } catch (Exception e) {
             throw new AuthenticationException();

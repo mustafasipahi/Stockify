@@ -1,7 +1,7 @@
 package com.stockify.project.security.config;
 
-import com.stockify.project.repository.UserRepository;
 import com.stockify.project.security.userdetail.UserPrincipal;
+import com.stockify.project.service.UserGetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 public class ApplicationBeanConfig {
 
-    private final UserRepository userRepository;
+    private final UserGetService userGetService;
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -30,7 +30,7 @@ public class ApplicationBeanConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> new UserPrincipal(userRepository.findByUsername(username)
+        return username -> new UserPrincipal(userGetService.findByUsername(username)
             .orElseThrow(() -> new UsernameNotFoundException("User " + username + " Not Found!")));
     }
 

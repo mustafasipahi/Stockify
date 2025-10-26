@@ -56,7 +56,7 @@ public class PaymentEmailService {
 
     private void sendNotificationsInternal(PaymentDto paymentDto, DocumentResponse documentResponse) {
         BrokerDto broker = paymentDto.getBroker();
-        String userEmail = "mustafasipahi193@gmail.com";
+        String userEmail = getEmail();
         if (isValidEmail(userEmail)) {
             try {
                 sendReceiverNotification(paymentDto, userEmail, documentResponse.getFile());
@@ -67,7 +67,7 @@ public class PaymentEmailService {
         } else {
             log.info("Company Email is invalid");
         }
-        String brokerEmail = "mustafasipahi193@gmail.com";
+        String brokerEmail = broker.getEmail();
         if (isValidEmail(brokerEmail)) {
             try {
                 sendPayerNotification(paymentDto, brokerEmail, documentResponse.getFile());

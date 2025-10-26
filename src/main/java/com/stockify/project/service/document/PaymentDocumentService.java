@@ -2,6 +2,7 @@ package com.stockify.project.service.document;
 
 import com.itextpdf.html2pdf.ConverterProperties;
 import com.itextpdf.html2pdf.HtmlConverter;
+import com.stockify.project.enums.TenantType;
 import com.stockify.project.exception.DocumentUploadException;
 import com.stockify.project.model.dto.PaymentDto;
 import com.stockify.project.model.other.ByteArrayMultipartFile;
@@ -20,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 
 import static com.stockify.project.util.DocumentUtil.replaceCharacter;
+import static com.stockify.project.util.TenantContext.getTenantId;
 
 @Slf4j
 @Service
@@ -103,7 +105,7 @@ public class PaymentDocumentService {
     private String getCompanyLogoAsBase64(PaymentDto paymentDto) {
         try {
             // PaymentDto'dan company ID veya broker ID'ye göre logo belirle
-            String logoFileName = "Gurme.png";
+            String logoFileName = TenantType.fromValue(getTenantId()) + ".png";
 
             // Logo dosyasını classpath'ten oku
             ClassPathResource logoResource = new ClassPathResource(LOGO_DIRECTORY + logoFileName);

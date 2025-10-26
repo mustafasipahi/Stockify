@@ -1,14 +1,15 @@
 package com.stockify.project.initialization;
 
+import com.stockify.project.enums.Role;
+import com.stockify.project.model.dto.UserDto;
 import com.stockify.project.model.entity.CompanyInfoEntity;
-import com.stockify.project.model.entity.UserEntity;
 import com.stockify.project.repository.CompanyInfoRepository;
-import com.stockify.project.repository.UserRepository;
+import com.stockify.project.service.UserGetService;
+import com.stockify.project.service.UserPostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,9 +21,9 @@ import static com.stockify.project.enums.TenantType.GURME;
 @RequiredArgsConstructor
 public class DataInitializerService implements ApplicationRunner {
 
-    private final UserRepository userRepository;
+    private final UserGetService userGetService;
+    private final UserPostService userPostService;
     private final CompanyInfoRepository companyInfoRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -32,27 +33,36 @@ public class DataInitializerService implements ApplicationRunner {
 
     private void createGurme() {
         if (companyInfoRepository.findByTenantId(GURME.getTenantId()).isEmpty()) {
-            CompanyInfoEntity companyInfoEntity = new CompanyInfoEntity();
-            companyInfoEntity.setCompanyName("Gurme Şirketler Grubu Lt.Ş.");
-            companyInfoEntity.setCompanyAddress("Antalyada Bir Yerde Gülveren Tarafında");
-            companyInfoEntity.setTenantId(GURME.getTenantId());
-            companyInfoRepository.save(companyInfoEntity);
+            CompanyInfoEntity companyInfo = CompanyInfoEntity.builder()
+                    .companyName("Gurme Şirketler Grubu Lt.Ş.")
+                    .companyAddress("Antalyada Bir Yerde Gülveren Tarafında")
+                    .tenantId(GURME.getTenantId())
+                    .build();
+            companyInfoRepository.save(companyInfo);
         }
-        if (userRepository.findByUsername(GURME_ADMIN_USER_NAME_1).isEmpty()) {
-            UserEntity user = new UserEntity();
-            user.setUsername(GURME_ADMIN_USER_NAME_1);
-            user.setPassword(passwordEncoder.encode(GURME_ADMIN_USER_PASSWORD_1));
-            user.setTenantId(GURME.getTenantId());
-            user.setEmail("");
-            userRepository.save(user);
+        if (userGetService.findByUsername(GURME_ADMIN_USER_NAME_1).isEmpty()) {
+            UserDto userDto = UserDto.builder()
+                    .username(GURME_ADMIN_USER_NAME_1)
+                    .password(GURME_ADMIN_USER_PASSWORD_1)
+                    .firstName("")
+                    .lastName("")
+                    .email("")
+                    .tenantId(GURME.getTenantId())
+                    .role(Role.ROLE_ADMIN)
+                    .build();
+            userPostService.create(userDto);
         }
-        if (userRepository.findByUsername(GURME_ADMIN_USER_NAME_2).isEmpty()) {
-            UserEntity user = new UserEntity();
-            user.setUsername(GURME_ADMIN_USER_NAME_2);
-            user.setPassword(passwordEncoder.encode(GURME_ADMIN_USER_PASSWORD_2));
-            user.setTenantId(GURME.getTenantId());
-            user.setEmail("");
-            userRepository.save(user);
+        if (userGetService.findByUsername(GURME_ADMIN_USER_NAME_2).isEmpty()) {
+            UserDto userDto = UserDto.builder()
+                    .username(GURME_ADMIN_USER_NAME_2)
+                    .password(GURME_ADMIN_USER_PASSWORD_2)
+                    .firstName("")
+                    .lastName("")
+                    .email("")
+                    .tenantId(GURME.getTenantId())
+                    .role(Role.ROLE_ADMIN)
+                    .build();
+            userPostService.create(userDto);
         }
     }
 }

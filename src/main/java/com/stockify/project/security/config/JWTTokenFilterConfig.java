@@ -41,7 +41,7 @@ public class JWTTokenFilterConfig extends OncePerRequestFilter {
                     if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                         UserPrincipal principal = (UserPrincipal) userDetails;
-                        TenantContext.setCurrentTenantId(principal.getUserEntity());
+                        TenantContext.setCurrentUser(principal.getUserEntity());
                         if (username.equals(userDetails.getUsername()) && expirationDate.after(new Date())) {
                             final UsernamePasswordAuthenticationToken authenticationToken =
                                     new UsernamePasswordAuthenticationToken(

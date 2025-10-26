@@ -1,5 +1,6 @@
 package com.stockify.project.model.entity;
 
+import com.stockify.project.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -35,8 +36,20 @@ public class UserEntity implements Serializable {
     @Column(nullable = false)
     private String password;
 
+    @NotNull
+    @Column(nullable = false)
+    private String firstName;
+
+    @NotNull
+    @Column(nullable = false)
+    private String lastName;
+
     @Column
     private String email;
+
+    @NotNull
+    @Column(nullable = false)
+    private Role role;
 
     @NotNull
     @Column(nullable = false)

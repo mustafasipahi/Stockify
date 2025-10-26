@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+<div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h2 style="color: #2c5aa0;">🆕 Yeni Kullanıcı Oluşturuldu</h2>
+
+    <p>Merhaba,</p>
+    <p><strong>{{BROKER_NAME}}</strong> tarafından yeni bir kullanıcı oluşturulmuştur.</p>
+
+    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <h3>Kullanıcı Bilgileri:</h3>
+        <p><strong>Ad Soyad:</strong> {{USER_FIRSTNAME}}</p>
+        <p><strong>Kullanıcı Adı:</strong> {{USERNAME}}</p>
+        <p><strong>Şifre:</strong> {{PASSWORD}}</p>
+    </div>
+
+    <div style="background-color: #e3f2fd; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <h3>Oluşturan Broker:</h3>
+        <p><strong>Broker Adı:</strong> {{BROKER_NAME}}</p>
+    </div>
+
+    <div style="background-color: #fff3cd; padding: 10px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #ffc107;">
+        <p style="margin: 0; font-size: 13px;">
+            <strong>⚠️ Güvenlik Uyarısı:</strong> Bu bilgileri güvenli bir şekilde saklayınız.
+        </p>
+    </div>
+
+    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 14px; color: #666;">
+        <p>Saygılarımızla,<br>{{COMPANY_NAME}} Sistem</p>
+    </div>
+</div>
+</body>
+</html>

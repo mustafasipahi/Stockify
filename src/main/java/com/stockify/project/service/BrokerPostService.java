@@ -7,10 +7,12 @@ import com.stockify.project.exception.BrokerIdException;
 import com.stockify.project.exception.BrokerNotFoundException;
 import com.stockify.project.model.dto.BrokerDto;
 import com.stockify.project.model.entity.BrokerEntity;
+import com.stockify.project.model.entity.UserEntity;
 import com.stockify.project.model.request.BrokerCreateRequest;
 import com.stockify.project.model.request.BrokerUpdateRequest;
 import com.stockify.project.model.request.DiscountUpdateRequest;
 import com.stockify.project.repository.BrokerRepository;
+import com.stockify.project.service.email.UserCreationEmailService;
 import com.stockify.project.validator.BrokerCreateValidator;
 import com.stockify.project.validator.BrokerUpdateValidator;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +22,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 
-import static com.stockify.project.util.TenantContext.getTenantId;
+import static com.stockify.project.converter.BrokerConverter.toEntity;
+import static com.stockify.project.util.UserInfoGenerator.generatePassword;
+import static com.stockify.project.util.TenantContext.*;
+import static com.stockify.project.util.UserInfoGenerator.generateUsername;
 
 @Slf4j
 @Service
@@ -32,20 +36,19 @@ public class BrokerPostService {
     private final BrokerRepository brokerRepository;
     private final BrokerCreateValidator brokerCreateValidator;
     private final BrokerUpdateValidator brokerUpdateValidator;
+    private final UserPostService userPostService;
+    private final UserGetService userGetService;
+    private final UserCreationEmailService userCreationEmailService;
 
     @Transactional
     public BrokerDto save(BrokerCreateRequest request) {
         brokerCreateValidator.validate(request);
-        BrokerEntity brokerEntity = BrokerEntity.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .email(request.getEmail())
-                .discountRate(Optional.ofNullable(request.getDiscountRate())
-                        .orElse(BigDecimal.ZERO))
-                .status(BrokerStatus.ACTIVE)
-                .tenantId(getTenantId())
-                .build();
+        String username = generateUsername(request.getFirstName(), request.getLastName());
+        String password = generatePassword();
+        UserEntity brokerUser = userPostService.saveBrokerUser(request, username, password);
+        BrokerEntity brokerEntity = toEntity(brokerUser.getId(), request.getDiscountRate());
         BrokerEntity savedBrokerEntity = brokerRepository.save(brokerEntity);
+        userCreationEmailService.sendUserCreationNotification(username, password, request.getFirstName(), getFirstname());
         return BrokerConverter.toIdDto(savedBrokerEntity);
     }
 
@@ -54,27 +57,29 @@ public class BrokerPostService {
         if (request.getBrokerId() == null) {
             throw new BrokerIdException();
         }
-        BrokerEntity brokerEntity = brokerRepository.findByIdAndTenantId(request.getBrokerId(), getTenantId())
+        BrokerEntity broker = brokerRepository.findByIdAndTenantId(request.getBrokerId(), getTenantId())
                 .orElseThrow(() -> new BrokerNotFoundException(request.getBrokerId()));
+        UserEntity user = userGetService.findById(broker.getBrokerUserId());
         if (StringUtils.isNotBlank(request.getFirstName()) && StringUtils.isNotBlank(request.getLastName())) {
             brokerUpdateValidator.validateFirstNameAndLastName(request.getFirstName(), request.getLastName());
-            brokerEntity.setFirstName(request.getFirstName());
-            brokerEntity.setLastName(request.getLastName());
+            user.setFirstName(request.getFirstName());
+            user.setLastName(request.getLastName());
         } else if (StringUtils.isNotBlank(request.getFirstName())) {
-            brokerUpdateValidator.validateFirstName(request.getFirstName(), brokerEntity.getLastName());
-            brokerEntity.setFirstName(request.getFirstName());
+            brokerUpdateValidator.validateFirstName(request.getFirstName(), user.getLastName());
+            user.setFirstName(request.getFirstName());
         } else if (StringUtils.isNotBlank(request.getLastName())) {
-            brokerUpdateValidator.validateLastName(brokerEntity.getFirstName(), request.getLastName());
-            brokerEntity.setLastName(request.getLastName());
+            brokerUpdateValidator.validateLastName(user.getFirstName(), request.getLastName());
+            user.setLastName(request.getLastName());
         }
         if (request.getDiscountRate() != null) {
             brokerUpdateValidator.validateDiscountRate(request.getDiscountRate());
-            brokerEntity.setDiscountRate(request.getDiscountRate());
+            broker.setDiscountRate(request.getDiscountRate());
         }
         if (StringUtils.isNotBlank(request.getEmail())) {
-            brokerEntity.setEmail(request.getEmail());
+            user.setEmail(request.getEmail());
         }
-        BrokerEntity updatedBrokerEntity = brokerRepository.save(brokerEntity);
+        BrokerEntity updatedBrokerEntity = brokerRepository.save(broker);
+        userPostService.save(user);
         return BrokerConverter.toIdDto(updatedBrokerEntity);
     }
 
