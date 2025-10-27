@@ -38,7 +38,7 @@ public class BrokerConverter {
                 .role(brokerUser.getRole().getRoleName())
                 .vkn(broker.getVkn())
                 .discountRate(broker.getDiscountRate())
-                .currentBalance(currentBalance)
+                .currentBalance(Optional.ofNullable(currentBalance).orElse(BigDecimal.ZERO))
                 .status(broker.getStatus())
                 .createdDate(getTime(broker.getCreatedDate()))
                 .lastModifiedDate(getTime(broker.getLastModifiedDate()))

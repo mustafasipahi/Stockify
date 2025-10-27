@@ -61,7 +61,7 @@ public class BrokerGetService {
         return userBrokerList.stream()
                 .map(brokerEntity -> {
                     BigDecimal brokerCurrentBalance = brokerCurrentBalanceMap.getOrDefault(brokerEntity.getId(), BigDecimal.ZERO);
-                    UserEntity brokerUser = brokerUserMap.getOrDefault(brokerEntity.getId(), new UserEntity());
+                    UserEntity brokerUser = brokerUserMap.getOrDefault(brokerEntity.getBrokerUserId(), new UserEntity());
                     return BrokerConverter.toDto(brokerEntity, brokerUser, brokerCurrentBalance);
                 })
                 .toList();

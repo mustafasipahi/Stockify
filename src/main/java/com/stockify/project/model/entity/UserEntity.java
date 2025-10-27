@@ -49,6 +49,7 @@ public class UserEntity implements Serializable {
 
     @NotNull
     @Column(nullable = false)
+    //@Enumerated(EnumType.STRING)
     private Role role;
 
     @NotNull
