@@ -28,21 +28,20 @@ public class BrokerConverter {
                 .build();
     }
 
-    public static BrokerDto toDto(BrokerEntity brokerEntity, BigDecimal currentBalance) {
-        UserEntity user = getUser();
+    public static BrokerDto toDto(BrokerEntity broker, UserEntity brokerUser, BigDecimal currentBalance) {
         return BrokerDto.builder()
-                .brokerId(brokerEntity.getId())
-                .brokerUserId(brokerEntity.getBrokerUserId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .role(user.getRole().getRoleName())
-                .vkn(brokerEntity.getVkn())
-                .discountRate(brokerEntity.getDiscountRate())
+                .brokerId(broker.getId())
+                .brokerUserId(broker.getBrokerUserId())
+                .firstName(brokerUser.getFirstName())
+                .lastName(brokerUser.getLastName())
+                .email(brokerUser.getEmail())
+                .role(brokerUser.getRole().getRoleName())
+                .vkn(broker.getVkn())
+                .discountRate(broker.getDiscountRate())
                 .currentBalance(currentBalance)
-                .status(brokerEntity.getStatus())
-                .createdDate(getTime(brokerEntity.getCreatedDate()))
-                .lastModifiedDate(getTime(brokerEntity.getLastModifiedDate()))
+                .status(broker.getStatus())
+                .createdDate(getTime(broker.getCreatedDate()))
+                .lastModifiedDate(getTime(broker.getLastModifiedDate()))
                 .build();
     }
 

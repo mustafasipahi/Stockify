@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.stockify.project.util.TenantContext.getTenantId;
@@ -21,6 +22,10 @@ public class UserGetService {
     public UserEntity findById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
+    }
+
+    public List<UserEntity> findAllByIdIn(List<Long> userIds) {
+        return userRepository.findAllById(userIds);
     }
 
     public Optional<UserEntity> findByUsername(String username) {

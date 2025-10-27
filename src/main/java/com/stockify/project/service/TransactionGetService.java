@@ -6,7 +6,9 @@ import com.stockify.project.enums.BrokerStatus;
 import com.stockify.project.exception.BrokerNotFoundException;
 import com.stockify.project.model.dto.BrokerDto;
 import com.stockify.project.model.dto.TransactionDto;
+import com.stockify.project.model.entity.BrokerEntity;
 import com.stockify.project.model.entity.TransactionEntity;
+import com.stockify.project.model.entity.UserEntity;
 import com.stockify.project.model.request.TransactionSearchRequest;
 import com.stockify.project.model.response.DocumentResponse;
 import com.stockify.project.repository.BrokerRepository;
@@ -22,6 +24,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -37,6 +40,7 @@ public class TransactionGetService {
     private final TransactionRepository transactionRepository;
     private final BrokerRepository brokerRepository;
     private final DocumentGetService documentGetService;
+    private final UserGetService userGetService;
 
     public Page<TransactionDto> getAllTransactions(TransactionSearchRequest request, int page, int size) {
         BrokerDto broker = getBroker(request.getBrokerId());
@@ -63,11 +67,18 @@ public class TransactionGetService {
                 .orElse(BigDecimal.ZERO);
     }
 
+    public Map<Long, BigDecimal> getBrokerCurrentBalanceMap(List<Long> brokerIds, Long tenantId) {
+        List<TransactionEntity> latestTransactions = transactionRepository.findLatestTransactionsByBrokerIds(brokerIds, tenantId);
+        return latestTransactions.stream()
+                .collect(Collectors.toMap(TransactionEntity::getBrokerId, TransactionEntity::getBalance));
+    }
+
     private BrokerDto getBroker(Long brokerId) {
         Long tenantId = getTenantId();
-        return brokerRepository.findByIdAndTenantId(brokerId, tenantId)
+        BrokerEntity brokerEntity = brokerRepository.findByIdAndTenantId(brokerId, tenantId)
                 .filter(broker -> broker.getStatus() == BrokerStatus.ACTIVE)
-                .map(brokerEntity -> BrokerConverter.toDto(brokerEntity, getBrokerCurrentBalance(brokerId, tenantId)))
                 .orElseThrow(() -> new BrokerNotFoundException(brokerId));
+        UserEntity brokerUser = userGetService.findById(brokerEntity.getBrokerUserId());
+        return BrokerConverter.toDto(brokerEntity, brokerUser, getBrokerCurrentBalance(brokerId, tenantId));
     }
 }

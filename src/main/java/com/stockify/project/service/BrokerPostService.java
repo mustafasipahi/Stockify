@@ -82,6 +82,9 @@ public class BrokerPostService {
         if (StringUtils.isNotBlank(request.getEmail())) {
             user.setEmail(request.getEmail());
         }
+        if (StringUtils.isNotBlank(request.getVkn())) {
+            broker.setVkn(request.getVkn());
+        }
         BrokerEntity updatedBrokerEntity = brokerRepository.save(broker);
         userPostService.save(user);
         return BrokerConverter.toIdDto(updatedBrokerEntity);
