@@ -39,7 +39,7 @@ public class InventoryConverter {
     public InventoryEntity toEntity(InventoryCreateRequest request) {
         return InventoryEntity.builder()
                 .productId(request.getProductId())
-                .ownerUserId(getUserId())
+                .ownerUserId(request.getOwnerUserId() != null ? request.getOwnerUserId() : getUserId())
                 .price(request.getPrice())
                 .active(true)
                 .productCount(request.getProductCount())
@@ -61,6 +61,16 @@ public class InventoryConverter {
                 .status(getInventoryStatus(inventoryEntity.getProductCount(), inventoryEntity.getCriticalProductCount()))
                 .createdDate(getTime(inventoryEntity.getCreatedDate()))
                 .lastModifiedDate(getTime(inventoryEntity.getLastModifiedDate()))
+                .build();
+    }
+
+    public InventoryCreateRequest toRequest(Long productId, Long ownerUserId, BigDecimal price, Integer productCount) {
+        return InventoryCreateRequest.builder()
+                .productId(productId)
+                .ownerUserId(ownerUserId)
+                .price(price)
+                .productCount(productCount)
+                .criticalProductCount(0)
                 .build();
     }
 

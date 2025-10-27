@@ -20,10 +20,12 @@ public class BrokerDto implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long brokerId;
+    private Long brokerUserId;
     private String firstName;
     private String lastName;
     private String email;
     private String role;
+    private String vkn;
     private BigDecimal currentBalance;
     private BigDecimal discountRate;
     private BrokerStatus status;

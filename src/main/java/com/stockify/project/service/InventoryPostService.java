@@ -5,6 +5,8 @@ import com.stockify.project.enums.InventoryStatus;
 import com.stockify.project.exception.InventoryIdException;
 import com.stockify.project.exception.InventoryNotFoundException;
 import com.stockify.project.model.dto.InventoryDto;
+import com.stockify.project.model.dto.SalesItemDto;
+import com.stockify.project.model.dto.SalesPrepareDto;
 import com.stockify.project.model.entity.InventoryEntity;
 import com.stockify.project.model.request.InventoryCreateRequest;
 import com.stockify.project.model.request.InventoryUpdateRequest;
@@ -15,8 +17,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.stockify.project.util.InventoryStatusUtil.getInventoryStatus;
 import static com.stockify.project.util.TenantContext.getTenantId;
@@ -84,12 +88,13 @@ public class InventoryPostService {
     }
 
     @Transactional
-    public void decreaseAndCreateInventory(Map<Long, Integer> productDecreaseProductCountMap) {
-        decreaseInventory(productDecreaseProductCountMap);
-        createBrokerInventory();
+    public void decreaseAndCreateInventory(SalesPrepareDto prepareDto) {
+        decreaseInventory(prepareDto);
     }
 
-    private void decreaseInventory(Map<Long, Integer> productDecreaseProductCountMap) {
+    private void decreaseInventory(SalesPrepareDto prepareDto) {
+        Map<Long, Integer> productDecreaseProductCountMap = prepareDto.getSalesItems().stream()
+                .collect(Collectors.toMap(SalesItemDto::getProductId, SalesItemDto::getProductCount));
         for (Map.Entry<Long, Integer> entry : productDecreaseProductCountMap.entrySet()) {
             Long productId = entry.getKey();
             Integer decreaseProductCount = entry.getValue();
@@ -102,10 +107,13 @@ public class InventoryPostService {
             inventoryEntity.setProductCount(newProductCount);
             inventoryEntity.setStatus(newStatus);
             inventoryRepository.save(inventoryEntity);
+            createBrokerInventory(productId, prepareDto.getBroker().getBrokerUserId(), inventoryEntity.getPrice(), decreaseProductCount);
         }
     }
 
-    private void createBrokerInventory() {
-
+    private void createBrokerInventory(Long productId, Long ownerUserId, BigDecimal price, Integer productCount) {
+        InventoryCreateRequest request = inventoryConverter.toRequest(productId, ownerUserId, price, productCount);
+        InventoryEntity inventoryEntity = inventoryConverter.toEntity(request);
+        inventoryRepository.save(inventoryEntity);
     }
 }

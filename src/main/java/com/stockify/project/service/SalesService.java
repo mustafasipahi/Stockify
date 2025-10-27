@@ -156,9 +156,8 @@ public class SalesService {
     }
 
     private void decreaseAndCreateProductInventory(SalesPrepareDto prepareDto) {
-        Map<Long, Integer> productDecreaseProductCountMap = prepareDto.getSalesItems().stream()
-                .collect(Collectors.toMap(SalesItemDto::getProductId, SalesItemDto::getProductCount));
-        inventoryPostService.decreaseAndCreateInventory(productDecreaseProductCountMap);
+
+        inventoryPostService.decreaseAndCreateInventory(prepareDto);
     }
 
     private void addCompanyInfo(SalesPrepareDto prepareDto) {

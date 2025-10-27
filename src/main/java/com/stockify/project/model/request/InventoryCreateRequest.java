@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 public class InventoryCreateRequest {
 
     private Long productId;
+    private Long ownerUserId;
     private BigDecimal price;
     private Integer productCount;
     private Integer criticalProductCount;

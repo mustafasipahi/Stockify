@@ -32,10 +32,12 @@ public class BrokerConverter {
         UserEntity user = getUser();
         return BrokerDto.builder()
                 .brokerId(brokerEntity.getId())
+                .brokerUserId(brokerEntity.getBrokerUserId())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())
                 .role(user.getRole().getRoleName())
+                .vkn(brokerEntity.getVkn())
                 .discountRate(brokerEntity.getDiscountRate())
                 .currentBalance(currentBalance)
                 .status(brokerEntity.getStatus())
