@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.stockify.project.util.TenantContext.getTenantId;
+import static com.stockify.project.util.TenantContext.getUserId;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +28,9 @@ public class InventoryGetService {
     private final InventoryConverter inventoryConverter;
 
     public InventoryDto detail(Long inventoryId) {
-        return inventoryRepository.findByIdAndTenantId(inventoryId, getTenantId())
+        Long userId = getUserId();
+        Long tenantId = getTenantId();
+        return inventoryRepository.findByIdAndOwnerUserIdAndTenantId(inventoryId, userId, tenantId)
                 .map(inventoryConverter::toDto)
                 .orElseThrow(() -> new InventoryNotFoundException(inventoryId));
     }

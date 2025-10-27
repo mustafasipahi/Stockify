@@ -36,6 +36,10 @@ public class BrokerEntity {
     @Column(nullable = false)
     private Long creatorUserId;
 
+    @NotNull
+    @Column(nullable = false)
+    private String vkn;
+
     @Column
     private BigDecimal discountRate;
 

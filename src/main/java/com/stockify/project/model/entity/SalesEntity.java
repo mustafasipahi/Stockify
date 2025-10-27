@@ -35,6 +35,9 @@ public class SalesEntity {
     @Column(nullable = false)
     private Long documentId;
 
+    @Column
+    private Long invoiceId;
+
     @NotNull
     @Column(nullable = false)
     private String documentNumber;

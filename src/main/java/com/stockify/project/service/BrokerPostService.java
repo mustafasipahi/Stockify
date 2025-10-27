@@ -11,6 +11,7 @@ import com.stockify.project.model.entity.UserEntity;
 import com.stockify.project.model.request.BrokerCreateRequest;
 import com.stockify.project.model.request.BrokerUpdateRequest;
 import com.stockify.project.model.request.DiscountUpdateRequest;
+import com.stockify.project.model.request.UserCreationEmailRequest;
 import com.stockify.project.repository.BrokerRepository;
 import com.stockify.project.service.email.UserCreationEmailService;
 import com.stockify.project.validator.BrokerCreateValidator;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
+import static com.stockify.project.converter.BrokerConverter.toEmailRequest;
 import static com.stockify.project.converter.BrokerConverter.toEntity;
 import static com.stockify.project.util.UserInfoGenerator.generatePassword;
 import static com.stockify.project.util.TenantContext.*;
@@ -45,10 +47,12 @@ public class BrokerPostService {
         brokerCreateValidator.validate(request);
         String username = generateUsername(request.getFirstName(), request.getLastName());
         String password = generatePassword();
+        UserEntity creatorUser = getUser();
         UserEntity brokerUser = userPostService.saveBrokerUser(request, username, password);
-        BrokerEntity brokerEntity = toEntity(brokerUser.getId(), request.getDiscountRate());
+        BrokerEntity brokerEntity = toEntity(request, brokerUser.getId());
         BrokerEntity savedBrokerEntity = brokerRepository.save(brokerEntity);
-        userCreationEmailService.sendUserCreationNotification(username, password, request.getFirstName(), getFirstname());
+        UserCreationEmailRequest emailRequest = toEmailRequest(username, password, creatorUser, brokerUser);
+        userCreationEmailService.sendUserCreationNotification(emailRequest);
         return BrokerConverter.toIdDto(savedBrokerEntity);
     }
 

@@ -27,5 +27,6 @@ public class SalesResponse {
     private BigDecimal totalTaxPrice;
     private BigDecimal totalPriceWithTax;
     private String downloadUrl;
+    private String invoiceDownloadUrl;
     private Long createdDate;
 }

@@ -4,9 +4,10 @@ import com.stockify.project.enums.BrokerStatus;
 import com.stockify.project.model.dto.BrokerDto;
 import com.stockify.project.model.entity.BrokerEntity;
 import com.stockify.project.model.entity.UserEntity;
+import com.stockify.project.model.request.BrokerCreateRequest;
+import com.stockify.project.model.request.UserCreationEmailRequest;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
 import java.util.Optional;
 
@@ -16,9 +17,10 @@ import static com.stockify.project.util.TenantContext.*;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BrokerConverter {
 
-    public static BrokerEntity toEntity(Long brokerUserId, BigDecimal discountRate) {
+    public static BrokerEntity toEntity(BrokerCreateRequest request, Long brokerUserId) {
         return BrokerEntity.builder()
-                .discountRate(Optional.ofNullable(discountRate).orElse(BigDecimal.ZERO))
+                .vkn(request.getVkn())
+                .discountRate(Optional.ofNullable(request.getDiscountRate()).orElse(BigDecimal.ZERO))
                 .status(BrokerStatus.ACTIVE)
                 .brokerUserId(brokerUserId)
                 .creatorUserId(getUserId())
@@ -33,11 +35,24 @@ public class BrokerConverter {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())
+                .role(user.getRole().getRoleName())
                 .discountRate(brokerEntity.getDiscountRate())
                 .currentBalance(currentBalance)
                 .status(brokerEntity.getStatus())
                 .createdDate(getTime(brokerEntity.getCreatedDate()))
                 .lastModifiedDate(getTime(brokerEntity.getLastModifiedDate()))
+                .build();
+    }
+
+    public static UserCreationEmailRequest toEmailRequest(String username, String password,
+                                                          UserEntity creatorUser, UserEntity brokerUser) {
+        return UserCreationEmailRequest.builder()
+                .brokerUsername(username)
+                .brokerPassword(password)
+                .brokerFirstName(brokerUser.getFirstName())
+                .brokerLastName(brokerUser.getLastName())
+                .creatorUserFirstName(creatorUser.getFirstName())
+                .creatorUserLastName(creatorUser.getLastName())
                 .build();
     }
 

@@ -47,7 +47,11 @@ public class SalesService {
     @Transactional
     public SalesResponse salesCalculate(SalesRequest request) {
         SalesPrepareDto prepareDto = prepareSalesFlow(request);
-        return salesConverter.toResponse(prepareDto.getSales(), prepareDto.getSalesItems(), null);
+        return salesConverter.toResponse(
+                prepareDto.getSales(),
+                prepareDto.getSalesItems(),
+                null,
+                null);
     }
 
     @Transactional
@@ -56,14 +60,20 @@ public class SalesService {
         addCompanyInfo(prepareDto);
         SalesEntity salesEntity = salesConverter.toSalesEntity(prepareDto.getSales());
         DocumentResponse documentResponse = uploadDocument(prepareDto);
+        DocumentResponse invoiceResponse = uploadInvoice(prepareDto, request.isCreateInvoice());
         salesEntity.setDocumentId(documentResponse.getDocumentId());
+        salesEntity.setInvoiceId(invoiceResponse.getDocumentId());
         SalesEntity savedSalesEntity = saveSalesEntity(salesEntity);
         saveSalesItemEntity(prepareDto.getSalesItems(), savedSalesEntity.getId());
-        decreaseProductInventory(prepareDto.getSalesItems());
+        decreaseAndCreateProductInventory(prepareDto);
         clearBasket(prepareDto.getBroker().getBrokerId());
         saveTransaction(savedSalesEntity);
         sendEmail(prepareDto, documentResponse);
-        return salesConverter.toResponse(prepareDto.getSales(), prepareDto.getSalesItems(), documentResponse.getDownloadUrl());
+        return salesConverter.toResponse(
+                prepareDto.getSales(),
+                prepareDto.getSalesItems(),
+                documentResponse.getDownloadUrl(),
+                invoiceResponse.getDownloadUrl());
     }
 
     @Transactional
@@ -145,10 +155,10 @@ public class SalesService {
         salesItemRepository.saveAll(salesConverter.toSalesItemEntity(salesItemDtoList));
     }
 
-    private void decreaseProductInventory(List<SalesItemDto> salesItems) {
-        Map<Long, Integer> productDecreaseProductCountMap = salesItems.stream()
+    private void decreaseAndCreateProductInventory(SalesPrepareDto prepareDto) {
+        Map<Long, Integer> productDecreaseProductCountMap = prepareDto.getSalesItems().stream()
                 .collect(Collectors.toMap(SalesItemDto::getProductId, SalesItemDto::getProductCount));
-        inventoryPostService.decreaseInventory(productDecreaseProductCountMap);
+        inventoryPostService.decreaseAndCreateInventory(productDecreaseProductCountMap);
     }
 
     private void addCompanyInfo(SalesPrepareDto prepareDto) {
@@ -158,6 +168,13 @@ public class SalesService {
 
     private DocumentResponse uploadDocument(SalesPrepareDto prepareDto) {
         return documentPostService.uploadSalesFile(prepareDto);
+    }
+
+    private DocumentResponse uploadInvoice(SalesPrepareDto prepareDto, boolean createInvoice) {
+        if (createInvoice) {
+
+        }
+        return new DocumentResponse();
     }
 
     private void clearBasket(Long brokerId) {

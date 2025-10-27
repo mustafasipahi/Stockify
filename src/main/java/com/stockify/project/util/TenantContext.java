@@ -26,10 +26,6 @@ public class TenantContext {
         return currentUser.get().getTenantId();
     }
 
-    public static String getFirstname() {
-        return currentUser.get().getFirstName();
-    }
-
     public static String getUsername() {
         return currentUser.get().getUsername();
     }

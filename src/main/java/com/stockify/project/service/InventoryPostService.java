@@ -20,6 +20,7 @@ import java.util.Optional;
 
 import static com.stockify.project.util.InventoryStatusUtil.getInventoryStatus;
 import static com.stockify.project.util.TenantContext.getTenantId;
+import static com.stockify.project.util.TenantContext.getUserId;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +33,9 @@ public class InventoryPostService {
 
     @Transactional
     public void saveDefault(Long productId) {
-        Optional<InventoryEntity> optionalInventory = inventoryRepository.findByIdAndTenantId(productId, getTenantId());
+        Long userId = getUserId();
+        Long tenantId = getTenantId();
+        Optional<InventoryEntity> optionalInventory = inventoryRepository.findByIdAndOwnerUserIdAndTenantId(productId, userId, tenantId);
         InventoryEntity inventoryEntity;
         if (optionalInventory.isPresent()) {
             inventoryEntity = optionalInventory.get();
@@ -56,7 +59,9 @@ public class InventoryPostService {
         if (request.getInventoryId() == null) {
             throw new InventoryIdException();
         }
-        InventoryEntity inventoryEntity = inventoryRepository.findByIdAndTenantId(request.getInventoryId(), getTenantId())
+        Long userId = getUserId();
+        Long tenantId = getTenantId();
+        InventoryEntity inventoryEntity = inventoryRepository.findByIdAndOwnerUserIdAndTenantId(request.getInventoryId(), userId, tenantId)
                 .orElseThrow(() -> new InventoryNotFoundException(request.getInventoryId()));
         if (request.getPrice() != null) {
             inventoryUpdateValidator.validatePrice(request.getPrice());
@@ -79,11 +84,18 @@ public class InventoryPostService {
     }
 
     @Transactional
-    public void decreaseInventory(Map<Long, Integer> productDecreaseProductCountMap) {
+    public void decreaseAndCreateInventory(Map<Long, Integer> productDecreaseProductCountMap) {
+        decreaseInventory(productDecreaseProductCountMap);
+        createBrokerInventory();
+    }
+
+    private void decreaseInventory(Map<Long, Integer> productDecreaseProductCountMap) {
         for (Map.Entry<Long, Integer> entry : productDecreaseProductCountMap.entrySet()) {
             Long productId = entry.getKey();
             Integer decreaseProductCount = entry.getValue();
-            InventoryEntity inventoryEntity = inventoryRepository.findByProductIdAndTenantId(productId, getTenantId())
+            Long userId = getUserId();
+            Long tenantId = getTenantId();
+            InventoryEntity inventoryEntity = inventoryRepository.findByProductIdAndOwnerUserIdAndTenantId(productId, userId, tenantId)
                     .orElseThrow(() -> new InventoryNotFoundException(productId));
             Integer newProductCount = inventoryEntity.getProductCount() - decreaseProductCount;
             InventoryStatus newStatus = getInventoryStatus(newProductCount, inventoryEntity.getCriticalProductCount());
@@ -91,5 +103,9 @@ public class InventoryPostService {
             inventoryEntity.setStatus(newStatus);
             inventoryRepository.save(inventoryEntity);
         }
+    }
+
+    private void createBrokerInventory() {
+
     }
 }

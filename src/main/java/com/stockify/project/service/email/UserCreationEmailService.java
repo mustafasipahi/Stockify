@@ -1,9 +1,11 @@
 package com.stockify.project.service.email;
 
+import com.stockify.project.model.request.UserCreationEmailRequest;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.MailException;
@@ -30,28 +32,27 @@ public class UserCreationEmailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    public void sendUserCreationNotification(String username, String password,
-                                             String brokerName, String userFirstname) {
-        if (username == null || password == null || brokerName == null || userFirstname == null) {
-            log.warn("Invalid Request - one or more parameters are null");
+    public void sendUserCreationNotification(UserCreationEmailRequest request) {
+        if (StringUtils.isBlank(request.getBrokerUsername()) || StringUtils.isBlank(request.getBrokerPassword())
+                || StringUtils.isBlank(request.getBrokerFirstName()) || StringUtils.isBlank(request.getBrokerLastName())
+                || StringUtils.isBlank(request.getCreatorUserFirstName()) || StringUtils.isBlank(request.getCreatorUserLastName())) {
+            log.warn("Invalid Request - one or more parameters are null or blank");
             return;
         }
-
         CompletableFuture.runAsync(() -> {
             try {
-                sendUserCreationEmail(username, password, brokerName, userFirstname);
-                log.info("User creation notification sent successfully for username: {}", username);
+                sendUserCreationEmail(request);
+                log.info("User creation notification sent successfully for username: {}", request.getBrokerUsername());
             } catch (Exception e) {
                 log.error("User Creation Email CompletableFuture RunAsync Error!", e);
             }
         });
     }
 
-    private void sendUserCreationEmail(String username, String password,
-                                       String brokerName, String userFirstname) {
+    private void sendUserCreationEmail(UserCreationEmailRequest request) {
         try {
-            String subject = createUserCreationSubject(userFirstname);
-            String htmlContent = createUserCreationEmailContent(username, password, brokerName, userFirstname);
+            String subject = createUserCreationSubject(request.getBrokerUsername());
+            String htmlContent = createUserCreationEmailContent(request);
             sendSimpleEmail(fromEmail, subject, htmlContent);
             log.info("Sent User Creation notification email from {} to {}", fromEmail, fromEmail);
         } catch (Exception e) {
@@ -74,13 +75,10 @@ public class UserCreationEmailService {
         }
     }
 
-    private String createUserCreationEmailContent(String username, String password,
-                                                  String brokerName, String userFirstname) throws MessagingException {
+    private String createUserCreationEmailContent(UserCreationEmailRequest request) throws MessagingException {
         try {
             String htmlTemplate = loadTemplate(USER_CREATION_TEMPLATE_PATH);
-            Map<String, String> templateVariables = buildUserCreationVariables(
-                    username, password, brokerName, userFirstname
-            );
+            Map<String, String> templateVariables = buildUserCreationVariables(request);
             return replacePlaceholders(htmlTemplate, templateVariables);
         } catch (IOException e) {
             log.error("Load Template Error!", e);
@@ -88,13 +86,12 @@ public class UserCreationEmailService {
         }
     }
 
-    private Map<String, String> buildUserCreationVariables(String username, String password,
-                                                           String brokerName, String userFirstname) {
+    private Map<String, String> buildUserCreationVariables(UserCreationEmailRequest request) {
         Map<String, String> variables = new HashMap<>();
-        variables.put("{{USERNAME}}", username);
-        variables.put("{{PASSWORD}}", password);
-        variables.put("{{BROKER_NAME}}", brokerName);
-        variables.put("{{USER_FIRSTNAME}}", userFirstname);
+        variables.put("{{BROKER_USERNAME}}", request.getBrokerUsername());
+        variables.put("{{BROKER_PASSWORD}}", request.getBrokerPassword());
+        variables.put("{{CREATOR_USER_FULL_NAME}}", request.getCreatorUserFirstName() + " " + request.getCreatorUserLastName());
+        variables.put("{{BROKER_FULL_NAME}}", request.getBrokerFirstName() + " " + request.getBrokerLastName());
         variables.put("{{COMPANY_NAME}}", COMPANY_NAME);
         return variables;
     }
@@ -116,7 +113,7 @@ public class UserCreationEmailService {
         return result;
     }
 
-    private String createUserCreationSubject(String userFirstname) {
-        return "Yeni Kullanıcı Oluşturuldu - " + userFirstname;
+    private String createUserCreationSubject(String brokerUsername) {
+        return "Yeni Kullanıcı Oluşturuldu - " + brokerUsername;
     }
 }

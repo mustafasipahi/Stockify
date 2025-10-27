@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import static com.stockify.project.util.DateUtil.getTime;
 import static com.stockify.project.util.InventoryStatusUtil.getInventoryStatus;
 import static com.stockify.project.util.TenantContext.getTenantId;
+import static com.stockify.project.util.TenantContext.getUserId;
 
 @Component
 @AllArgsConstructor
@@ -25,6 +26,7 @@ public class InventoryConverter {
     public InventoryEntity toDefaultEntity(Long productId) {
         return InventoryEntity.builder()
                 .productId(productId)
+                .ownerUserId(getUserId())
                 .active(true)
                 .price(BigDecimal.ZERO)
                 .productCount(0)
@@ -37,6 +39,7 @@ public class InventoryConverter {
     public InventoryEntity toEntity(InventoryCreateRequest request) {
         return InventoryEntity.builder()
                 .productId(request.getProductId())
+                .ownerUserId(getUserId())
                 .price(request.getPrice())
                 .active(true)
                 .productCount(request.getProductCount())

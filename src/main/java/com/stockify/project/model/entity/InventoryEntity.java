@@ -39,6 +39,10 @@ public class InventoryEntity {
 
     @NotNull
     @Column(nullable = false)
+    private Long ownerUserId;
+
+    @NotNull
+    @Column(nullable = false)
     private BigDecimal price;
 
     @NotNull

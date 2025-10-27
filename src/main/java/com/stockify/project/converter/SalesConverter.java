@@ -95,7 +95,8 @@ public class SalesConverter {
                 .toList();
     }
 
-    public SalesResponse toResponse(SalesDto sales, List<SalesItemDto> salesItems, String downloadUrl) {
+    public SalesResponse toResponse(SalesDto sales, List<SalesItemDto> salesItems,
+                                    String downloadUrl, String invoiceDownloadUrl) {
         return SalesResponse.builder()
                 .salesId(sales.getId())
                 .documentNumber(sales.getDocumentNumber())
@@ -107,6 +108,7 @@ public class SalesConverter {
                 .totalTaxPrice(sales.getTotalTaxPrice())
                 .totalPriceWithTax(sales.getTotalPriceWithTax())
                 .downloadUrl(downloadUrl)
+                .invoiceDownloadUrl(invoiceDownloadUrl)
                 .createdDate(getTime(sales.getCreatedDate()))
                 .build();
     }
