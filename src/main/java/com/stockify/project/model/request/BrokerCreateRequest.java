@@ -16,7 +16,9 @@ public class BrokerCreateRequest {
     private String firstName;
     private String lastName;
     private String email;
+    private String tkn;
     private String vkn;
     private BigDecimal discountRate;
+    private Long birthDate;
     private Long targetDay;
 }

@@ -1,9 +1,6 @@
 package com.stockify.project.validator;
 
-import com.stockify.project.exception.BrokerDiscountRateException;
-import com.stockify.project.exception.BrokerEmailException;
-import com.stockify.project.exception.BrokerNameException;
-import com.stockify.project.exception.BrokerVknException;
+import com.stockify.project.exception.*;
 import com.stockify.project.model.request.BrokerCreateRequest;
 import com.stockify.project.service.UserGetService;
 import lombok.AllArgsConstructor;
@@ -11,6 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+
+import static com.stockify.project.util.DateUtil.getLocalDate;
 
 @Component
 @AllArgsConstructor
@@ -21,6 +20,7 @@ public class BrokerCreateValidator {
     public void validate(BrokerCreateRequest request) {
         validateName(request);
         validateEmail(request.getEmail());
+        validateTkn(request);
         validateVkn(request.getVkn());
         validateDiscountRate(request.getDiscountRate());
     }
@@ -40,6 +40,22 @@ public class BrokerCreateValidator {
     private void validateEmail(String email) {
         if (StringUtils.isBlank(email)) {
             throw new BrokerEmailException();
+        }
+    }
+
+    private void validateTkn(BrokerCreateRequest request) {
+        boolean isValidTkn = false;
+        try {
+            isValidTkn = TknValidator.validateTkn(
+                    request.getTkn(),
+                    request.getFirstName(),
+                    request.getLastName(),
+                    getLocalDate(request.getBirthDate()).getYear());
+        } catch (Exception e) {
+            throw new BrokerTknException();
+        }
+        if (!isValidTkn) {
+            throw new BrokerTknException();
         }
     }
 

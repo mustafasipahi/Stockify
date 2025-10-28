@@ -39,6 +39,10 @@ public class BrokerEntity {
 
     @NotNull
     @Column(nullable = false)
+    private String tkn;
+
+    @NotNull
+    @Column(nullable = false)
     private String vkn;
 
     @Column

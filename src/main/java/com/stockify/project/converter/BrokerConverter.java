@@ -19,6 +19,7 @@ public class BrokerConverter {
 
     public static BrokerEntity toEntity(BrokerCreateRequest request, Long brokerUserId) {
         return BrokerEntity.builder()
+                .tkn(request.getTkn())
                 .vkn(request.getVkn())
                 .discountRate(Optional.ofNullable(request.getDiscountRate()).orElse(BigDecimal.ZERO))
                 .status(BrokerStatus.ACTIVE)
@@ -37,6 +38,7 @@ public class BrokerConverter {
                 .lastName(brokerUser.getLastName())
                 .email(brokerUser.getEmail())
                 .role(brokerUser.getRole().getRoleName())
+                .tkn(broker.getTkn())
                 .vkn(broker.getVkn())
                 .discountRate(broker.getDiscountRate())
                 .currentBalance(Optional.ofNullable(currentBalance).orElse(BigDecimal.ZERO))

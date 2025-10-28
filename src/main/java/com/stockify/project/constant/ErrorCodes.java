@@ -43,6 +43,7 @@ public class ErrorCodes {
     public static final int USER_NOT_FOUND = 1035;
     public static final int HAS_AVAILABLE_INVENTORY = 1036;
     public static final int HAS_AVAILABLE_PRODUCT = 1037;
+    public static final int BROKER_TKN_REQUIRED = 1038;
 
     public static final int UNKNOWN_ERROR = 9999;
 }
