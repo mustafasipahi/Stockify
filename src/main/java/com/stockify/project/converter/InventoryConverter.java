@@ -26,7 +26,7 @@ public class InventoryConverter {
     public InventoryEntity toDefaultEntity(Long productId) {
         return InventoryEntity.builder()
                 .productId(productId)
-                .ownerUserId(getUserId())
+                .creatorUserId(getUserId())
                 .active(true)
                 .price(BigDecimal.ZERO)
                 .productCount(0)
@@ -39,7 +39,7 @@ public class InventoryConverter {
     public InventoryEntity toEntity(InventoryCreateRequest request) {
         return InventoryEntity.builder()
                 .productId(request.getProductId())
-                .ownerUserId(request.getOwnerUserId() != null ? request.getOwnerUserId() : getUserId())
+                .creatorUserId(request.getCreatorUserId() != null ? request.getCreatorUserId() : getUserId())
                 .price(request.getPrice())
                 .active(true)
                 .productCount(request.getProductCount())
@@ -64,10 +64,10 @@ public class InventoryConverter {
                 .build();
     }
 
-    public InventoryCreateRequest toRequest(Long productId, Long ownerUserId, BigDecimal price, Integer productCount) {
+    public InventoryCreateRequest toRequest(Long productId, Long creatorUserId, BigDecimal price, Integer productCount) {
         return InventoryCreateRequest.builder()
                 .productId(productId)
-                .ownerUserId(ownerUserId)
+                .creatorUserId(creatorUserId)
                 .price(price)
                 .productCount(productCount)
                 .criticalProductCount(0)

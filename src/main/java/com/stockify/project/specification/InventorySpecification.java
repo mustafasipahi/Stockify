@@ -25,7 +25,7 @@ public class InventorySpecification {
             }
             predicates.add(criteriaBuilder.equal(root.get("active"), true));
             predicates.add(criteriaBuilder.equal(root.get("tenantId"), getTenantId()));
-            predicates.add(criteriaBuilder.equal(root.get("ownerUserId"), getUserId()));
+            predicates.add(criteriaBuilder.equal(root.get("creatorUserId"), getUserId()));
             query.orderBy(criteriaBuilder.desc(root.get("createdDate")));
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

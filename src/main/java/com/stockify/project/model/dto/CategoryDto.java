@@ -1,6 +1,7 @@
 package com.stockify.project.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.stockify.project.enums.CategoryStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,6 +23,7 @@ public class CategoryDto implements Serializable {
 
     private Long categoryId;
     private String name;
+    private CategoryStatus status;
     private BigDecimal taxRate;
     private Long createdDate;
 }

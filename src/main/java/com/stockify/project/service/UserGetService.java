@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-import static com.stockify.project.util.TenantContext.getTenantId;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -32,7 +30,7 @@ public class UserGetService {
         return userRepository.findByUsername(username);
     }
 
-    public Optional<UserEntity> findByFirstNameAndLastNameAndTenantId(String firstName, String lastName) {
-        return userRepository.findByFirstNameAndLastNameAndTenantId(firstName, lastName, getTenantId());
+    public Optional<UserEntity> findByFirstNameAndLastName(String firstName, String lastName) {
+        return userRepository.findByFirstNameAndLastName(firstName, lastName);
     }
 }

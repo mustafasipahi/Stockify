@@ -18,7 +18,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.stockify.project.util.TenantContext.getTenantId;
-import static com.stockify.project.util.TenantContext.getUserId;
 
 @Service
 @RequiredArgsConstructor
@@ -28,9 +27,8 @@ public class InventoryGetService {
     private final InventoryConverter inventoryConverter;
 
     public InventoryDto detail(Long inventoryId) {
-        Long userId = getUserId();
         Long tenantId = getTenantId();
-        return inventoryRepository.findByIdAndOwnerUserIdAndTenantId(inventoryId, userId, tenantId)
+        return inventoryRepository.findByIdAndTenantId(inventoryId, tenantId)
                 .map(inventoryConverter::toDto)
                 .orElseThrow(() -> new InventoryNotFoundException(inventoryId));
     }
@@ -83,6 +81,11 @@ public class InventoryGetService {
                 .toList();
     }
 
+    public boolean hasAvailableInventory(Long productId) {
+        return getAvailableInventory().stream()
+                .anyMatch(inventory -> inventory.getProduct().getProductId().equals(productId));
+    }
+
     private InventorySearchRequest getInventorySearchRequest(List<InventoryStatus> statusList) {
         return InventorySearchRequest.builder()
                 .statusList(statusList)
@@ -94,8 +97,8 @@ public class InventoryGetService {
             return false;
         }
         if (!ProductStatus.ACTIVE.equals(inventoryDto.getProduct().getStatus())) {
-           return false;
+            return false;
         }
-       return true;
+        return true;
     }
 }

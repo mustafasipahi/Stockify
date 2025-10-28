@@ -14,6 +14,7 @@ public class CategoryConverter {
         return CategoryDto.builder()
                 .categoryId(categoryEntity.getId())
                 .name(categoryEntity.getName())
+                .status(categoryEntity.getStatus())
                 .taxRate(categoryEntity.getTaxRate())
                 .createdDate(getTime(categoryEntity.getCreatedDate()))
                 .build();

@@ -11,7 +11,8 @@ import static com.stockify.project.util.DateUtil.getTime;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TransactionConverter {
 
-    public static TransactionDto toDto(TransactionEntity transactionEntity, BrokerDto broker, String downloadUrl) {
+    public static TransactionDto toDto(TransactionEntity transactionEntity, BrokerDto broker,
+                                       String downloadDocumentUrl, String downloadInvoiceUrl) {
         return TransactionDto.builder()
                 .firstName(broker.getFirstName())
                 .lastName(broker.getLastName())
@@ -19,7 +20,9 @@ public class TransactionConverter {
                 .balance(transactionEntity.getBalance())
                 .type(transactionEntity.getType())
                 .paymentType(transactionEntity.getPaymentType())
-                .downloadUrl(downloadUrl)
+                .requestedInvoice(transactionEntity.isRequestedInvoice())
+                .downloadDocumentUrl(downloadDocumentUrl)
+                .downloadInvoiceUrl(downloadInvoiceUrl)
                 .createdDate(getTime(transactionEntity.getCreatedDate()))
                 .build();
     }

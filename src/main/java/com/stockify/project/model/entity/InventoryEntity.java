@@ -39,7 +39,7 @@ public class InventoryEntity {
 
     @NotNull
     @Column(nullable = false)
-    private Long ownerUserId;
+    private Long creatorUserId;
 
     @NotNull
     @Column(nullable = false)

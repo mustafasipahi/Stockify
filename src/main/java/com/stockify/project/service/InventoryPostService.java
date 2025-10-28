@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.stockify.project.util.FinanceUtil.isValidAmount;
 import static com.stockify.project.util.InventoryStatusUtil.getInventoryStatus;
 import static com.stockify.project.util.TenantContext.getTenantId;
 import static com.stockify.project.util.TenantContext.getUserId;
@@ -39,7 +40,7 @@ public class InventoryPostService {
     public void saveDefault(Long productId) {
         Long userId = getUserId();
         Long tenantId = getTenantId();
-        Optional<InventoryEntity> optionalInventory = inventoryRepository.findByIdAndOwnerUserIdAndTenantId(productId, userId, tenantId);
+        Optional<InventoryEntity> optionalInventory = inventoryRepository.findByProductIdAndCreatorUserIdAndTenantId(productId, userId, tenantId);
         InventoryEntity inventoryEntity;
         if (optionalInventory.isPresent()) {
             inventoryEntity = optionalInventory.get();
@@ -63,9 +64,8 @@ public class InventoryPostService {
         if (request.getInventoryId() == null) {
             throw new InventoryIdException();
         }
-        Long userId = getUserId();
         Long tenantId = getTenantId();
-        InventoryEntity inventoryEntity = inventoryRepository.findByIdAndOwnerUserIdAndTenantId(request.getInventoryId(), userId, tenantId)
+        InventoryEntity inventoryEntity = inventoryRepository.findByIdAndTenantId(request.getInventoryId(), tenantId)
                 .orElseThrow(() -> new InventoryNotFoundException(request.getInventoryId()));
         if (request.getPrice() != null) {
             inventoryUpdateValidator.validatePrice(request.getPrice());
@@ -89,10 +89,6 @@ public class InventoryPostService {
 
     @Transactional
     public void decreaseAndCreateInventory(SalesPrepareDto prepareDto) {
-        decreaseInventory(prepareDto);
-    }
-
-    private void decreaseInventory(SalesPrepareDto prepareDto) {
         Map<Long, Integer> productDecreaseProductCountMap = prepareDto.getSalesItems().stream()
                 .collect(Collectors.toMap(SalesItemDto::getProductId, SalesItemDto::getProductCount));
         for (Map.Entry<Long, Integer> entry : productDecreaseProductCountMap.entrySet()) {
@@ -100,7 +96,7 @@ public class InventoryPostService {
             Integer decreaseProductCount = entry.getValue();
             Long userId = getUserId();
             Long tenantId = getTenantId();
-            InventoryEntity inventoryEntity = inventoryRepository.findByProductIdAndOwnerUserIdAndTenantId(productId, userId, tenantId)
+            InventoryEntity inventoryEntity = inventoryRepository.findByProductIdAndCreatorUserIdAndTenantId(productId, userId, tenantId)
                     .orElseThrow(() -> new InventoryNotFoundException(productId));
             Integer newProductCount = inventoryEntity.getProductCount() - decreaseProductCount;
             InventoryStatus newStatus = getInventoryStatus(newProductCount, inventoryEntity.getCriticalProductCount());
@@ -111,9 +107,20 @@ public class InventoryPostService {
         }
     }
 
-    private void createBrokerInventory(Long productId, Long ownerUserId, BigDecimal price, Integer productCount) {
-        InventoryCreateRequest request = inventoryConverter.toRequest(productId, ownerUserId, price, productCount);
-        InventoryEntity inventoryEntity = inventoryConverter.toEntity(request);
-        inventoryRepository.save(inventoryEntity);
+    private void createBrokerInventory(Long productId, Long creatorUserId, BigDecimal price, Integer productCount) {
+        InventoryCreateRequest request = inventoryConverter.toRequest(productId, creatorUserId, price, productCount);
+        Optional<InventoryEntity> optionalInventory = inventoryRepository.findByProductIdAndCreatorUserIdAndTenantId(productId, creatorUserId, getTenantId());
+        InventoryEntity inventory;
+        if (optionalInventory.isPresent()) {
+            InventoryEntity updateInventory = optionalInventory.get();
+            updateInventory.setPrice(isValidAmount(price) ? price : BigDecimal.ZERO);
+            updateInventory.setProductCount(updateInventory.getProductCount() != null ? updateInventory.getProductCount() + productCount : productCount);
+            inventory = updateInventory;
+        } else {
+            inventory = inventoryConverter.toEntity(request);
+        }
+        inventory.setActive(true);
+        inventory.setStatus(getInventoryStatus(inventory.getProductCount(), inventory.getCriticalProductCount()));
+        inventoryRepository.save(inventory);
     }
 }

@@ -20,6 +20,7 @@ public class ProductDto implements Serializable {
 
     private Long productId;
     private Long categoryId;
+    private Long creatorUserId;
     private String categoryName;
     private BigDecimal taxRate;
     private String inventoryCode;

@@ -5,12 +5,12 @@ import com.stockify.project.model.dto.BrokerDto;
 import com.stockify.project.model.entity.BrokerEntity;
 import com.stockify.project.model.entity.UserEntity;
 import com.stockify.project.model.request.BrokerCreateRequest;
-import com.stockify.project.model.request.UserCreationEmailRequest;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.util.Optional;
 
+import static com.stockify.project.util.DateUtil.getLocalDate;
 import static com.stockify.project.util.DateUtil.getTime;
 import static com.stockify.project.util.TenantContext.*;
 
@@ -25,6 +25,7 @@ public class BrokerConverter {
                 .brokerUserId(brokerUserId)
                 .creatorUserId(getUserId())
                 .tenantId(getTenantId())
+                .targetDay(getLocalDate(request.getTargetDay()))
                 .build();
     }
 
@@ -40,20 +41,9 @@ public class BrokerConverter {
                 .discountRate(broker.getDiscountRate())
                 .currentBalance(Optional.ofNullable(currentBalance).orElse(BigDecimal.ZERO))
                 .status(broker.getStatus())
+                .targetDay(getTime(broker.getTargetDay()))
                 .createdDate(getTime(broker.getCreatedDate()))
                 .lastModifiedDate(getTime(broker.getLastModifiedDate()))
-                .build();
-    }
-
-    public static UserCreationEmailRequest toEmailRequest(String username, String password,
-                                                          UserEntity creatorUser, UserEntity brokerUser) {
-        return UserCreationEmailRequest.builder()
-                .brokerUsername(username)
-                .brokerPassword(password)
-                .brokerFirstName(brokerUser.getFirstName())
-                .brokerLastName(brokerUser.getLastName())
-                .creatorUserFirstName(creatorUser.getFirstName())
-                .creatorUserLastName(creatorUser.getLastName())
                 .build();
     }
 

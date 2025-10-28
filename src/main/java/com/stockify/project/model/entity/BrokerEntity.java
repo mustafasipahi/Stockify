@@ -9,6 +9,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -51,6 +52,9 @@ public class BrokerEntity {
     @NotNull
     @Column(nullable = false)
     private Long tenantId;
+
+    @Column
+    private LocalDate targetDay;
 
     @CreatedDate
     private LocalDateTime createdDate;

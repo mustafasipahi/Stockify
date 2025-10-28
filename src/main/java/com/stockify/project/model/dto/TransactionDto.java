@@ -23,6 +23,8 @@ public class TransactionDto {
     private BigDecimal balance;
     private TransactionType type;
     private PaymentType paymentType;
-    private String downloadUrl;
+    private boolean requestedInvoice;
+    private String downloadDocumentUrl;
+    private String downloadInvoiceUrl;
     private Long createdDate;
 }

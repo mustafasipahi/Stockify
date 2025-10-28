@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import static com.stockify.project.util.DateUtil.getTime;
 import static com.stockify.project.util.TenantContext.getTenantId;
+import static com.stockify.project.util.TenantContext.getUserId;
 
 @Component
 @AllArgsConstructor
@@ -23,6 +24,7 @@ public class ProductConverter {
     public ProductEntity toEntity(ProductCreateRequest request) {
         return ProductEntity.builder()
                 .categoryId(request.getCategoryId())
+                .creatorUserId(getUserId())
                 .inventoryCode(inventoryCodeGenerator.generateInventoryCode())
                 .name(request.getName())
                 .status(ProductStatus.ACTIVE)
@@ -35,6 +37,7 @@ public class ProductConverter {
         return ProductDto.builder()
                 .productId(productEntity.getId())
                 .categoryId(productEntity.getCategoryId())
+                .creatorUserId(productEntity.getCreatorUserId())
                 .categoryName(category.getName())
                 .taxRate(category.getTaxRate())
                 .inventoryCode(productEntity.getInventoryCode())

@@ -46,11 +46,7 @@ public class PaymentService {
     }
 
     private BrokerDto getBroker(Long brokerId) {
-        BrokerDto broker = brokerGetService.detail(brokerId);
-        if (broker.getStatus() != BrokerStatus.ACTIVE) {
-            throw new BrokerNotFoundException(brokerId);
-        }
-        return broker;
+        return brokerGetService.getActiveBroker(brokerId);
     }
 
     private void addCompanyInfo(PaymentDto paymentDto) {

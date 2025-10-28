@@ -30,6 +30,10 @@ public class CategoryEntity {
 
     @NotNull
     @Column(nullable = false)
+    private Long creatorUserId;
+
+    @NotNull
+    @Column(nullable = false)
     private String name;
 
     @NotNull

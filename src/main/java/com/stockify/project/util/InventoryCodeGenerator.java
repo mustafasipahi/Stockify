@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.stockify.project.util.TenantContext.getTenantId;
+import static com.stockify.project.util.TenantContext.getUserId;
 
 @Slf4j
 @Component
@@ -19,7 +20,9 @@ public class InventoryCodeGenerator {
 
     @Transactional
     public String generateInventoryCode() {
-        String lastCode = productRepository.findFirstByTenantIdOrderByCreatedDateDesc(getTenantId())
+        Long userId = getUserId();
+        Long tenantId = getTenantId();
+        String lastCode = productRepository.findFirstByCreatorUserIdAndTenantIdOrderByCreatedDateDesc(userId, tenantId)
                 .map(ProductEntity::getInventoryCode)
                 .orElse(null);
         int newSequence = 1;

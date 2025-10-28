@@ -22,7 +22,9 @@ public class ToPassiveService {
 
     @Transactional
     public void updateToPassiveByCategoryId(Long categoryId) {
-        List<ProductEntity> productList = productRepository.findByCategoryIdAndTenantId(categoryId, getTenantId()).stream()
+        Long userId = getUserId();
+        Long tenantId = getTenantId();
+        List<ProductEntity> productList = productRepository.findByCreatorUserIdAndCategoryIdAndTenantId(userId, categoryId, tenantId).stream()
                 .peek(product -> product.setStatus(ProductStatus.PASSIVE))
                 .toList();
         productRepository.saveAll(productList).forEach(product -> inventoryToPassive(product.getId()));
@@ -34,9 +36,8 @@ public class ToPassiveService {
     }
 
     private void inventoryToPassive(Long productId) {
-        Long userId = getUserId();
         Long tenantId = getTenantId();
-        inventoryRepository.findByIdAndOwnerUserIdAndTenantId(productId, userId, tenantId)
+        inventoryRepository.findByIdAndTenantId(productId, tenantId)
                 .ifPresent(inventory -> {
                     inventory.setActive(false);
                     inventoryRepository.save(inventory);

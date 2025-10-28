@@ -39,6 +39,10 @@ public class ProductEntity {
 
     @NotNull
     @Column(nullable = false)
+    private Long creatorUserId;
+
+    @NotNull
+    @Column(nullable = false)
     private String inventoryCode;
 
     @NotNull

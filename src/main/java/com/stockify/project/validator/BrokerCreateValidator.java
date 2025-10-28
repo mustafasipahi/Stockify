@@ -59,7 +59,7 @@ public class BrokerCreateValidator {
     }
 
     private boolean alreadyUsed(String firstName, String lastName) {
-        return userGetService.findByFirstNameAndLastNameAndTenantId(firstName, lastName)
+        return userGetService.findByFirstNameAndLastName(firstName, lastName)
                 .isPresent();
     }
 }

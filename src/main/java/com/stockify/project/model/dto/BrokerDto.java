@@ -29,6 +29,7 @@ public class BrokerDto implements Serializable {
     private BigDecimal currentBalance;
     private BigDecimal discountRate;
     private BrokerStatus status;
+    private Long targetDay;
     private Long createdDate;
     private Long lastModifiedDate;
 }

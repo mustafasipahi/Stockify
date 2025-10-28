@@ -15,6 +15,4 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
     List<DocumentEntity> findAllByIdInAndTenantId(Set<Long> ids, Long tenantId);
 
     Optional<DocumentEntity> findByIdAndTenantId(Long id, Long tenantId);
-
-    void deleteByIdAndTenantId(Long id, Long tenantId);
 }

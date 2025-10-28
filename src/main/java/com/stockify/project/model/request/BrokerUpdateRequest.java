@@ -19,4 +19,5 @@ public class BrokerUpdateRequest {
     private String email;
     private String vkn;
     private BigDecimal discountRate;
+    private Long targetDay;
 }

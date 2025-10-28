@@ -41,7 +41,7 @@ public class BrokerController {
 
     @GetMapping("/detail/{id}")
     public BrokerDto detail(@PathVariable Long id) {
-        return brokerGetService.detail(id);
+        return brokerGetService.getActiveBroker(id);
     }
 
     @GetMapping("/all")

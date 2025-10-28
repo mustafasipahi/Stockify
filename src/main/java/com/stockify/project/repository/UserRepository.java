@@ -9,5 +9,5 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     Optional<UserEntity> findByUsername(String username);
 
-    Optional<UserEntity> findByFirstNameAndLastNameAndTenantId(String firstName, String lastName, Long tenantId);
+    Optional<UserEntity> findByFirstNameAndLastName(String firstName, String lastName);
 }

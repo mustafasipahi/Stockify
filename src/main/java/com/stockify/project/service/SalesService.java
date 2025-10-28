@@ -1,8 +1,6 @@
 package com.stockify.project.service;
 
 import com.stockify.project.converter.SalesConverter;
-import com.stockify.project.enums.BrokerStatus;
-import com.stockify.project.exception.BrokerNotFoundException;
 import com.stockify.project.model.dto.*;
 import com.stockify.project.model.entity.SalesEntity;
 import com.stockify.project.model.request.SalesRequest;
@@ -19,9 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.stockify.project.validator.BasketValidator.validateAndProcessProducts;
 import static com.stockify.project.validator.SalesValidator.validate;
@@ -67,7 +63,7 @@ public class SalesService {
         saveSalesItemEntity(prepareDto.getSalesItems(), savedSalesEntity.getId());
         decreaseAndCreateProductInventory(prepareDto);
         clearBasket(prepareDto.getBroker().getBrokerId());
-        saveTransaction(savedSalesEntity);
+        saveTransaction(savedSalesEntity, request.isCreateInvoice());
         sendEmail(prepareDto, documentResponse);
         return salesConverter.toResponse(
                 prepareDto.getSales(),
@@ -97,7 +93,7 @@ public class SalesService {
         List<BasketDto> basket = getBrokerBasket(request.getBrokerId());
         validateBasket(basket);
         BrokerDto broker = getBroker(request.getBrokerId());
-        BigDecimal discountRate = getDiscountRate(broker);
+        BigDecimal discountRate = getDiscountRate(broker.getDiscountRate());
         List<SalesItemDto> salesItems = validateAndProcessProducts(basket, availableProducts, false);
         SalesPriceDto salesPriceDto = calculateTaxAndDiscount(salesItems, discountRate);
         SalesDto sales = salesConverter.toSalesDto(request.getBrokerId(), salesPriceDto);
@@ -109,14 +105,11 @@ public class SalesService {
     }
 
     private BrokerDto getBroker(Long brokerId) {
-        return brokerGetService.detail(brokerId);
+        return brokerGetService.getActiveBroker(brokerId);
     }
 
-    private BigDecimal getDiscountRate(BrokerDto broker) {
-        if (broker.getStatus() != BrokerStatus.ACTIVE) {
-            throw new BrokerNotFoundException(broker.getBrokerId());
-        }
-        return Optional.ofNullable(broker.getDiscountRate())
+    private BigDecimal getDiscountRate(BigDecimal discountRate) {
+        return Optional.ofNullable(discountRate)
                 .orElse(BigDecimal.ZERO);
     }
 
@@ -156,7 +149,6 @@ public class SalesService {
     }
 
     private void decreaseAndCreateProductInventory(SalesPrepareDto prepareDto) {
-
         inventoryPostService.decreaseAndCreateInventory(prepareDto);
     }
 
@@ -180,8 +172,8 @@ public class SalesService {
         basketPostService.clearBasket(brokerId);
     }
 
-    private void saveTransaction(SalesEntity salesEntity) {
-        transactionPostService.createSalesTransaction(salesEntity);
+    private void saveTransaction(SalesEntity salesEntity, boolean createInvoice) {
+        transactionPostService.createSalesTransaction(salesEntity, createInvoice);
     }
 
     private void sendEmail(SalesPrepareDto salesPrepareDto, DocumentResponse documentResponse) {

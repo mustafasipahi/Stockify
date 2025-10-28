@@ -3,6 +3,7 @@ package com.stockify.project.service;
 import com.stockify.project.enums.CategoryStatus;
 import com.stockify.project.exception.CategoryIdException;
 import com.stockify.project.exception.CategoryNotFoundException;
+import com.stockify.project.exception.HasAvailableProductException;
 import com.stockify.project.model.entity.CategoryEntity;
 import com.stockify.project.model.request.CategoryCreateRequest;
 import com.stockify.project.model.request.CategoryUpdateRequest;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.stockify.project.util.TenantContext.getTenantId;
+import static com.stockify.project.util.TenantContext.getUserId;
 
 @Service
 @RequiredArgsConstructor
@@ -24,11 +26,13 @@ public class CategoryPostService {
     private final CategoryCreateValidator createValidator;
     private final CategoryUpdateValidator updateValidator;
     private final ToPassiveService toPassiveService;
+    private final ProductGetService productGetService;
 
     @Transactional
     public void save(CategoryCreateRequest request) {
         createValidator.validate(request);
         CategoryEntity categoryEntity = CategoryEntity.builder()
+                .creatorUserId(getUserId())
                 .name(request.getName())
                 .taxRate(request.getTaxRate())
                 .tenantId(getTenantId())
@@ -61,8 +65,15 @@ public class CategoryPostService {
         }
         CategoryEntity categoryEntity = categoryRepository.findByIdAndTenantId(categoryId, getTenantId())
                 .orElseThrow(() -> new CategoryNotFoundException(categoryId));
+        if (hasAvailableProducts(categoryId)) {
+            throw new HasAvailableProductException(categoryId);
+        }
         categoryEntity.setStatus(CategoryStatus.PASSIVE);
         categoryRepository.save(categoryEntity);
         toPassiveService.updateToPassiveByCategoryId(categoryId);
+    }
+
+    private boolean hasAvailableProducts(Long categoryId) {
+        return productGetService.hasAvailableProducts(categoryId);
     }
 }

@@ -15,7 +15,9 @@ public class UserInfoGenerator {
     private static final SecureRandom random = new SecureRandom();
 
     public static String generateUsername(String firstName, String lastName) {
-        return String.format("user_%s_%s", firstName.toLowerCase(), lastName.toLowerCase());
+        String cleanFirstName = firstName.trim().toLowerCase().replaceAll("[^a-z0-9]", "");
+        String cleanLastName = lastName.trim().toLowerCase().replaceAll("[^a-z0-9]", "");
+        return String.format("user_%s_%s", cleanFirstName, cleanLastName);
     }
 
     public static String generatePassword() {

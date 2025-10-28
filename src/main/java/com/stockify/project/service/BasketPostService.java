@@ -64,7 +64,7 @@ public class BasketPostService {
     }
 
     private void validateBroker(Long brokerId) {
-        brokerGetService.info(brokerId);
+        brokerGetService.getActiveBroker(brokerId);
     }
 
     private void validateProduct(Long productId, Integer productCount) {

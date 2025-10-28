@@ -22,9 +22,7 @@ public class TransactionSpecification {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(criteriaBuilder.equal(root.get("tenantId"), getTenantId()));
-            if (request.getBrokerId() != null) {
-                predicates.add(criteriaBuilder.equal(root.get("brokerId"), request.getBrokerId()));
-            }
+            predicates.add(criteriaBuilder.equal(root.get("brokerId"), request.getBrokerId()));
             LocalDateTime now = LocalDateTime.now();
             LocalDateTime startDate = Optional.ofNullable(getLocalDateTime(request.getStartDate()))
                     .orElse(now.minusMonths(1));

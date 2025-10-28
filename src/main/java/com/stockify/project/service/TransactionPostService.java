@@ -16,19 +16,21 @@ import java.math.BigDecimal;
 public class TransactionPostService {
 
     private final TransactionRepository transactionRepository;
-    private final TransactionGetService transactionGetService;
+    private final BalanceService balanceService;
 
     @Transactional
-    public void createSalesTransaction(SalesEntity salesEntity) {
-        BigDecimal currentBalance = transactionGetService.getBrokerCurrentBalance(salesEntity.getBrokerId(), salesEntity.getTenantId());
+    public void createSalesTransaction(SalesEntity salesEntity, boolean createInvoice) {
+        BigDecimal currentBalance = balanceService.getBrokerCurrentBalance(salesEntity.getBrokerId());
         BigDecimal newBalance = currentBalance.add(salesEntity.getTotalPrice());
         TransactionEntity transaction = TransactionEntity.builder()
                 .tenantId(salesEntity.getTenantId())
                 .brokerId(salesEntity.getBrokerId())
                 .documentId(salesEntity.getDocumentId())
+                .invoiceId(salesEntity.getInvoiceId())
                 .type(TransactionType.SALE)
                 .salesId(salesEntity.getId())
                 .documentNumber(salesEntity.getDocumentNumber())
+                .requestedInvoice(createInvoice)
                 .price(salesEntity.getTotalPrice())
                 .balance(newBalance)
                 .build();
@@ -37,7 +39,7 @@ public class TransactionPostService {
 
     @Transactional
     public void createPaymentTransaction(PaymentEntity paymentEntity) {
-        BigDecimal currentBalance = transactionGetService.getBrokerCurrentBalance(paymentEntity.getBrokerId(), paymentEntity.getTenantId());
+        BigDecimal currentBalance = balanceService.getBrokerCurrentBalance(paymentEntity.getBrokerId());
         BigDecimal newBalance = currentBalance.subtract(paymentEntity.getPrice());
         TransactionEntity transaction = TransactionEntity.builder()
                 .tenantId(paymentEntity.getTenantId())

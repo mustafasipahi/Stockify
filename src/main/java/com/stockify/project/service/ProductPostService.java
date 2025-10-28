@@ -2,6 +2,7 @@ package com.stockify.project.service;
 
 import com.stockify.project.converter.ProductConverter;
 import com.stockify.project.enums.ProductStatus;
+import com.stockify.project.exception.HasAvailableInventoryException;
 import com.stockify.project.exception.ProductIdException;
 import com.stockify.project.exception.ProductNotFoundException;
 import com.stockify.project.model.dto.ProductDto;
@@ -27,6 +28,7 @@ public class ProductPostService {
     private final ProductUpdateValidator updateValidator;
     private final ProductConverter productConverter;
     private final InventoryPostService inventoryPostService;
+    private final InventoryGetService inventoryGetService;
     private final ToPassiveService toPassiveService;
 
     @Transactional
@@ -61,9 +63,16 @@ public class ProductPostService {
     public ProductDto delete(Long productId) {
         ProductEntity productEntity = productRepository.findByIdAndTenantId(productId, getTenantId())
                 .orElseThrow(() -> new ProductNotFoundException(productId));
+        if (hasAvailableInventory(productId)) {
+            throw new HasAvailableInventoryException(productId);
+        }
         productEntity.setStatus(ProductStatus.PASSIVE);
         ProductEntity deletedProduct = productRepository.save(productEntity);
         toPassiveService.updateToPassiveByProductId(productId);
         return productConverter.toIdDto(deletedProduct);
+    }
+
+    private boolean hasAvailableInventory(Long productId) {
+        return inventoryGetService.hasAvailableInventory(productId);
     }
 }

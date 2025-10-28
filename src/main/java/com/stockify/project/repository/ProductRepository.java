@@ -1,5 +1,6 @@
 package com.stockify.project.repository;
 
+import com.stockify.project.enums.ProductStatus;
 import com.stockify.project.model.entity.ProductEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -11,9 +12,11 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long>, J
 
     Optional<ProductEntity> findByIdAndTenantId(Long id, Long tenantId);
 
-    List<ProductEntity> findByCategoryIdAndTenantId(Long categoryId, Long tenantId);
+    Optional<ProductEntity> findByCreatorUserIdAndCategoryIdAndTenantIdAndStatus(Long creatorUserId, Long categoryId, Long tenantId, ProductStatus status);
 
-    Optional<ProductEntity> findByNameAndTenantId(String name, Long tenantId);
+    List<ProductEntity> findByCreatorUserIdAndCategoryIdAndTenantId(Long creatorUserId, Long categoryId, Long tenantId);
 
-    Optional<ProductEntity> findFirstByTenantIdOrderByCreatedDateDesc(Long tenantId);
+    Optional<ProductEntity> findByCreatorUserIdAndNameAndTenantId(Long creatorUserId, String name, Long tenantId);
+
+    Optional<ProductEntity> findFirstByCreatorUserIdAndTenantIdOrderByCreatedDateDesc(Long creatorUserId, Long tenantId);
 }

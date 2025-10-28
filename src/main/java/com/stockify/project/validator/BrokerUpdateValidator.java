@@ -2,14 +2,11 @@ package com.stockify.project.validator;
 
 import com.stockify.project.exception.BrokerDiscountRateException;
 import com.stockify.project.exception.BrokerNameException;
-import com.stockify.project.repository.BrokerRepository;
 import com.stockify.project.service.UserGetService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-
-import static com.stockify.project.util.TenantContext.getTenantId;
 
 @Component
 @AllArgsConstructor
@@ -42,7 +39,7 @@ public class BrokerUpdateValidator {
     }
 
     private boolean alreadyUsed(String firstName, String lastName) {
-        return userGetService.findByFirstNameAndLastNameAndTenantId(firstName, lastName)
+        return userGetService.findByFirstNameAndLastName(firstName, lastName)
                 .isPresent();
     }
 }

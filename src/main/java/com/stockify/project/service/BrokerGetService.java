@@ -25,24 +25,16 @@ import static com.stockify.project.util.TenantContext.getUserId;
 public class BrokerGetService {
 
     private final BrokerRepository brokerRepository;
-    private final TransactionGetService transactionGetService;
+    private final BalanceService balanceService;
     private final UserGetService userGetService;
 
-    public BrokerDto info(Long brokerId) {
+    public BrokerDto getActiveBroker(Long brokerId) {
         Long tenantId = getTenantId();
-        BrokerEntity broker = brokerRepository.findByIdAndTenantId(brokerId, tenantId)
+        BrokerEntity brokerEntity = brokerRepository.findByIdAndTenantId(brokerId, tenantId)
+                .filter(broker -> broker.getStatus() == BrokerStatus.ACTIVE)
                 .orElseThrow(() -> new BrokerNotFoundException(brokerId));
-        UserEntity brokerUser = userGetService.findById(broker.getBrokerUserId());
-        return BrokerConverter.toDto(broker, brokerUser, null);
-    }
-
-    public BrokerDto detail(Long brokerId) {
-        Long tenantId = getTenantId();
-        BigDecimal brokerCurrentBalance = getBrokerCurrentBalance(brokerId, tenantId);
-        BrokerEntity broker = brokerRepository.findByIdAndTenantId(brokerId, tenantId)
-                .orElseThrow(() -> new BrokerNotFoundException(brokerId));
-        UserEntity brokerUser = userGetService.findById(broker.getBrokerUserId());
-        return BrokerConverter.toDto(broker, brokerUser, brokerCurrentBalance);
+        UserEntity brokerUser = userGetService.findById(brokerEntity.getBrokerUserId());
+        return BrokerConverter.toDto(brokerEntity, brokerUser, getBrokerCurrentBalance(brokerId));
     }
 
     public List<BrokerDto> getAllBrokers() {
@@ -56,7 +48,7 @@ public class BrokerGetService {
                 .map(BrokerEntity::getBrokerUserId)
                 .distinct()
                 .toList();
-        Map<Long, BigDecimal> brokerCurrentBalanceMap = getBrokerCurrentBalanceMap(brokerIds, tenantId);
+        Map<Long, BigDecimal> brokerCurrentBalanceMap = getBrokerCurrentBalanceMap(brokerIds);
         Map<Long, UserEntity> brokerUserMap = getBrokerUserMap(brokerUserIds);
         return userBrokerList.stream()
                 .map(brokerEntity -> {
@@ -67,12 +59,12 @@ public class BrokerGetService {
                 .toList();
     }
 
-    private BigDecimal getBrokerCurrentBalance(Long brokerId, Long tenantId) {
-        return transactionGetService.getBrokerCurrentBalance(brokerId, tenantId);
+    private BigDecimal getBrokerCurrentBalance(Long brokerId) {
+        return balanceService.getBrokerCurrentBalance(brokerId);
     }
 
-    private Map<Long, BigDecimal> getBrokerCurrentBalanceMap(List<Long> brokerIds, Long tenantId) {
-        return transactionGetService.getBrokerCurrentBalanceMap(brokerIds, tenantId);
+    private Map<Long, BigDecimal> getBrokerCurrentBalanceMap(List<Long> brokerIds) {
+        return balanceService.getBrokerCurrentBalanceMap(brokerIds);
     }
 
     private Map<Long, UserEntity> getBrokerUserMap(List<Long> brokerUserIds) {

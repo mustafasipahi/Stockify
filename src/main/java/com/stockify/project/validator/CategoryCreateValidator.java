@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 import static com.stockify.project.util.TenantContext.getTenantId;
+import static com.stockify.project.util.TenantContext.getUserId;
 
 @Component
 @AllArgsConstructor
@@ -27,7 +28,10 @@ public class CategoryCreateValidator {
         if (StringUtils.isBlank(request.getName())) {
             throw new CategoryNameException();
         }
-        Optional<CategoryEntity> categoryByName = categoryRepository.findByNameAndTenantId(request.getName(), getTenantId());
+        Optional<CategoryEntity> categoryByName = categoryRepository.findByNameAndCreatorUserIdAndTenantId(
+                request.getName(),
+                getUserId(),
+                getTenantId());
         if (categoryByName.isPresent()) {
             throw new CategoryNameAlreadyUseException();
         }

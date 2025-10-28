@@ -41,6 +41,8 @@ public class ErrorCodes {
     public static final int BROKER_EMAIL_REQUIRED = 1033;
     public static final int BROKER_VKN_REQUIRED = 1034;
     public static final int USER_NOT_FOUND = 1035;
+    public static final int HAS_AVAILABLE_INVENTORY = 1036;
+    public static final int HAS_AVAILABLE_PRODUCT = 1037;
 
     public static final int UNKNOWN_ERROR = 9999;
 }
