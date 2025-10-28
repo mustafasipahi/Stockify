@@ -19,6 +19,5 @@ public class BrokerCreateRequest {
     private String tkn;
     private String vkn;
     private BigDecimal discountRate;
-    private Long birthDate;
     private Long targetDay;
 }

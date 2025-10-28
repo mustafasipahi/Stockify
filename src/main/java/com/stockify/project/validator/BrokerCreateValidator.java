@@ -9,8 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
-import static com.stockify.project.util.DateUtil.getLocalDate;
-
 @Component
 @AllArgsConstructor
 public class BrokerCreateValidator {
@@ -44,17 +42,7 @@ public class BrokerCreateValidator {
     }
 
     private void validateTkn(BrokerCreateRequest request) {
-        boolean isValidTkn = false;
-        try {
-            isValidTkn = TknValidator.validateTkn(
-                    request.getTkn(),
-                    request.getFirstName(),
-                    request.getLastName(),
-                    getLocalDate(request.getBirthDate()).getYear());
-        } catch (Exception e) {
-            throw new BrokerTknException();
-        }
-        if (!isValidTkn) {
+        if (StringUtils.isBlank(request.getTkn())) {
             throw new BrokerTknException();
         }
     }
