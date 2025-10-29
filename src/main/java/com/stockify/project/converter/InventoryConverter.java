@@ -5,10 +5,9 @@ import com.stockify.project.model.dto.InventoryDto;
 import com.stockify.project.model.dto.ProductDto;
 import com.stockify.project.model.entity.InventoryEntity;
 import com.stockify.project.model.request.InventoryCreateRequest;
-import com.stockify.project.service.ProductGetService;
 import com.stockify.project.util.FinanceUtil;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
@@ -17,13 +16,10 @@ import static com.stockify.project.util.InventoryStatusUtil.getInventoryStatus;
 import static com.stockify.project.util.TenantContext.getTenantId;
 import static com.stockify.project.util.TenantContext.getUserId;
 
-@Component
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class InventoryConverter {
 
-    private final ProductGetService productGetService;
-
-    public InventoryEntity toDefaultEntity(Long productId) {
+    public static InventoryEntity toDefaultEntity(Long productId) {
         return InventoryEntity.builder()
                 .productId(productId)
                 .creatorUserId(getUserId())
@@ -36,7 +32,7 @@ public class InventoryConverter {
                 .build();
     }
 
-    public InventoryEntity toEntity(InventoryCreateRequest request) {
+    public static InventoryEntity toEntity(InventoryCreateRequest request) {
         return InventoryEntity.builder()
                 .productId(request.getProductId())
                 .creatorUserId(request.getCreatorUserId() != null ? request.getCreatorUserId() : getUserId())
@@ -49,10 +45,10 @@ public class InventoryConverter {
                 .build();
     }
 
-    public InventoryDto toDto(InventoryEntity inventoryEntity) {
+    public static InventoryDto toDto(InventoryEntity inventoryEntity, ProductDto productDto) {
         return InventoryDto.builder()
                 .inventoryId(inventoryEntity.getId())
-                .product(getProductDto(inventoryEntity.getProductId()))
+                .product(productDto)
                 .price(inventoryEntity.getPrice())
                 .totalPrice(FinanceUtil.multiply(inventoryEntity.getPrice(), inventoryEntity.getProductCount()))
                 .productCount(inventoryEntity.getProductCount())
@@ -64,23 +60,9 @@ public class InventoryConverter {
                 .build();
     }
 
-    public InventoryCreateRequest toRequest(Long productId, Long creatorUserId, BigDecimal price, Integer productCount) {
-        return InventoryCreateRequest.builder()
-                .productId(productId)
-                .creatorUserId(creatorUserId)
-                .price(price)
-                .productCount(productCount)
-                .criticalProductCount(0)
-                .build();
-    }
-
-    public InventoryDto toIdDto(InventoryEntity inventoryEntity) {
+    public static InventoryDto toIdDto(InventoryEntity inventoryEntity) {
         return InventoryDto.builder()
                 .inventoryId(inventoryEntity.getId())
                 .build();
-    }
-
-    private ProductDto getProductDto(Long productId) {
-        return productGetService.detail(productId);
     }
 }

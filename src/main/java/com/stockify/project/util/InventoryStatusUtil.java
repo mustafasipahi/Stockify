@@ -1,6 +1,8 @@
 package com.stockify.project.util;
 
 import com.stockify.project.enums.InventoryStatus;
+import com.stockify.project.enums.ProductStatus;
+import com.stockify.project.model.dto.InventoryDto;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -22,5 +24,18 @@ public class InventoryStatusUtil {
         } else {
             return InventoryStatus.AVAILABLE;
         }
+    }
+
+    public static boolean isValid(InventoryDto inventoryDto) {
+        if(inventoryDto == null) {
+            return false;
+        }
+        if (!inventoryDto.isActive()) {
+            return false;
+        }
+        if (inventoryDto.getProduct() == null) {
+            return false;
+        }
+        return ProductStatus.ACTIVE.equals(inventoryDto.getProduct().getStatus());
     }
 }

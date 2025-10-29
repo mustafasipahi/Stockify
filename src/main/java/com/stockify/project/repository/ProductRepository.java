@@ -12,6 +12,8 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long>, J
 
     Optional<ProductEntity> findByIdAndTenantId(Long id, Long tenantId);
 
+    List<ProductEntity> findAllByIdInAndTenantId(List<Long> idList, Long tenantId);
+
     Optional<ProductEntity> findByCreatorUserIdAndCategoryIdAndTenantIdAndStatus(Long creatorUserId, Long categoryId, Long tenantId, ProductStatus status);
 
     List<ProductEntity> findByCreatorUserIdAndCategoryIdAndTenantId(Long creatorUserId, Long categoryId, Long tenantId);
