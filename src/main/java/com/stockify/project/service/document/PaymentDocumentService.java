@@ -64,7 +64,7 @@ public class PaymentDocumentService {
         html = html.replace("{{document_number}}", replaceCharacter(paymentDto.getDocumentNumber() != null ? paymentDto.getDocumentNumber() : ""));
 
         // Logo - Base64 olarak embed et
-        String logoBase64 = getCompanyLogoAsBase64(paymentDto);
+        String logoBase64 = getCompanyLogoAsBase64();
         html = html.replace("{{company_logo}}", logoBase64);
         // Logo varsa göster, yoksa gizle
         html = html.replace("{{logo_display}}", logoBase64.isEmpty() ? "display:none;" : "");
@@ -102,7 +102,7 @@ public class PaymentDocumentService {
      * PaymentDto içinden company bilgisi alınır ve ona göre logo yüklenir
      * Örnek: resources/static/logos/company_1.png
      */
-    private String getCompanyLogoAsBase64(PaymentDto paymentDto) {
+    private String getCompanyLogoAsBase64() {
         try {
             // PaymentDto'dan company ID veya broker ID'ye göre logo belirle
             String logoFileName = TenantType.fromValue(getTenantId()) + ".png";

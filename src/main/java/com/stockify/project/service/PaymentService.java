@@ -1,8 +1,6 @@
 package com.stockify.project.service;
 
 import com.stockify.project.converter.PaymentConverter;
-import com.stockify.project.enums.BrokerStatus;
-import com.stockify.project.exception.BrokerNotFoundException;
 import com.stockify.project.model.dto.BrokerDto;
 import com.stockify.project.model.dto.CompanyInfoDto;
 import com.stockify.project.model.dto.PaymentDto;

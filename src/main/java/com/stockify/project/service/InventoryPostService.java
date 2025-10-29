@@ -32,7 +32,6 @@ public class InventoryPostService {
     private final InventoryRepository inventoryRepository;
     private final InventoryCreateValidator inventoryCreateValidator;
     private final InventoryUpdateValidator inventoryUpdateValidator;
-    private final InventoryConverter inventoryConverter;
 
     @Transactional
     public void saveDefault(Long productId) {
@@ -44,7 +43,7 @@ public class InventoryPostService {
             inventoryEntity = optionalInventory.get();
             inventoryEntity.setActive(true);
         } else {
-            inventoryEntity = inventoryConverter.toDefaultEntity(productId);
+            inventoryEntity = InventoryConverter.toDefaultEntity(productId);
         }
         inventoryRepository.save(inventoryEntity);
     }
@@ -52,9 +51,9 @@ public class InventoryPostService {
     @Transactional
     public InventoryDto save(InventoryCreateRequest request) {
         inventoryCreateValidator.validate(request);
-        InventoryEntity inventoryEntity = inventoryConverter.toEntity(request);
+        InventoryEntity inventoryEntity = InventoryConverter.toEntity(request);
         InventoryEntity savedInventoryEntity = inventoryRepository.save(inventoryEntity);
-        return inventoryConverter.toIdDto(savedInventoryEntity);
+        return InventoryConverter.toIdDto(savedInventoryEntity);
     }
 
     @Transactional
@@ -82,7 +81,7 @@ public class InventoryPostService {
         }
         inventoryEntity.setStatus(getInventoryStatus(inventoryEntity.getProductCount(), inventoryEntity.getCriticalProductCount()));
         InventoryEntity updatedInventoryEntity = inventoryRepository.save(inventoryEntity);
-        return inventoryConverter.toIdDto(updatedInventoryEntity);
+        return InventoryConverter.toIdDto(updatedInventoryEntity);
     }
 
     @Transactional
