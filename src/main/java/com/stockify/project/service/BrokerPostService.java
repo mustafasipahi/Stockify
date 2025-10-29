@@ -26,7 +26,6 @@ import java.math.BigDecimal;
 
 import static com.stockify.project.converter.EmailConverter.toEmailRequest;
 import static com.stockify.project.converter.BrokerConverter.toEntity;
-import static com.stockify.project.util.DateUtil.getLocalDate;
 import static com.stockify.project.util.UserInfoGenerator.generatePassword;
 import static com.stockify.project.util.TenantContext.*;
 import static com.stockify.project.util.UserInfoGenerator.generateUsername;
@@ -86,8 +85,8 @@ public class BrokerPostService {
         if (StringUtils.isNotBlank(request.getVkn())) {
             broker.setVkn(request.getVkn());
         }
-        if (request.getTargetDay() != null) {
-            broker.setTargetDay(getLocalDate(request.getTargetDay()));
+        if (request.getTargetDayOfWeek() != null) {
+            broker.setTargetDayOfWeek(request.getTargetDayOfWeek());
         }
         BrokerEntity updatedBrokerEntity = brokerRepository.save(broker);
         userPostService.save(user);

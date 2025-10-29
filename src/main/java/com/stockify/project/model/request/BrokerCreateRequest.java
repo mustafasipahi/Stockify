@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 
 @Getter
 @Setter
@@ -19,5 +20,5 @@ public class BrokerCreateRequest {
     private String tkn;
     private String vkn;
     private BigDecimal discountRate;
-    private Long targetDay;
+    private DayOfWeek targetDayOfWeek;
 }

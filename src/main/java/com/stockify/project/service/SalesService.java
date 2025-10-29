@@ -61,7 +61,7 @@ public class SalesService {
         salesEntity.setInvoiceId(invoiceResponse.getDocumentId());
         SalesEntity savedSalesEntity = saveSalesEntity(salesEntity);
         saveSalesItemEntity(prepareDto.getSalesItems(), savedSalesEntity.getId());
-        decreaseAndCreateProductInventory(prepareDto);
+        decreaseProductInventory(prepareDto);
         clearBasket(prepareDto.getBroker().getBrokerId());
         saveTransaction(savedSalesEntity, request.isCreateInvoice());
         sendEmail(prepareDto, documentResponse);
@@ -148,8 +148,8 @@ public class SalesService {
         salesItemRepository.saveAll(salesConverter.toSalesItemEntity(salesItemDtoList));
     }
 
-    private void decreaseAndCreateProductInventory(SalesPrepareDto prepareDto) {
-        inventoryPostService.decreaseAndCreateInventory(prepareDto);
+    private void decreaseProductInventory(SalesPrepareDto prepareDto) {
+        inventoryPostService.decreaseInventory(prepareDto);
     }
 
     private void addCompanyInfo(SalesPrepareDto prepareDto) {

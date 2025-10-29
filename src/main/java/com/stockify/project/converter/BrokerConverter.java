@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.util.Optional;
 
-import static com.stockify.project.util.DateUtil.getLocalDate;
 import static com.stockify.project.util.DateUtil.getTime;
 import static com.stockify.project.util.TenantContext.*;
 
@@ -26,7 +25,7 @@ public class BrokerConverter {
                 .brokerUserId(brokerUserId)
                 .creatorUserId(getUserId())
                 .tenantId(getTenantId())
-                .targetDay(getLocalDate(request.getTargetDay()))
+                .targetDayOfWeek(request.getTargetDayOfWeek())
                 .build();
     }
 
@@ -43,7 +42,7 @@ public class BrokerConverter {
                 .discountRate(broker.getDiscountRate())
                 .currentBalance(Optional.ofNullable(currentBalance).orElse(BigDecimal.ZERO))
                 .status(broker.getStatus())
-                .targetDay(getTime(broker.getTargetDay()))
+                .targetDayOfWeek(broker.getTargetDayOfWeek())
                 .createdDate(getTime(broker.getCreatedDate()))
                 .lastModifiedDate(getTime(broker.getLastModifiedDate()))
                 .build();

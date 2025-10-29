@@ -7,6 +7,7 @@ import lombok.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 
 @Getter
 @Setter
@@ -30,7 +31,7 @@ public class BrokerDto implements Serializable {
     private BigDecimal currentBalance;
     private BigDecimal discountRate;
     private BrokerStatus status;
-    private Long targetDay;
+    private DayOfWeek targetDayOfWeek;
     private Long createdDate;
     private Long lastModifiedDate;
 }
