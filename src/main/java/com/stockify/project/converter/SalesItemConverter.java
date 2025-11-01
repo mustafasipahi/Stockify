@@ -63,8 +63,12 @@ public class SalesItemConverter {
             Integer productCount = basketItem.getProductCount();
             BigDecimal unitPrice = availableProduct.getPrice();
             BigDecimal totalPrice = unitPrice.multiply(BigDecimal.valueOf(productCount));
+
+            // İndirim hesaplamaları
             BigDecimal itemDiscountAmount = divide(multiply(totalPrice, effectiveDiscountRate), BigDecimal.valueOf(100));
             BigDecimal priceAfterDiscount = totalPrice.subtract(itemDiscountAmount);
+
+            // KDV hesaplaması indirimli fiyat üzerinden yapılıyor
             BigDecimal taxRate = availableProduct.getTaxRate();
             BigDecimal taxPrice = divide(multiply(priceAfterDiscount, taxRate), BigDecimal.valueOf(100));
             BigDecimal totalPriceWithTax = priceAfterDiscount.add(taxPrice);

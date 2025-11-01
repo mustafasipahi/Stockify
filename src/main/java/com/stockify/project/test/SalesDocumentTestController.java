@@ -26,8 +26,8 @@ import static com.stockify.project.util.FinanceUtil.divide;
 import static com.stockify.project.util.FinanceUtil.multiply;
 
 @Slf4j
-@RestController
-@RequestMapping("/sales/stream/api/test")
+//@RestController
+//@RequestMapping("/sales/stream/api/test")
 @RequiredArgsConstructor
 public class SalesDocumentTestController {
 

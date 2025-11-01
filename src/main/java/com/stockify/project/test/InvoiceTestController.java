@@ -8,8 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/invoice/api/test")
-@RequiredArgsConstructor
+//@RequestMapping("/invoice/api/test")
+//@RequiredArgsConstructor
 public class InvoiceTestController {
 
     private static final String TEST_TEXT = "{\n" +
