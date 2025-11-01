@@ -4,18 +4,12 @@ import com.stockify.project.model.dto.BrokerDto;
 import com.stockify.project.model.dto.SalesPrepareDto;
 import com.stockify.project.model.response.DocumentResponse;
 import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.mail.MailException;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
@@ -24,6 +18,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import static com.stockify.project.util.EmailUtil.*;
 import static com.stockify.project.util.TenantContext.getEmail;
 
 @Slf4j
@@ -36,28 +31,26 @@ public class SalesEmailService {
     private static final String DATE_FORMAT = "dd/MM/yyyy HH:mm";
     private static final String COMPANY_NAME = "Stokify";
 
-    private final JavaMailSender mailSender;
-
-    @Value("${spring.mail.username}")
-    private String fromEmail;
+    private final EmailService emailService;
 
     public void sendSalesNotifications(SalesPrepareDto salesPrepareDto, DocumentResponse documentResponse) {
         if (salesPrepareDto == null || documentResponse == null) {
             log.warn("Invalid Request - salesPrepareDto or documentResponse null");
             return;
         }
+        String userEmail = getEmail();
+        String brokerEmail = salesPrepareDto.getBroker().getEmail();
         CompletableFuture.runAsync(() -> {
             try {
-                sendNotificationsInternal(salesPrepareDto, documentResponse);
+                sendNotificationsInternal(salesPrepareDto, documentResponse, userEmail, brokerEmail);
             } catch (Exception e) {
                 log.error("Sales CompletableFuture RunAsync Error!", e);
             }
         });
     }
 
-    private void sendNotificationsInternal(SalesPrepareDto salesPrepareDto, DocumentResponse documentResponse) {
-        BrokerDto broker = salesPrepareDto.getBroker();
-        String userEmail = getEmail();
+    private void sendNotificationsInternal(SalesPrepareDto salesPrepareDto, DocumentResponse documentResponse,
+                                           String userEmail, String brokerEmail) {
         if (isValidEmail(userEmail)) {
             try {
                 sendSellerNotification(salesPrepareDto, userEmail, documentResponse.getFile());
@@ -68,7 +61,6 @@ public class SalesEmailService {
         } else {
             log.info("Company Email is invalid");
         }
-        String brokerEmail = broker.getEmail();
         if (isValidEmail(brokerEmail)) {
             try {
                 sendBuyerNotification(salesPrepareDto, brokerEmail, documentResponse.getFile());
@@ -97,19 +89,7 @@ public class SalesEmailService {
 
     private void sendEmailWithAttachment(String to, String subject, String htmlContent,
                                          MultipartFile file, String fileName) throws MessagingException {
-        try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, StandardCharsets.UTF_8.name());
-            helper.setFrom(fromEmail);
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(htmlContent, true);
-            helper.addAttachment(fileName, file);
-            mailSender.send(message);
-        } catch (MailException e) {
-            log.error("Send Email Error! to: {} subject: {}", maskEmail(to), subject, e);
-            throw new MessagingException(e.getMessage(), e);
-        }
+        emailService.sendEmailWithAttachment(to, subject, htmlContent, file, fileName);
     }
 
     private String createEmailContent(String templatePath, SalesPrepareDto salesData) throws MessagingException {
@@ -191,31 +171,5 @@ public class SalesEmailService {
 
     private String createBuyerFileName(SalesPrepareDto salesData) {
         return "Fatura_" + salesData.getSales().getDocumentNumber() + ".pdf";
-    }
-
-    private String formatPrice(java.math.BigDecimal price) {
-        return price != null ? String.format("%,.2f", price) : "0,00";
-    }
-
-    private String formatDiscountRate(java.math.BigDecimal rate) {
-        return rate != null ? String.format("%.1f", rate) : "0,0";
-    }
-
-    private boolean isValidEmail(String email) {
-        return StringUtils.isNotBlank(email) && email.contains("@") && email.contains(".");
-    }
-
-    private String maskEmail(String email) {
-        if (StringUtils.isBlank(email) || !email.contains("@")) {
-            return "***";
-        }
-        String[] parts = email.split("@");
-        String username = parts[0];
-        String domain = parts[1];
-
-        if (username.length() <= 2) {
-            return "***@" + domain;
-        }
-        return username.substring(0, 2) + "***@" + domain;
     }
 }

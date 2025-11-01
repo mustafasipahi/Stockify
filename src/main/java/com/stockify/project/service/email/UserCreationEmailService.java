@@ -2,17 +2,12 @@ package com.stockify.project.service.email;
 
 import com.stockify.project.model.request.UserCreationEmailRequest;
 import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.mail.MailException;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -27,7 +22,7 @@ public class UserCreationEmailService {
     private static final String USER_CREATION_TEMPLATE_PATH = "templates/user_creation_email.html";
     private static final String COMPANY_NAME = "Stokify";
 
-    private final JavaMailSender mailSender;
+    private final EmailService emailService;
 
     @Value("${spring.mail.username}")
     private String fromEmail;
@@ -61,23 +56,12 @@ public class UserCreationEmailService {
     }
 
     private void sendSimpleEmail(String to, String subject, String htmlContent) throws MessagingException {
-        try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, StandardCharsets.UTF_8.name());
-            helper.setFrom(fromEmail);
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(htmlContent, true);
-            mailSender.send(message);
-        } catch (MailException e) {
-            log.error("Send Email Error! to: {} subject: {}", to, subject, e);
-            throw new MessagingException(e.getMessage(), e);
-        }
+        emailService.sendEmail(to, subject, htmlContent);
     }
 
     private String createUserCreationEmailContent(UserCreationEmailRequest request) throws MessagingException {
         try {
-            String htmlTemplate = loadTemplate(USER_CREATION_TEMPLATE_PATH);
+            String htmlTemplate = loadTemplate();
             Map<String, String> templateVariables = buildUserCreationVariables(request);
             return replacePlaceholders(htmlTemplate, templateVariables);
         } catch (IOException e) {
@@ -96,11 +80,11 @@ public class UserCreationEmailService {
         return variables;
     }
 
-    private String loadTemplate(String templatePath) throws IOException {
-        ClassPathResource resource = new ClassPathResource(templatePath);
+    private String loadTemplate() throws IOException {
+        ClassPathResource resource = new ClassPathResource(UserCreationEmailService.USER_CREATION_TEMPLATE_PATH);
         if (!resource.exists()) {
-            log.error("Template not found: {}", templatePath);
-            throw new IOException("Template not found: " + templatePath);
+            log.error("Template not found: {}", UserCreationEmailService.USER_CREATION_TEMPLATE_PATH);
+            throw new IOException("Template not found: " + UserCreationEmailService.USER_CREATION_TEMPLATE_PATH);
         }
         return new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
     }

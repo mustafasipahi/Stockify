@@ -4,15 +4,10 @@ import com.stockify.project.model.dto.BrokerDto;
 import com.stockify.project.model.dto.PaymentDto;
 import com.stockify.project.model.response.DocumentResponse;
 import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.mail.MailException;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import static com.stockify.project.util.EmailUtil.*;
 import static com.stockify.project.util.TenantContext.getEmail;
 
 @Slf4j
@@ -35,28 +31,26 @@ public class PaymentEmailService {
     private static final String DATE_FORMAT = "dd/MM/yyyy HH:mm";
     private static final String COMPANY_NAME = "Stokify";
 
-    private final JavaMailSender mailSender;
-
-    @Value("${spring.mail.username}")
-    private String fromEmail;
+    private final EmailService emailService;
 
     public void sendPaymentNotifications(PaymentDto paymentDto, DocumentResponse documentResponse) {
         if (paymentDto == null || documentResponse == null) {
             log.warn("Invalid Request - paymentDto or documentResponse null");
             return;
         }
+        String userEmail = getEmail();
+        String brokerEmail = paymentDto.getBroker().getEmail();
         CompletableFuture.runAsync(() -> {
             try {
-                sendNotificationsInternal(paymentDto, documentResponse);
+                sendNotificationsInternal(paymentDto, documentResponse, userEmail, brokerEmail);
             } catch (Exception e) {
                 log.error("Payment CompletableFuture RunAsync Error!", e);
             }
         });
     }
 
-    private void sendNotificationsInternal(PaymentDto paymentDto, DocumentResponse documentResponse) {
-        BrokerDto broker = paymentDto.getBroker();
-        String userEmail = getEmail();
+    private void sendNotificationsInternal(PaymentDto paymentDto, DocumentResponse documentResponse,
+                                           String userEmail, String brokerEmail) {
         if (isValidEmail(userEmail)) {
             try {
                 sendReceiverNotification(paymentDto, userEmail, documentResponse.getFile());
@@ -67,7 +61,6 @@ public class PaymentEmailService {
         } else {
             log.info("Company Email is invalid");
         }
-        String brokerEmail = broker.getEmail();
         if (isValidEmail(brokerEmail)) {
             try {
                 sendPayerNotification(paymentDto, brokerEmail, documentResponse.getFile());
@@ -96,19 +89,7 @@ public class PaymentEmailService {
 
     private void sendEmailWithAttachment(String to, String subject, String htmlContent,
                                          MultipartFile file, String fileName) throws MessagingException {
-        try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, StandardCharsets.UTF_8.name());
-            helper.setFrom(fromEmail);
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(htmlContent, true);
-            helper.addAttachment(fileName, file);
-            mailSender.send(message);
-        } catch (MailException e) {
-            log.error("Send Email Error! to: {} subject: {}", maskEmail(to), subject, e);
-            throw new MessagingException(e.getMessage(), e);
-        }
+        emailService.sendEmailWithAttachment(to, subject, htmlContent, file, fileName);
     }
 
     private String createEmailContent(String templatePath, PaymentDto paymentDto) throws MessagingException {
@@ -176,27 +157,5 @@ public class PaymentEmailService {
 
     private String createPayerFileName(PaymentDto paymentDto) {
         return "Makbuz_" + paymentDto.getDocumentNumber() + ".pdf";
-    }
-
-    private String formatPrice(java.math.BigDecimal price) {
-        return price != null ? String.format("%,.2f", price) : "0,00";
-    }
-
-    private boolean isValidEmail(String email) {
-        return StringUtils.isNotBlank(email) && email.contains("@") && email.contains(".");
-    }
-
-    private String maskEmail(String email) {
-        if (StringUtils.isBlank(email) || !email.contains("@")) {
-            return "***";
-        }
-        String[] parts = email.split("@");
-        String username = parts[0];
-        String domain = parts[1];
-
-        if (username.length() <= 2) {
-            return "***@" + domain;
-        }
-        return username.substring(0, 2) + "***@" + domain;
     }
 }
