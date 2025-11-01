@@ -5,6 +5,7 @@ import com.stockify.project.model.dto.*;
 import com.stockify.project.model.entity.SalesEntity;
 import com.stockify.project.model.request.SalesRequest;
 import com.stockify.project.model.response.DocumentResponse;
+import com.stockify.project.model.response.InvoiceCreateResponse;
 import com.stockify.project.model.response.SalesResponse;
 import com.stockify.project.repository.SalesItemRepository;
 import com.stockify.project.repository.SalesRepository;
@@ -15,11 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
 
-import static com.stockify.project.validator.BasketValidator.validateAndProcessProducts;
+import static com.stockify.project.converter.SalesItemConverter.validateAndPrepareProducts;
+import static com.stockify.project.converter.SalesPriceCalculatorConverter.calculateTaxAndDiscount;
 import static com.stockify.project.validator.SalesValidator.validate;
 import static com.stockify.project.validator.SalesValidator.validateBasket;
 
@@ -39,6 +40,7 @@ public class SalesService {
     private final BasketPostService basketPostService;
     private final SalesEmailService salesEmailService;
     private final CompanyGetService companyGetService;
+    private final InvoiceService invoiceService;
 
     @Transactional
     public SalesResponse salesCalculate(SalesRequest request) {
@@ -82,9 +84,13 @@ public class SalesService {
     }
 
     public List<SalesItemDto> getBrokerBasketDetail(Long brokerId) {
+        validate(brokerId);
+        List<SalesProductDto> availableProducts = getSalesInventory();
         List<BasketDto> basket = getBrokerBasket(brokerId);
-        List<SalesProductDto> products = getSalesInventory();
-        return validateAndProcessProducts(basket, products, false);
+        validateBasket(basket);
+        BrokerDto broker = getBroker(brokerId);
+        BigDecimal discountRate = getDiscountRate(broker.getDiscountRate());
+        return validateAndPrepareProducts(basket, availableProducts, false, discountRate);
     }
 
     private SalesPrepareDto prepareSalesFlow(SalesRequest request) {
@@ -94,7 +100,7 @@ public class SalesService {
         validateBasket(basket);
         BrokerDto broker = getBroker(request.getBrokerId());
         BigDecimal discountRate = getDiscountRate(broker.getDiscountRate());
-        List<SalesItemDto> salesItems = validateAndProcessProducts(basket, availableProducts, false);
+        List<SalesItemDto> salesItems = validateAndPrepareProducts(basket, availableProducts, false, discountRate);
         SalesPriceDto salesPriceDto = calculateTaxAndDiscount(salesItems, discountRate);
         SalesDto sales = salesConverter.toSalesDto(request.getBrokerId(), salesPriceDto);
         return salesConverter.toPrepareDto(sales, salesItems, broker);
@@ -111,30 +117,6 @@ public class SalesService {
     private BigDecimal getDiscountRate(BigDecimal discountRate) {
         return Optional.ofNullable(discountRate)
                 .orElse(BigDecimal.ZERO);
-    }
-
-    private SalesPriceDto calculateTaxAndDiscount(List<SalesItemDto> salesItems, BigDecimal discountRate) {
-        BigDecimal subtotalPrice = salesItems.stream()
-                .map(SalesItemDto::getTotalPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal originalTotalTaxPrice = salesItems.stream()
-                .map(SalesItemDto::getTaxPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal discountPrice = subtotalPrice.multiply(discountRate)
-                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_DOWN);
-        BigDecimal subtotalPriceWithDiscount = subtotalPrice.subtract(discountPrice);
-        BigDecimal taxDiscountAmount = originalTotalTaxPrice.multiply(discountRate)
-                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_DOWN);
-        BigDecimal totalTaxPrice = originalTotalTaxPrice.subtract(taxDiscountAmount);
-        BigDecimal totalPriceWithTax = subtotalPriceWithDiscount.add(totalTaxPrice);
-        return SalesPriceDto.builder()
-                .subtotalPrice(subtotalPrice)              // Brüt tutar (KDV hariç)
-                .discountRate(discountRate)                // İskonto oranı %
-                .discountPrice(discountPrice)              // İskonto tutarı
-                .totalPrice(subtotalPriceWithDiscount)     // Net tutar (KDV hariç)
-                .totalTaxPrice(totalTaxPrice)              // İskonto sonrası KDV tutarı
-                .totalPriceWithTax(totalPriceWithTax)      // Genel toplam (KDV dahil)
-                .build();
     }
 
     private SalesEntity saveSalesEntity(SalesEntity salesEntity) {
@@ -163,7 +145,8 @@ public class SalesService {
 
     private DocumentResponse uploadInvoice(SalesPrepareDto prepareDto, boolean createInvoice) {
         if (createInvoice) {
-
+            InvoiceCreateResponse invoice = invoiceService.createInvoice(prepareDto);
+            return new DocumentResponse();
         }
         return new DocumentResponse();
     }

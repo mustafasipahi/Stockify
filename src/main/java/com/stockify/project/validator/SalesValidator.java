@@ -19,6 +19,12 @@ public class SalesValidator {
         }
     }
 
+    public static void validate(Long brokerId) {
+        if (brokerId == null) {
+            throw new BrokerIdException();
+        }
+    }
+
     public static void validateBasket(List<BasketDto> basket) {
         if (CollectionUtils.isEmpty(basket)) {
             throw new BasketEmptyException();

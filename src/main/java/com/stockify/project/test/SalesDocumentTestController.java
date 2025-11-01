@@ -1,7 +1,9 @@
 package com.stockify.project.test;
 
 import com.stockify.project.model.dto.*;
+import com.stockify.project.model.response.InvoiceCreateResponse;
 import com.stockify.project.model.response.SalesDocumentResponse;
+import com.stockify.project.service.InvoiceService;
 import com.stockify.project.service.document.SalesDocumentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,13 +22,17 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.stockify.project.util.FinanceUtil.divide;
+import static com.stockify.project.util.FinanceUtil.multiply;
+
 @Slf4j
-//@RestController
-//@RequestMapping("/sales/stream/api/test")
+@RestController
+@RequestMapping("/sales/stream/api/test")
 @RequiredArgsConstructor
 public class SalesDocumentTestController {
 
     private final SalesDocumentService salesDocumentService;
+    private final InvoiceService invoiceService;
 
     private static final String OUTPUT_DIRECTORY = "generated-pdfs";
 
@@ -78,6 +84,14 @@ public class SalesDocumentTestController {
         }
     }
 
+    @GetMapping("/generate-sales-invoice")
+    public InvoiceCreateResponse generateTestSalesInvoice() {
+        SalesPrepareDto testData = createTestData();
+        InvoiceCreateResponse invoice = invoiceService.createInvoice(testData);
+        System.out.println();
+        return invoice;
+    }
+
     private SalesPrepareDto createTestData() {
         SalesPrepareDto prepareDto = new SalesPrepareDto();
 
@@ -90,6 +104,9 @@ public class SalesDocumentTestController {
         BrokerDto broker = new BrokerDto();
         broker.setFirstName("Ahmet");
         broker.setLastName("YILMAZ");
+        broker.setEmail("ahmet.yilmaz@example.com");
+        broker.setTkn("12345678901"); // TCKN
+        broker.setVkn("1234567890"); // VKN (varsa)
         broker.setCurrentBalance(new BigDecimal("2500.75"));
 
         // Satış bilgileri
@@ -101,22 +118,12 @@ public class SalesDocumentTestController {
         sales.setTotalPrice(new BigDecimal("8075.00"));
         sales.setTotalTaxPrice(new BigDecimal("1453.50"));
         sales.setTotalPriceWithTax(new BigDecimal("9528.50"));
+        sales.setCreatedDate(LocalDateTime.now());
 
         // Satış kalemleri
         List<SalesItemDto> salesItems = Arrays.asList(
                 createSalesItem("LENOVO THINKPAD E15", new BigDecimal("7500.00"), new BigDecimal("1"), new BigDecimal("18")),
                 createSalesItem("LOGITECH MX MASTER 3", new BigDecimal("650.00"), new BigDecimal("1"), new BigDecimal("18")),
-                createSalesItem("SAMSUNG 32GB USB BELLEK", new BigDecimal("350.00"), new BigDecimal("1"), new BigDecimal("18")),
-                createSalesItem("SAMSUNG 32GB USB BELLEK", new BigDecimal("350.00"), new BigDecimal("1"), new BigDecimal("18")),
-                createSalesItem("SAMSUNG 32GB USB BELLEK", new BigDecimal("350.00"), new BigDecimal("1"), new BigDecimal("18")),
-                createSalesItem("SAMSUNG 32GB USB BELLEK", new BigDecimal("350.00"), new BigDecimal("1"), new BigDecimal("18")),
-                createSalesItem("SAMSUNG 32GB USB BELLEK", new BigDecimal("350.00"), new BigDecimal("1"), new BigDecimal("18")),
-                createSalesItem("SAMSUNG 32GB USB BELLEK", new BigDecimal("350.00"), new BigDecimal("1"), new BigDecimal("18")),
-                createSalesItem("SAMSUNG 32GB USB BELLEK", new BigDecimal("350.00"), new BigDecimal("1"), new BigDecimal("18")),
-                createSalesItem("SAMSUNG 32GB USB BELLEK", new BigDecimal("350.00"), new BigDecimal("1"), new BigDecimal("18")),
-                createSalesItem("SAMSUNG 32GB USB BELLEK", new BigDecimal("350.00"), new BigDecimal("1"), new BigDecimal("18")),
-                createSalesItem("SAMSUNG 32GB USB BELLEK", new BigDecimal("350.00"), new BigDecimal("1"), new BigDecimal("18")),
-                createSalesItem("SAMSUNG 32GB USB BELLEK", new BigDecimal("350.00"), new BigDecimal("1"), new BigDecimal("18")),
                 createSalesItem("SAMSUNG 32GB USB BELLEK", new BigDecimal("350.00"), new BigDecimal("1"), new BigDecimal("18"))
         );
 
@@ -135,12 +142,14 @@ public class SalesDocumentTestController {
         item.setProductCount(count.intValue());
         item.setTaxRate(taxRate);
 
-        // Toplam hesaplamaları
-        BigDecimal total = unitPrice.multiply(count);
-        BigDecimal tax = total.multiply(taxRate).divide(new BigDecimal("100"));
-        BigDecimal totalWithTax = total.add(tax);
+        // Toplam hesaplamaları (İSKONTO ÖNCESİ)
+        BigDecimal totalPrice = unitPrice.multiply(count);
+        BigDecimal taxPrice = divide(multiply(totalPrice, taxRate), BigDecimal.valueOf(100));
+        BigDecimal totalPriceWithTax = totalPrice.add(taxPrice);
 
-        item.setTotalPriceWithTax(totalWithTax);
+        item.setTotalPrice(totalPrice);           // KDV hariç toplam
+        item.setTaxPrice(taxPrice);               // KDV tutarı
+        item.setTotalPriceWithTax(totalPriceWithTax); // KDV dahil toplam
 
         return item;
     }

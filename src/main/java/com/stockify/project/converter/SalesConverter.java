@@ -45,14 +45,26 @@ public class SalesConverter {
                 .build();
     }
 
-    public static SalesItemDto toSalesItemDto(Long productId, Integer productCount, BigDecimal unitPrice, BigDecimal totalPrice,
-                                              BigDecimal taxRate, BigDecimal taxPrice, BigDecimal totalPriceWithTax, String productName) {
+    public static SalesItemDto toSalesItemDto(Long productId,
+                                              Integer productCount,
+                                              BigDecimal unitPrice,
+                                              BigDecimal totalPrice,
+                                              BigDecimal taxRate,
+                                              BigDecimal taxPrice,
+                                              BigDecimal totalPriceWithTax,
+                                              String productName,
+                                              BigDecimal discountRate,
+                                              BigDecimal discountPrice,
+                                              BigDecimal priceAfterDiscount) {
         return SalesItemDto.builder()
                 .productId(productId)
                 .productName(productName)
                 .productCount(productCount)
                 .unitPrice(unitPrice)
                 .totalPrice(totalPrice)
+                .discountRate(discountRate)
+                .discountPrice(discountPrice)
+                .priceAfterDiscount(priceAfterDiscount)
                 .taxRate(taxRate)
                 .taxPrice(taxPrice)
                 .totalPriceWithTax(totalPriceWithTax)
@@ -87,6 +99,9 @@ public class SalesConverter {
                         .productCount(salesItem.getProductCount())
                         .unitPrice(salesItem.getUnitPrice())
                         .totalPrice(salesItem.getTotalPrice())
+                        .discountRate(salesItem.getDiscountRate())
+                        .discountPrice(salesItem.getDiscountPrice())
+                        .priceAfterDiscount(salesItem.getPriceAfterDiscount())
                         .taxRate(salesItem.getTaxRate())
                         .taxPrice(salesItem.getTaxPrice())
                         .totalPriceWithTax(salesItem.getTotalPriceWithTax())

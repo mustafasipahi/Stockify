@@ -49,6 +49,18 @@ public class SalesItemEntity {
 
     @NotNull
     @Column(nullable = false)
+    private BigDecimal discountRate;
+
+    @NotNull
+    @Column(nullable = false)
+    private BigDecimal discountPrice;
+
+    @NotNull
+    @Column(nullable = false)
+    private BigDecimal priceAfterDiscount;
+
+    @NotNull
+    @Column(nullable = false)
     private BigDecimal taxRate;
 
     @NotNull

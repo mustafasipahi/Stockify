@@ -10,10 +10,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static com.stockify.project.converter.BasketConverter.toEntity;
-import static com.stockify.project.validator.BasketValidator.validateAndProcessProducts;
+import static com.stockify.project.converter.SalesItemConverter.validateAndPrepareProducts;
 
 @Service
 @RequiredArgsConstructor
@@ -72,7 +73,7 @@ public class BasketPostService {
         basketDto.setProductId(productId);
         basketDto.setProductCount(productCount);
         List<SalesProductDto> products = inventoryGetService.getSalesInventory();
-        validateAndProcessProducts(List.of(basketDto), products, true);
+        validateAndPrepareProducts(List.of(basketDto), products, true, BigDecimal.ZERO);
     }
 
     private boolean exists(List<BasketEntity> brokerBasket, Long productId) {

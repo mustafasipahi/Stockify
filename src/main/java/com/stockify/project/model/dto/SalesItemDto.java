@@ -20,6 +20,9 @@ public class SalesItemDto {
     private Integer productCount;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;
+    private BigDecimal discountRate;
+    private BigDecimal discountPrice;
+    private BigDecimal priceAfterDiscount;  // İndirim sonrası fiyat (KDV hariç)
     private BigDecimal taxRate;
     private BigDecimal taxPrice;
     private BigDecimal totalPriceWithTax;
