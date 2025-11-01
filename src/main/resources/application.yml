@@ -74,6 +74,11 @@ stockify:
         - application/vnd.openxmlformats-officedocument.wordprocessingml.document
       max-file-size: 50MB
 
+invoice:
+  base-url: ${INVOICE_BASE_URL}
+  client_id: ${INVOICE_CLIENT_ID}
+  tenant: ${INVOICE_TENANT}
+
 # Actuator for health checks (Render requirement)
 management:
   endpoints:
