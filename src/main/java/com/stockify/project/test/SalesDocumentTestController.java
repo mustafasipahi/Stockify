@@ -3,14 +3,12 @@ package com.stockify.project.test;
 import com.stockify.project.model.dto.*;
 import com.stockify.project.model.response.InvoiceCreateResponse;
 import com.stockify.project.model.response.SalesDocumentResponse;
-import com.stockify.project.service.InvoiceService;
+import com.stockify.project.service.InvoiceCreateService;
 import com.stockify.project.service.document.SalesDocumentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.io.FileOutputStream;
 import java.math.BigDecimal;
@@ -32,7 +30,7 @@ import static com.stockify.project.util.FinanceUtil.multiply;
 public class SalesDocumentTestController {
 
     private final SalesDocumentService salesDocumentService;
-    private final InvoiceService invoiceService;
+    private final InvoiceCreateService invoiceCreateService;
 
     private static final String OUTPUT_DIRECTORY = "generated-pdfs";
 
@@ -87,7 +85,7 @@ public class SalesDocumentTestController {
     @GetMapping("/generate-sales-invoice")
     public InvoiceCreateResponse generateTestSalesInvoice() {
         SalesPrepareDto testData = createTestData();
-        InvoiceCreateResponse invoice = invoiceService.createInvoice(testData);
+        InvoiceCreateResponse invoice = invoiceCreateService.createInvoice(testData);
         System.out.println();
         return invoice;
     }

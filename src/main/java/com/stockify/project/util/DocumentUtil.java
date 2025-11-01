@@ -1,6 +1,7 @@
 package com.stockify.project.util;
 
 import com.stockify.project.enums.DocumentType;
+import com.stockify.project.model.entity.DocumentEntity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -49,14 +50,24 @@ public class DocumentUtil {
         return replaceCharacterForFile(fileName);
     }
 
-    public static String getDownloadUrl(Long id) {
-        if (id == null) {
+    public static String getDownloadUrl(DocumentEntity document) {
+        if (document == null) {
             return null;
         }
-        return ServletUriComponentsBuilder
-                .fromCurrentContextPath()
-                .path("/documents/download/")
-                .path(String.valueOf(id))
-                .toUriString();
+        if (document.getOutId() != null) {
+            return ServletUriComponentsBuilder
+                    .fromCurrentContextPath()
+                    .path("/documents/download/out/")
+                    .path(String.valueOf(document.getOutId()))
+                    .toUriString();
+        }
+        if (document.getId() != null) {
+            return ServletUriComponentsBuilder
+                    .fromCurrentContextPath()
+                    .path("/documents/download/")
+                    .path(String.valueOf(document.getId()))
+                    .toUriString();
+        }
+        return null;
     }
 }

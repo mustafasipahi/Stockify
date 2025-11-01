@@ -40,7 +40,7 @@ public class SalesService {
     private final BasketPostService basketPostService;
     private final SalesEmailService salesEmailService;
     private final CompanyGetService companyGetService;
-    private final InvoiceService invoiceService;
+    private final InvoiceCreateService invoiceCreateService;
 
     @Transactional
     public SalesResponse salesCalculate(SalesRequest request) {
@@ -145,8 +145,8 @@ public class SalesService {
 
     private DocumentResponse uploadInvoice(SalesPrepareDto prepareDto, boolean createInvoice) {
         if (createInvoice) {
-            InvoiceCreateResponse invoice = invoiceService.createInvoice(prepareDto);
-            return new DocumentResponse();
+            InvoiceCreateResponse invoice = invoiceCreateService.createInvoice(prepareDto);
+            return documentPostService.uploadInvoiceFile(prepareDto.getBroker().getBrokerId(), invoice);
         }
         return new DocumentResponse();
     }

@@ -8,6 +8,7 @@ import com.stockify.project.model.dto.SalesPrepareDto;
 import com.stockify.project.model.entity.DocumentEntity;
 import com.stockify.project.model.request.DocumentUploadRequest;
 import com.stockify.project.model.response.DocumentResponse;
+import com.stockify.project.model.response.InvoiceCreateResponse;
 import com.stockify.project.model.response.PaymentDocumentResponse;
 import com.stockify.project.model.response.SalesDocumentResponse;
 import com.stockify.project.repository.DocumentRepository;
@@ -59,6 +60,11 @@ public class DocumentPostService {
         }
     }
 
+    public DocumentResponse uploadInvoiceFile(Long brokerId, InvoiceCreateResponse invoice) {
+        DocumentUploadRequest uploadRequest = new DocumentUploadRequest(brokerId, DocumentType.INVOICE);
+        return uploadFileToCloud(invoice, uploadRequest);
+    }
+
     @Transactional
     public DocumentResponse uploadFile(MultipartFile file, DocumentUploadRequest request) {
         return uploadFileToCloud(file, request);
@@ -77,16 +83,32 @@ public class DocumentPostService {
             Map<String, String> stringObjectMap = pdfPostService.uploadPdf(file, fileName);
             DocumentEntity document = DocumentConverter.toEntity(
                     request,
+                    null,
                     originalFilename,
                     stringObjectMap.getOrDefault("bucket", null),
                     stringObjectMap.getOrDefault("objectName", null),
                     stringObjectMap.getOrDefault("path", null),
-                    stringObjectMap.getOrDefault("fullPath", null));
+                    stringObjectMap.getOrDefault("fullPath", null),
+                    null);
             DocumentEntity savedDocument = documentRepository.save(document);
             return DocumentConverter.toResponse(savedDocument, file);
         } catch (Exception e) {
             log.error("Upload File Error", e);
             throw new DocumentUploadException();
         }
+    }
+
+    public DocumentResponse uploadFileToCloud(InvoiceCreateResponse invoice, DocumentUploadRequest request) {
+        DocumentEntity document = DocumentConverter.toEntity(
+                request,
+                invoice.getEttn(),
+                "invoice",
+                "",
+                "invoice",
+                "",
+                "",
+                invoice.getMessage());
+        DocumentEntity savedDocument = documentRepository.save(document);
+        return DocumentConverter.toResponse(savedDocument, null);
     }
 }

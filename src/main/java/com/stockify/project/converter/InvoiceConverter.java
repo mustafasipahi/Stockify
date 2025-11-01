@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
@@ -40,6 +41,13 @@ public class InvoiceConverter {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(accessToken);
+        return headers;
+    }
+
+    public static HttpHeaders createDownloadHeaders(String accessToken, String tenant) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        headers.set("Cookie", ".AspNetCore.Culture=c%3Den%7Cuic%3Den; __tenant=" + tenant);
         return headers;
     }
 
@@ -136,6 +144,18 @@ public class InvoiceConverter {
         }
     }
 
+    public static void validateDownloadResponse(ResponseEntity<byte[]> response) {
+        if (response == null) {
+            throw new StockifyRuntimeException("Fatura indirilemedi");
+        }
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new StockifyRuntimeException("PDF indirilemedi: " + response.getStatusCode());
+        }
+        if (response.getBody() == null) {
+            throw new StockifyRuntimeException("PDF içeriği boş");
+        }
+    }
+
     public static String createTokenErrorMessage(Exception e) {
         if (e instanceof HttpClientErrorException httpClientErrorException) {
             try {
@@ -186,5 +206,22 @@ public class InvoiceConverter {
             }
         }
         return "Fatura gönderme işlemi başarısız";
+    }
+
+    public static String createDownloadErrorMessage(Exception e) {
+        if (e instanceof HttpClientErrorException httpClientErrorException) {
+            return "HTTP bağlantı tatası: " + httpClientErrorException.getStatusCode();
+        }
+        if (e instanceof StockifyRuntimeException stockifyRuntimeException) {
+            try {
+                String message = stockifyRuntimeException.getMessage();
+                if (message != null) {
+                    return message;
+                }
+            } catch (Exception ex) {
+                log.warn("createDownloadErrorMessage mesajı alınamadı", ex);
+            }
+        }
+        return "Fatura indirme işlemi başarısız";
     }
 }

@@ -6,6 +6,7 @@ import com.stockify.project.exception.DocumentNotFoundException;
 import com.stockify.project.model.entity.DocumentEntity;
 import com.stockify.project.model.response.DocumentResponse;
 import com.stockify.project.repository.DocumentRepository;
+import com.stockify.project.service.InvoiceGetService;
 import com.stockify.project.service.pdf.PdfGetService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,12 +30,30 @@ public class DocumentGetService {
 
     private final DocumentRepository documentRepository;
     private final PdfGetService pdfGetService;
+    private final InvoiceGetService invoiceGetService;
 
     public ResponseEntity<InputStreamResource> downloadFile(Long documentId) {
         try {
             DocumentEntity document = documentRepository.findByIdAndTenantId(documentId, getTenantId())
                     .orElseThrow(DocumentNotFoundException::new);
             byte[] documentBytes = pdfGetService.downloadPdf(document.getFileName());
+            ByteArrayInputStream bis = new ByteArrayInputStream(documentBytes);
+            InputStreamResource inputStreamResource = new InputStreamResource(bis);
+            HttpHeaders headers = getHttpHeaders(document, documentBytes);
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(documentBytes.length)
+                    .body(inputStreamResource);
+        } catch (Exception e) {
+            throw new DocumentDownloadException();
+        }
+    }
+
+    public ResponseEntity<InputStreamResource> downloadOutFile(Long documentId) {
+        try {
+            DocumentEntity document = documentRepository.findByIdAndTenantId(documentId, getTenantId())
+                    .orElseThrow(DocumentNotFoundException::new);
+            byte[] documentBytes = invoiceGetService.downloadInvoice(document.getOutId());
             ByteArrayInputStream bis = new ByteArrayInputStream(documentBytes);
             InputStreamResource inputStreamResource = new InputStreamResource(bis);
             HttpHeaders headers = getHttpHeaders(document, documentBytes);

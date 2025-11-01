@@ -27,6 +27,9 @@ public class DocumentEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column
+    private String outId;
+
     @NotNull
     @Column(nullable = false)
     private Long brokerId;
@@ -56,6 +59,9 @@ public class DocumentEntity {
     @NotNull
     @Column(nullable = false)
     private Long tenantId;
+
+    @Column
+    private String message;
 
     @CreatedDate
     private LocalDateTime createdDate;

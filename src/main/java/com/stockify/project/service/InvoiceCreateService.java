@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import static com.stockify.project.converter.InvoiceConverter.*;
@@ -18,35 +17,17 @@ import static com.stockify.project.converter.InvoiceConverter.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class InvoiceService {
+public class InvoiceCreateService {
 
     private final RestTemplate restTemplate;
     private final InvoiceProperties invoiceProperties;
+    private final InvoiceTokenService invoiceTokenService;
 
     public InvoiceCreateResponse createInvoice(SalesPrepareDto prepareDto) {
-        InvoiceTokenResponse invoiceTokenResponse = prepareToken("mehmetali@birhesap.com.tr", "Abc123456!");
+        InvoiceTokenResponse invoiceTokenResponse = invoiceTokenService.prepareToken("mehmetali@birhesap.com.tr", "Abc123456!");
         InvoiceCreateResponse invoiceCreateResponse = prepareInvoice(prepareDto, invoiceTokenResponse);
         log.info("Fatura oluşturma işlemi başarılı: {}", invoiceCreateResponse);
         return invoiceCreateResponse;
-    }
-
-    private InvoiceTokenResponse prepareToken(String username, String password) {
-        try {
-            String url = invoiceProperties.getBaseUrl() + "/connect/token";
-            HttpHeaders headers = createTokenHeaders(invoiceProperties.getTenant());
-            MultiValueMap<String, String> body = createTokenRequestBody(username, password, invoiceProperties.getClientId());
-            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
-            ResponseEntity<InvoiceTokenResponse> response = restTemplate.postForEntity(
-                    url,
-                    request,
-                    InvoiceTokenResponse.class
-            );
-            return response.getBody();
-        } catch (Exception e) {
-            String errorMessage = createTokenErrorMessage(e);
-            log.error("Token alma hatası: {}", errorMessage);
-            throw new StockifyRuntimeException(errorMessage);
-        }
     }
 
     private InvoiceCreateResponse prepareInvoice(SalesPrepareDto prepareDto, InvoiceTokenResponse token) {
@@ -58,8 +39,7 @@ public class InvoiceService {
             ResponseEntity<InvoiceCreateResponse> response = restTemplate.postForEntity(
                     url,
                     request,
-                    InvoiceCreateResponse.class
-            );
+                    InvoiceCreateResponse.class);
             InvoiceCreateResponse responseDto = response.getBody();
             validateInvoiceResponse(responseDto);
             return responseDto;

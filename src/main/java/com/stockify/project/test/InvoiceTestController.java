@@ -3,7 +3,7 @@ package com.stockify.project.test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stockify.project.model.dto.SalesPrepareDto;
-import com.stockify.project.service.InvoiceService;
+import com.stockify.project.service.InvoiceCreateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -73,11 +73,11 @@ public class InvoiceTestController {
             "  }\n" +
             "}";
 
-    private final InvoiceService invoiceService;
+    private final InvoiceCreateService invoiceCreateService;
 
     @PostMapping("/create/invoice")
     public void createInvoice(@RequestParam String username, @RequestParam String password) throws JsonProcessingException {
         SalesPrepareDto prepareDto = new ObjectMapper().readValue(TEST_TEXT, SalesPrepareDto.class);
-        invoiceService.createInvoice(prepareDto);
+        invoiceCreateService.createInvoice(prepareDto);
     }
 }
