@@ -1,6 +1,5 @@
 package com.stockify.project.service.email;
 
-import com.stockify.project.model.dto.BrokerDto;
 import com.stockify.project.model.dto.PaymentDto;
 import com.stockify.project.model.response.DocumentResponse;
 import jakarta.mail.MessagingException;
@@ -19,6 +18,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import static com.stockify.project.util.EmailUtil.*;
+import static com.stockify.project.util.NameUtil.getBrokerFullName;
 import static com.stockify.project.util.TenantContext.getEmail;
 
 @Slf4j
@@ -113,7 +113,7 @@ public class PaymentEmailService {
 
     private Map<String, String> buildTemplateVariables(PaymentDto paymentDto) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
-        String brokerName = buildBrokerName(paymentDto.getBroker());
+        String brokerName = getBrokerFullName(paymentDto.getBroker());
 
         Map<String, String> variables = new HashMap<>();
         variables.put("{{BROKER_NAME}}", brokerName);
@@ -134,13 +134,6 @@ public class PaymentEmailService {
             result = result.replace(entry.getKey(), entry.getValue());
         }
         return result;
-    }
-
-    private String buildBrokerName(BrokerDto broker) {
-        return String.join(" ",
-                StringUtils.defaultString(broker.getFirstName(), ""),
-                StringUtils.defaultString(broker.getLastName(), "")
-        ).trim();
     }
 
     private String createReceiverSubject(PaymentDto paymentDto) {

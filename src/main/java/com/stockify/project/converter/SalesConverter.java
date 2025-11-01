@@ -4,28 +4,20 @@ import com.stockify.project.model.dto.*;
 import com.stockify.project.model.entity.SalesEntity;
 import com.stockify.project.model.entity.SalesItemEntity;
 import com.stockify.project.model.response.SalesResponse;
-import com.stockify.project.repository.SalesRepository;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
-import static com.stockify.project.constant.DocumentNumberConstants.SALES_DEFAULT;
-import static com.stockify.project.constant.DocumentNumberConstants.SALES_PREFIX;
 import static com.stockify.project.util.DateUtil.getTime;
 import static com.stockify.project.util.TenantContext.getTenantId;
 
-@Component
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SalesConverter {
 
-    private final SalesRepository salesRepository;
-
-    public SalesPrepareDto toPrepareDto(SalesDto sales, List<SalesItemDto> salesItems, BrokerDto broker) {
+    public static SalesPrepareDto toPrepareDto(SalesDto sales, List<SalesItemDto> salesItems, BrokerDto broker) {
         return SalesPrepareDto.builder()
                 .sales(sales)
                 .salesItems(salesItems)
@@ -33,7 +25,7 @@ public class SalesConverter {
                 .build();
     }
 
-    public SalesDto toSalesDto(Long brokerId, SalesPriceDto salesPriceDto) {
+    public static SalesDto toSalesDto(Long brokerId, SalesPriceDto salesPriceDto) {
         return SalesDto.builder()
                 .brokerId(brokerId)
                 .subtotalPrice(salesPriceDto.getSubtotalPrice())
@@ -71,13 +63,10 @@ public class SalesConverter {
                 .build();
     }
 
-    public SalesEntity toSalesEntity(SalesDto sales) {
-        String documentNumber = getDocumentNumber();
-        sales.setDocumentNumber(documentNumber);
+    public static SalesEntity toSalesEntity(SalesDto sales) {
         return SalesEntity.builder()
                 .brokerId(sales.getBrokerId())
                 .documentId(sales.getDocumentId())
-                .documentNumber(documentNumber)
                 .subtotalPrice(sales.getSubtotalPrice())
                 .discountRate(sales.getDiscountRate())
                 .discountPrice(sales.getDiscountPrice())
@@ -88,7 +77,7 @@ public class SalesConverter {
                 .build();
     }
 
-    public List<SalesItemEntity> toSalesItemEntity(List<SalesItemDto> salesItems) {
+    public static List<SalesItemEntity> toSalesItemEntity(List<SalesItemDto> salesItems) {
         if (CollectionUtils.isEmpty(salesItems)) {
             return Collections.emptyList();
         }
@@ -110,11 +99,10 @@ public class SalesConverter {
                 .toList();
     }
 
-    public SalesResponse toResponse(SalesDto sales, List<SalesItemDto> salesItems,
-                                    String downloadUrl, String invoiceDownloadUrl) {
+    public static SalesResponse toResponse(SalesDto sales, List<SalesItemDto> salesItems,
+                                           String downloadUrl, String invoiceDownloadUrl) {
         return SalesResponse.builder()
                 .salesId(sales.getId())
-                .documentNumber(sales.getDocumentNumber())
                 .salesItems(salesItems)
                 .subtotalPrice(sales.getSubtotalPrice())
                 .discountRate(sales.getDiscountRate())
@@ -126,11 +114,5 @@ public class SalesConverter {
                 .invoiceDownloadUrl(invoiceDownloadUrl)
                 .createdDate(getTime(sales.getCreatedDate()))
                 .build();
-    }
-
-    private String getDocumentNumber() {
-        return Optional.ofNullable(salesRepository.findMaxDocumentNumberNumeric())
-                .map(lastDocumentNumber -> SALES_PREFIX + (lastDocumentNumber + 1))
-                .orElse(SALES_PREFIX + SALES_DEFAULT);
     }
 }

@@ -29,7 +29,6 @@ public class TransactionPostService {
                 .invoiceId(salesEntity.getInvoiceId())
                 .type(TransactionType.SALE)
                 .salesId(salesEntity.getId())
-                .documentNumber(salesEntity.getDocumentNumber())
                 .requestedInvoice(createInvoice)
                 .price(salesEntity.getTotalPrice())
                 .balance(newBalance)
@@ -48,7 +47,6 @@ public class TransactionPostService {
                 .type(TransactionType.PAYMENT)
                 .paymentType(paymentEntity.getType())
                 .paymentId(paymentEntity.getId())
-                .documentNumber(paymentEntity.getDocumentNumber())
                 .price(paymentEntity.getPrice())
                 .balance(newBalance)
                 .build();

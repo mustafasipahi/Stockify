@@ -30,7 +30,6 @@ public class SalesService {
 
     private final SalesRepository salesRepository;
     private final SalesItemRepository salesItemRepository;
-    private final SalesConverter salesConverter;
     private final InventoryPostService inventoryPostService;
     private final InventoryGetService inventoryGetService;
     private final BrokerGetService brokerGetService;
@@ -45,7 +44,7 @@ public class SalesService {
     @Transactional
     public SalesResponse salesCalculate(SalesRequest request) {
         SalesPrepareDto prepareDto = prepareSalesFlow(request);
-        return salesConverter.toResponse(
+        return SalesConverter.toResponse(
                 prepareDto.getSales(),
                 prepareDto.getSalesItems(),
                 null,
@@ -56,7 +55,7 @@ public class SalesService {
     public SalesResponse salesConfirm(SalesRequest request) {
         SalesPrepareDto prepareDto = prepareSalesFlow(request);
         addCompanyInfo(prepareDto);
-        SalesEntity salesEntity = salesConverter.toSalesEntity(prepareDto.getSales());
+        SalesEntity salesEntity = SalesConverter.toSalesEntity(prepareDto.getSales());
         DocumentResponse documentResponse = uploadDocument(prepareDto);
         DocumentResponse invoiceResponse = uploadInvoice(prepareDto, request.isCreateInvoice());
         salesEntity.setDocumentId(documentResponse.getDocumentId());
@@ -67,7 +66,7 @@ public class SalesService {
         clearBasket(prepareDto.getBroker().getBrokerId());
         saveTransaction(savedSalesEntity, request.isCreateInvoice());
         sendEmail(prepareDto, documentResponse);
-        return salesConverter.toResponse(
+        return SalesConverter.toResponse(
                 prepareDto.getSales(),
                 prepareDto.getSalesItems(),
                 documentResponse.getDownloadUrl(),
@@ -102,8 +101,8 @@ public class SalesService {
         BigDecimal discountRate = getDiscountRate(broker.getDiscountRate());
         List<SalesItemDto> salesItems = validateAndPrepareProducts(basket, availableProducts, false, discountRate);
         SalesPriceDto salesPriceDto = calculateTaxAndDiscount(salesItems, discountRate);
-        SalesDto sales = salesConverter.toSalesDto(request.getBrokerId(), salesPriceDto);
-        return salesConverter.toPrepareDto(sales, salesItems, broker);
+        SalesDto sales = SalesConverter.toSalesDto(request.getBrokerId(), salesPriceDto);
+        return SalesConverter.toPrepareDto(sales, salesItems, broker);
     }
 
     private List<BasketDto> getBrokerBasket(Long brokerId) {
@@ -127,7 +126,7 @@ public class SalesService {
         List<SalesItemDto> salesItemDtoList = salesItems.stream()
                 .peek(salesItem -> salesItem.setSalesId(salesId))
                 .toList();
-        salesItemRepository.saveAll(salesConverter.toSalesItemEntity(salesItemDtoList));
+        salesItemRepository.saveAll(SalesConverter.toSalesItemEntity(salesItemDtoList));
     }
 
     private void decreaseProductInventory(SalesPrepareDto prepareDto) {
@@ -146,7 +145,7 @@ public class SalesService {
     private DocumentResponse uploadInvoice(SalesPrepareDto prepareDto, boolean createInvoice) {
         if (createInvoice) {
             InvoiceCreateResponse invoice = invoiceCreateService.createInvoice(prepareDto);
-            return documentPostService.uploadInvoiceFile(prepareDto.getBroker().getBrokerId(), invoice);
+            return documentPostService.uploadInvoiceFile(prepareDto, invoice);
         }
         return new DocumentResponse();
     }

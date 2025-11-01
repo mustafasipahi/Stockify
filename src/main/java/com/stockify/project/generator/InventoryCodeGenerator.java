@@ -1,4 +1,4 @@
-package com.stockify.project.util;
+package com.stockify.project.generator;
 
 import com.stockify.project.model.entity.ProductEntity;
 import com.stockify.project.repository.ProductRepository;

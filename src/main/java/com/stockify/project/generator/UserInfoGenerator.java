@@ -1,4 +1,4 @@
-package com.stockify.project.util;
+package com.stockify.project.generator;
 
 import java.security.SecureRandom;
 import lombok.AccessLevel;

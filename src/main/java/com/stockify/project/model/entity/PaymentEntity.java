@@ -38,10 +38,6 @@ public class PaymentEntity {
 
     @NotNull
     @Column(nullable = false)
-    private String documentNumber;
-
-    @NotNull
-    @Column(nullable = false)
     private BigDecimal price;
 
     @NotNull

@@ -6,7 +6,7 @@ import com.stockify.project.model.dto.ProductDto;
 import com.stockify.project.model.entity.ProductEntity;
 import com.stockify.project.model.request.ProductCreateRequest;
 import com.stockify.project.service.CategoryGetService;
-import com.stockify.project.util.InventoryCodeGenerator;
+import com.stockify.project.generator.InventoryCodeGenerator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 

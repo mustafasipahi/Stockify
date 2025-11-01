@@ -14,6 +14,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import static com.stockify.project.util.NameUtil.getBrokerFullName;
+import static com.stockify.project.util.NameUtil.getUserFullName;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -74,8 +77,8 @@ public class UserCreationEmailService {
         Map<String, String> variables = new HashMap<>();
         variables.put("{{BROKER_USERNAME}}", request.getBrokerUsername());
         variables.put("{{BROKER_PASSWORD}}", request.getBrokerPassword());
-        variables.put("{{CREATOR_USER_FULL_NAME}}", request.getCreatorUserFirstName() + " " + request.getCreatorUserLastName());
-        variables.put("{{BROKER_FULL_NAME}}", request.getBrokerFirstName() + " " + request.getBrokerLastName());
+        variables.put("{{CREATOR_USER_FULL_NAME}}", getUserFullName(request));
+        variables.put("{{BROKER_FULL_NAME}}", getBrokerFullName(request));
         variables.put("{{COMPANY_NAME}}", COMPANY_NAME);
         return variables;
     }

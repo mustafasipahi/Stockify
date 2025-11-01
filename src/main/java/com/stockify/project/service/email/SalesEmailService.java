@@ -1,12 +1,10 @@
 package com.stockify.project.service.email;
 
-import com.stockify.project.model.dto.BrokerDto;
 import com.stockify.project.model.dto.SalesPrepareDto;
 import com.stockify.project.model.response.DocumentResponse;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +17,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static com.stockify.project.util.EmailUtil.*;
+import static com.stockify.project.util.NameUtil.getBrokerFullName;
 import static com.stockify.project.util.TenantContext.getEmail;
 
 @Slf4j
@@ -113,7 +112,7 @@ public class SalesEmailService {
 
     private Map<String, String> buildTemplateVariables(SalesPrepareDto salesData) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
-        String brokerName = buildBrokerName(salesData.getBroker());
+        String brokerName = getBrokerFullName(salesData.getBroker());
         String productList = buildProductList(salesData);
 
         Map<String, String> variables = new HashMap<>();
@@ -148,13 +147,6 @@ public class SalesEmailService {
                         item.getProductCount(),
                         formatPrice(item.getTotalPriceWithTax())))
                 .collect(Collectors.joining("<br>"));
-    }
-
-    private String buildBrokerName(BrokerDto broker) {
-        return String.join(" ",
-                StringUtils.defaultString(broker.getFirstName(), ""),
-                StringUtils.defaultString(broker.getLastName(), "")
-        ).trim();
     }
 
     private String createSellerSubject(SalesPrepareDto salesData) {

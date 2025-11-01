@@ -5,23 +5,15 @@ import com.stockify.project.model.dto.PaymentDto;
 import com.stockify.project.model.entity.PaymentEntity;
 import com.stockify.project.model.request.PaymentCreateRequest;
 import com.stockify.project.model.response.PaymentResponse;
-import com.stockify.project.repository.PaymentRepository;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
-import java.util.Optional;
-
-import static com.stockify.project.constant.DocumentNumberConstants.PAYMENT_DEFAULT;
-import static com.stockify.project.constant.DocumentNumberConstants.PAYMENT_PREFIX;
 import static com.stockify.project.util.TenantContext.getTenantId;
 
-@Component
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PaymentConverter {
 
-    private final PaymentRepository paymentRepository;
-
-    public PaymentDto toDto(PaymentCreateRequest request, BrokerDto broker) {
+    public static PaymentDto toDto(PaymentCreateRequest request, BrokerDto broker) {
         return PaymentDto.builder()
                 .broker(broker)
                 .price(request.getPaymentPrice())
@@ -29,11 +21,8 @@ public class PaymentConverter {
                 .build();
     }
 
-    public PaymentEntity toEntity(PaymentDto paymentDto) {
-        String documentNumber = getDocumentNumber();
-        paymentDto.setDocumentNumber(documentNumber);
+    public static PaymentEntity toEntity(PaymentDto paymentDto) {
         return PaymentEntity.builder()
-                .documentNumber(documentNumber)
                 .brokerId(paymentDto.getBroker().getBrokerId())
                 .price(paymentDto.getPrice())
                 .type(paymentDto.getType())
@@ -41,18 +30,12 @@ public class PaymentConverter {
                 .build();
     }
 
-    public PaymentResponse toResponse(PaymentEntity paymentEntity, BrokerDto broker, String downloadUrl) {
+    public static PaymentResponse toResponse(PaymentEntity paymentEntity, BrokerDto broker, String downloadUrl) {
         return PaymentResponse.builder()
                 .firstName(broker.getFirstName())
                 .lastName(broker.getLastName())
                 .paymentPrice(paymentEntity.getPrice())
                 .downloadUrl(downloadUrl)
                 .build();
-    }
-
-    private String getDocumentNumber() {
-        return Optional.ofNullable(paymentRepository.findMaxDocumentNumberNumeric())
-                .map(lastDocumentNumber -> PAYMENT_PREFIX + (lastDocumentNumber + 1))
-                .orElse(PAYMENT_PREFIX + PAYMENT_DEFAULT);
     }
 }

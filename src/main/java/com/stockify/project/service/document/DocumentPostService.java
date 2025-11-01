@@ -2,6 +2,8 @@ package com.stockify.project.service.document;
 import com.stockify.project.converter.DocumentConverter;
 import com.stockify.project.enums.DocumentType;
 import com.stockify.project.exception.DocumentUploadException;
+import com.stockify.project.generator.DocumentNumberGenerator;
+import com.stockify.project.model.dto.BrokerDto;
 import com.stockify.project.model.dto.PaymentDto;
 import com.stockify.project.model.dto.SalesPrepareDto;
 
@@ -16,14 +18,15 @@ import com.stockify.project.service.pdf.PdfPostService;
 import com.stockify.project.validator.DocumentUploadValidator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
-import static com.stockify.project.util.DateUtil.getDocumentNameDate;
-import static com.stockify.project.util.DocumentUtil.createDocumentName;
+import static com.stockify.project.generator.DocumentNameGenerator.createDocumentName;
+import static com.stockify.project.util.NameUtil.getBrokerFullName;
 
 @Slf4j
 @Service
@@ -41,7 +44,8 @@ public class DocumentPostService {
         try {
             SalesDocumentResponse salesPDF = salesDocumentService.generatePDF(prepareDto);
             DocumentUploadRequest uploadRequest = new DocumentUploadRequest(prepareDto.getBroker().getBrokerId(), DocumentType.VOUCHER);
-            return uploadFileToCloud(salesPDF.getFile(), uploadRequest);
+            String documentNumber = DocumentNumberGenerator.getSalesDocumentNumber();
+            return uploadFileToCloud(uploadRequest, documentNumber, prepareDto.getBroker(), salesPDF.getFile());
         } catch (Exception e) {
             log.error("Upload Sales File Error", e);
             throw new DocumentUploadException();
@@ -53,37 +57,36 @@ public class DocumentPostService {
         try {
             PaymentDocumentResponse paymentPDF = paymentDocumentService.generatePDF(paymentDto);
             DocumentUploadRequest uploadRequest = new DocumentUploadRequest(paymentDto.getBroker().getBrokerId(), DocumentType.RECEIPT);
-            return uploadFileToCloud(paymentPDF.getFile(), uploadRequest);
+            String documentNumber = DocumentNumberGenerator.getPaymentDocumentNumber();
+            return uploadFileToCloud(uploadRequest, documentNumber, paymentDto.getBroker(), paymentPDF.getFile());
         } catch (Exception e) {
             log.error("Upload Payment File Error", e);
             throw new DocumentUploadException();
         }
     }
 
-    public DocumentResponse uploadInvoiceFile(Long brokerId, InvoiceCreateResponse invoice) {
-        DocumentUploadRequest uploadRequest = new DocumentUploadRequest(brokerId, DocumentType.INVOICE);
-        return uploadFileToCloud(invoice, uploadRequest);
+    @Transactional
+    public DocumentResponse uploadInvoiceFile(SalesPrepareDto prepareDto, InvoiceCreateResponse invoice) {
+        DocumentUploadRequest uploadRequest = new DocumentUploadRequest(prepareDto.getSales().getBrokerId(), DocumentType.INVOICE);
+        return uploadFileToCloud(uploadRequest, prepareDto.getSales().getDocumentNumber(), invoice);
     }
 
     @Transactional
-    public DocumentResponse uploadFile(MultipartFile file, DocumentUploadRequest request) {
-        return uploadFileToCloud(file, request);
+    public DocumentResponse uploadRestFile(MultipartFile file, DocumentUploadRequest request) {
+        String documentNumber = DocumentNumberGenerator.getUnknownDocumentNumber();
+        return uploadFileToCloud(request, documentNumber, new BrokerDto(), file);
     }
 
-    public DocumentResponse uploadFileToCloud(MultipartFile file, DocumentUploadRequest request) {
+    private DocumentResponse uploadFileToCloud(DocumentUploadRequest request, String documentNumber, BrokerDto broker, MultipartFile file) {
         uploadValidator.validate(file, request);
         try {
-            String documentNameDate = getDocumentNameDate();
             String originalFilename = file.getOriginalFilename();
-            String fileName = createDocumentName(
-                    request.getBrokerId(),
-                    request.getDocumentType(),
-                    documentNameDate,
-                    originalFilename);
+            String fileName = createDocumentName(getBrokerFullName(broker), request.getDocumentType());
             Map<String, String> stringObjectMap = pdfPostService.uploadPdf(file, fileName);
             DocumentEntity document = DocumentConverter.toEntity(
                     request,
                     null,
+                    getDocumentNumber(documentNumber),
                     originalFilename,
                     stringObjectMap.getOrDefault("bucket", null),
                     stringObjectMap.getOrDefault("objectName", null),
@@ -98,17 +101,25 @@ public class DocumentPostService {
         }
     }
 
-    public DocumentResponse uploadFileToCloud(InvoiceCreateResponse invoice, DocumentUploadRequest request) {
+    private DocumentResponse uploadFileToCloud(DocumentUploadRequest request, String documentNumber, InvoiceCreateResponse invoice) {
         DocumentEntity document = DocumentConverter.toEntity(
                 request,
                 invoice.getEttn(),
+                getDocumentNumber(documentNumber),
                 "invoice",
-                "",
                 "invoice",
-                "",
-                "",
+                "invoice",
+                "/",
+                "/",
                 invoice.getMessage());
         DocumentEntity savedDocument = documentRepository.save(document);
         return DocumentConverter.toResponse(savedDocument, null);
+    }
+
+    private String getDocumentNumber(String documentNumber) {
+        if (StringUtils.isBlank(documentNumber)) {
+            return DocumentNumberGenerator.getUnknownDocumentNumber();
+        }
+        return documentNumber;
     }
 }

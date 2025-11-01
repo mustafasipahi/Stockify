@@ -46,10 +46,6 @@ public class TransactionEntity {
     @Column
     private Long invoiceId;
 
-    @NotNull
-    @Column(nullable = false)
-    private String documentNumber;
-
     @Column
     private boolean requestedInvoice;
 

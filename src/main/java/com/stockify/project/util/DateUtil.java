@@ -8,7 +8,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -36,11 +35,5 @@ public class DateUtil {
         return Optional.ofNullable(timestamp)
                 .map(i -> LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault()).toLocalDate())
                 .orElse(null);
-    }
-
-    public static String getDocumentNameDate() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy_HHmm");
-        LocalDateTime now = LocalDateTime.now();
-        return now.format(formatter);
     }
 }

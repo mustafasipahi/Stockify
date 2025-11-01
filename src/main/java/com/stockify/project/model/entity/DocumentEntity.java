@@ -43,6 +43,10 @@ public class DocumentEntity {
     private String fileName;
 
     @NotNull
+    @Column(nullable = false)
+    private String documentNumber;
+
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DocumentType documentType;

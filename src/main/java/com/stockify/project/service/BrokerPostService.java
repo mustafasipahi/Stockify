@@ -26,9 +26,9 @@ import java.math.BigDecimal;
 
 import static com.stockify.project.converter.EmailConverter.toEmailRequest;
 import static com.stockify.project.converter.BrokerConverter.toEntity;
-import static com.stockify.project.util.UserInfoGenerator.generatePassword;
+import static com.stockify.project.generator.UserInfoGenerator.generatePassword;
 import static com.stockify.project.util.TenantContext.*;
-import static com.stockify.project.util.UserInfoGenerator.generateUsername;
+import static com.stockify.project.generator.UserInfoGenerator.generateUsername;
 
 @Slf4j
 @Service

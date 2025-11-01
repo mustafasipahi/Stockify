@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
-    private final PaymentConverter paymentConverter;
     private final BrokerGetService brokerGetService;
     private final TransactionPostService transactionPostService;
     private final DocumentPostService documentPostService;
@@ -32,15 +31,15 @@ public class PaymentService {
     public PaymentResponse save(PaymentCreateRequest request) {
         PaymentCreateValidator.validate(request);
         BrokerDto broker = getBroker(request.getBrokerId());
-        PaymentDto paymentDto = paymentConverter.toDto(request, broker);
+        PaymentDto paymentDto = PaymentConverter.toDto(request, broker);
         addCompanyInfo(paymentDto);
-        PaymentEntity paymentEntity = paymentConverter.toEntity(paymentDto);
+        PaymentEntity paymentEntity = PaymentConverter.toEntity(paymentDto);
         DocumentResponse documentResponse = uploadDocument(paymentDto);
         paymentEntity.setDocumentId(documentResponse.getDocumentId());
         PaymentEntity savedPaymentEntity = savePaymentEntity(paymentEntity);
         saveTransaction(savedPaymentEntity);
         sendEmail(paymentDto, documentResponse);
-        return paymentConverter.toResponse(savedPaymentEntity, broker, documentResponse.getDownloadUrl());
+        return PaymentConverter.toResponse(savedPaymentEntity, broker, documentResponse.getDownloadUrl());
     }
 
     private BrokerDto getBroker(Long brokerId) {

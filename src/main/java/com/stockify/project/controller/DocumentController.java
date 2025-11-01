@@ -23,7 +23,7 @@ public class DocumentController {
 
     @PostMapping(value = "/upload", consumes = "multipart/form-data")
     public DocumentResponse uploadFile(@RequestParam MultipartFile file, DocumentUploadRequest request) {
-        return documentPostService.uploadFile(file, request);
+        return documentPostService.uploadRestFile(file, request);
     }
 
     @GetMapping(value = "/download/{documentId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)

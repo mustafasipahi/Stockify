@@ -18,7 +18,6 @@ import java.util.List;
 public class SalesResponse {
 
     private Long salesId;
-    private String documentNumber;
     private List<SalesItemDto> salesItems;
     private BigDecimal subtotalPrice;
     private BigDecimal discountRate;
