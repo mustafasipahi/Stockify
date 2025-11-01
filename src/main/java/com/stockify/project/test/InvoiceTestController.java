@@ -7,9 +7,9 @@ import com.stockify.project.service.InvoiceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
+//@RestController
 //@RequestMapping("/invoice/api/test")
-//@RequiredArgsConstructor
+@RequiredArgsConstructor
 public class InvoiceTestController {
 
     private static final String TEST_TEXT = "{\n" +
