@@ -19,6 +19,7 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -44,10 +45,15 @@ public class InvoiceConverter {
         return headers;
     }
 
-    public static HttpHeaders createDownloadHeaders(String accessToken, String tenant) {
+    public static HttpHeaders createInvoiceDownloadUrlHeaders(String accessToken, String tenant) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
         headers.set("Cookie", ".AspNetCore.Culture=c%3Den%7Cuic%3Den; __tenant=" + tenant);
+        return headers;
+    }
+
+    public static HttpHeaders createInvoiceDownloadHeaders(HttpHeaders headers) {
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_PDF, MediaType.APPLICATION_OCTET_STREAM));
         return headers;
     }
 
@@ -144,15 +150,24 @@ public class InvoiceConverter {
         }
     }
 
-    public static void validateDownloadResponse(ResponseEntity<byte[]> response) {
-        if (response == null) {
+    public static void validateInvoiceUrlResponse(ResponseEntity<String> documentUrlResponse) {
+        if (!documentUrlResponse.getStatusCode().is2xxSuccessful()) {
+            throw new StockifyRuntimeException("Fatura url hatası: " + documentUrlResponse.getStatusCode());
+        }
+        if (documentUrlResponse.getBody() == null) {
+            throw new StockifyRuntimeException("Fatura URL'si alınamadı");
+        }
+    }
+
+    public static void validateInvoiceDownloadResponse(ResponseEntity<byte[]> documentDownloadResponse) {
+        if (documentDownloadResponse == null) {
             throw new StockifyRuntimeException("Fatura indirilemedi");
         }
-        if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new StockifyRuntimeException("PDF indirilemedi: " + response.getStatusCode());
+        if (!documentDownloadResponse.getStatusCode().is2xxSuccessful()) {
+            throw new StockifyRuntimeException("Fatura indirilemedi: " + documentDownloadResponse.getStatusCode());
         }
-        if (response.getBody() == null) {
-            throw new StockifyRuntimeException("PDF içeriği boş");
+        if (documentDownloadResponse.getBody() == null) {
+            throw new StockifyRuntimeException("Fatura içeriği boş");
         }
     }
 

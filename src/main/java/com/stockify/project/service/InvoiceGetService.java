@@ -28,17 +28,28 @@ public class InvoiceGetService {
     public byte[] downloadInvoice(String outId) {
         try {
             InvoiceTokenResponse tokenResponse = invoiceTokenService.prepareToken("mehmetali@birhesap.com.tr", "Abc123456!");
-            String url = invoiceProperties.getBaseUrl() + "/api/app/invoice-outbox/get-invoice-outbox-pdf";
-            HttpHeaders headers = createDownloadHeaders(tokenResponse.getAccessToken(), outId);
-            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url).queryParam("ettn", outId);
-            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(headers);
-            ResponseEntity<byte[]> response = restTemplate.exchange(
+            String documentUrl = invoiceProperties.getBaseUrl() + "/api/app/invoice-outbox/get-invoice-outbox-pdf";
+            HttpHeaders documentUrlHeaders = createInvoiceDownloadUrlHeaders(tokenResponse.getAccessToken(), outId);
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(documentUrl).queryParam("ettn", outId);
+            HttpEntity<MultiValueMap<String, String>> documentUrlRequest = new HttpEntity<>(documentUrlHeaders);
+            ResponseEntity<String> documentUrlResponse = restTemplate.exchange(
                     builder.toUriString(),
                     HttpMethod.GET,
-                    request,
-                    byte[].class);
-            validateDownloadResponse(response);
-            return response.getBody();
+                    documentUrlRequest,
+                    String.class
+            );
+            validateInvoiceUrlResponse(documentUrlResponse);
+            String pdfUrl = documentUrlResponse.getBody();
+            HttpHeaders documentDownloadHeaders = createInvoiceDownloadHeaders(documentUrlHeaders);
+            HttpEntity<MultiValueMap<String, String>> documentDownloadRequest = new HttpEntity<>(documentDownloadHeaders);
+            ResponseEntity<byte[]> documentDownloadResponse = restTemplate.exchange(
+                    pdfUrl,
+                    HttpMethod.GET,
+                    documentDownloadRequest,
+                    byte[].class
+            );
+            validateInvoiceDownloadResponse(documentDownloadResponse);
+            return documentDownloadResponse.getBody();
         } catch (Exception e) {
             String errorMessage = createDownloadErrorMessage(e);
             log.error("Fatura indirme hatası - ETTN: {}, Hata: {}", outId, errorMessage);
