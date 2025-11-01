@@ -29,7 +29,7 @@ public class InvoiceGetService {
         try {
             InvoiceTokenResponse tokenResponse = invoiceTokenService.prepareToken("mehmetali@birhesap.com.tr", "Abc123456!");
             String url = invoiceProperties.getBaseUrl() + "/api/app/invoice-outbox/get-invoice-outbox-pdf";
-            HttpHeaders headers = createDownloadHeaders(tokenResponse.getAccessToken(), outId);;
+            HttpHeaders headers = createDownloadHeaders(tokenResponse.getAccessToken(), outId);
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url).queryParam("ettn", outId);
             HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(headers);
             ResponseEntity<byte[]> response = restTemplate.exchange(
