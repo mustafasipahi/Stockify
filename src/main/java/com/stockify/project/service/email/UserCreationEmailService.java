@@ -31,6 +31,7 @@ public class UserCreationEmailService {
     private String fromEmail;
 
     public void sendUserCreationNotification(UserCreationEmailRequest request) {
+        log.info("Sending user creation notification creator user: {} request: {}", getUserFullName(request), request);
         if (StringUtils.isBlank(request.getBrokerUsername()) || StringUtils.isBlank(request.getBrokerPassword())
                 || StringUtils.isBlank(request.getBrokerFirstName()) || StringUtils.isBlank(request.getBrokerLastName())
                 || StringUtils.isBlank(request.getCreatorUserFirstName()) || StringUtils.isBlank(request.getCreatorUserLastName())) {
