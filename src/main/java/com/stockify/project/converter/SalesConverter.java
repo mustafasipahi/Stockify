@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,6 +35,7 @@ public class SalesConverter {
                 .totalPrice(salesPriceDto.getTotalPrice())
                 .totalTaxPrice(salesPriceDto.getTotalTaxPrice())
                 .totalPriceWithTax(salesPriceDto.getTotalPriceWithTax())
+                .createdDate(LocalDateTime.now())
                 .build();
     }
 

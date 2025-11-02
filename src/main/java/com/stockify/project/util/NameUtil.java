@@ -21,7 +21,29 @@ public class NameUtil {
         return getFullName(brokerDto.getFirstName(), brokerDto.getLastName());
     }
 
+    public static String getBrokerUsername(BrokerDto brokerDto) {
+        return getUsername(brokerDto.getFirstName(), brokerDto.getLastName());
+    }
+
     private static String getFullName(String firstName, String lastName) {
+        String fullName = "";
+        if (StringUtils.isNotBlank(firstName)) {
+            fullName = firstName;
+        }
+        if (StringUtils.isNotBlank(lastName)) {
+            if (StringUtils.isNotBlank(fullName)) {
+                fullName = fullName + " " + lastName;
+            } else {
+                fullName = lastName;
+            }
+        }
+        if (StringUtils.isBlank(fullName)) {
+            fullName = "Unknown";
+        }
+        return fullName;
+    }
+
+    private static String getUsername(String firstName, String lastName) {
         String fullName = "";
         if (StringUtils.isNotBlank(firstName)) {
             fullName = firstName;
@@ -37,6 +59,5 @@ public class NameUtil {
             fullName = "unknown_name";
         }
         return fullName;
-
     }
 }

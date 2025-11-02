@@ -26,7 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Map;
 
 import static com.stockify.project.generator.DocumentNameGenerator.createDocumentName;
-import static com.stockify.project.util.NameUtil.getBrokerFullName;
+import static com.stockify.project.util.NameUtil.getBrokerUsername;
 
 @Slf4j
 @Service
@@ -81,7 +81,7 @@ public class DocumentPostService {
         uploadValidator.validate(file, request);
         try {
             String originalFilename = file.getOriginalFilename();
-            String fileName = createDocumentName(getBrokerFullName(broker), request.getDocumentType());
+            String fileName = createDocumentName(getBrokerUsername(broker), request.getDocumentType());
             Map<String, String> stringObjectMap = pdfPostService.uploadPdf(file, fileName);
             DocumentEntity document = DocumentConverter.toEntity(
                     request,
