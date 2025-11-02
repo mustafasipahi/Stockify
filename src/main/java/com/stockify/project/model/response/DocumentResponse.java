@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class DocumentResponse {
 
     private Long documentId;
+    private String documentNumber;
     private String fileName;
     private MultipartFile file;
     private String downloadUrl;

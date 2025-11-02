@@ -19,6 +19,7 @@ public class PaymentDto {
 
     private BrokerDto broker;
     private CompanyInfoDto companyInfo;
+    private Long documentId;
     private String documentNumber;
     private BigDecimal price;
     private PaymentType type;

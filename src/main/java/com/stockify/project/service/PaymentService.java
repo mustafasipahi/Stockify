@@ -52,7 +52,10 @@ public class PaymentService {
     }
 
     private DocumentResponse uploadDocument(PaymentDto paymentDto) {
-        return documentPostService.uploadPaymentFile(paymentDto);
+        DocumentResponse documentResponse = documentPostService.uploadPaymentFile(paymentDto);
+        paymentDto.setDocumentId(documentResponse.getDocumentId());
+        paymentDto.setDocumentNumber(documentResponse.getDocumentNumber());
+        return documentResponse;
     }
 
     private PaymentEntity savePaymentEntity(PaymentEntity paymentEntity) {

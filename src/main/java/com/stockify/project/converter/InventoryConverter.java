@@ -35,7 +35,7 @@ public class InventoryConverter {
     public static InventoryEntity toEntity(InventoryCreateRequest request) {
         return InventoryEntity.builder()
                 .productId(request.getProductId())
-                .creatorUserId(request.getCreatorUserId() != null ? request.getCreatorUserId() : getUserId())
+                .creatorUserId(getUserId())
                 .price(request.getPrice())
                 .active(true)
                 .productCount(request.getProductCount())

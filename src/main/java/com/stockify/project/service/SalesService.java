@@ -139,7 +139,10 @@ public class SalesService {
     }
 
     private DocumentResponse uploadDocument(SalesPrepareDto prepareDto) {
-        return documentPostService.uploadSalesFile(prepareDto);
+        DocumentResponse documentResponse = documentPostService.uploadSalesFile(prepareDto);
+        prepareDto.getSales().setDocumentId(documentResponse.getDocumentId());
+        prepareDto.getSales().setDocumentNumber(documentResponse.getDocumentNumber());
+        return documentResponse;
     }
 
     private DocumentResponse uploadInvoice(SalesPrepareDto prepareDto, boolean createInvoice) {

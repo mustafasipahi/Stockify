@@ -33,6 +33,7 @@ public class DocumentConverter {
     public static DocumentResponse toResponse(DocumentEntity document, MultipartFile file) {
         return DocumentResponse.builder()
                 .documentId(document.getId())
+                .documentNumber(document.getDocumentNumber())
                 .fileName(document.getFileName())
                 .file(file)
                 .downloadUrl(getDownloadUrl(document))
