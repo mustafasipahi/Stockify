@@ -4,13 +4,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class InvoiceTokenResponse {
+public class InvoiceTokenResponse implements Serializable {
 
     @JsonProperty("access_token")
     private String accessToken;
