@@ -14,20 +14,20 @@ public class BrokerUpdateValidator {
 
     private final UserGetService userGetService;
 
-    public void validateFirstNameAndLastName(String firstName, String lastName) {
-        if (alreadyUsed(firstName, lastName)) {
+    public void validateFirstNameAndLastName(Long brokerId, String firstName, String lastName) {
+        if (alreadyUsed(brokerId, firstName, lastName)) {
             throw new BrokerNameException("Broker Name Already Used!");
         }
     }
 
-    public void validateFirstName(String firstName, String lastName) {
-        if (alreadyUsed(firstName, lastName)) {
+    public void validateFirstName(Long brokerId, String firstName, String lastName) {
+        if (alreadyUsed(brokerId, firstName, lastName)) {
             throw new BrokerNameException("Broker First Name Already Used!");
         }
     }
 
-    public void validateLastName(String firstName, String lastName) {
-        if (alreadyUsed(firstName, lastName)) {
+    public void validateLastName(Long brokerId, String firstName, String lastName) {
+        if (alreadyUsed(brokerId, firstName, lastName)) {
             throw new BrokerNameException("Broker Last Name Already Used!");
         }
     }
@@ -38,8 +38,9 @@ public class BrokerUpdateValidator {
         }
     }
 
-    private boolean alreadyUsed(String firstName, String lastName) {
+    private boolean alreadyUsed(Long brokerId, String firstName, String lastName) {
         return userGetService.findByFirstNameAndLastName(firstName, lastName)
+                .filter(broker -> !broker.getId().equals(brokerId))
                 .isPresent();
     }
 }

@@ -61,18 +61,19 @@ public class BrokerPostService {
         if (request.getBrokerId() == null) {
             throw new BrokerIdException();
         }
-        BrokerEntity broker = brokerRepository.findByIdAndTenantId(request.getBrokerId(), getTenantId())
-                .orElseThrow(() -> new BrokerNotFoundException(request.getBrokerId()));
+        Long brokerId = request.getBrokerId();
+        BrokerEntity broker = brokerRepository.findByIdAndTenantId(brokerId, getTenantId())
+                .orElseThrow(() -> new BrokerNotFoundException(brokerId));
         UserEntity user = userGetService.findById(broker.getBrokerUserId());
         if (StringUtils.isNotBlank(request.getFirstName()) && StringUtils.isNotBlank(request.getLastName())) {
-            brokerUpdateValidator.validateFirstNameAndLastName(request.getFirstName(), request.getLastName());
+            brokerUpdateValidator.validateFirstNameAndLastName(brokerId, request.getFirstName(), request.getLastName());
             user.setFirstName(request.getFirstName());
             user.setLastName(request.getLastName());
         } else if (StringUtils.isNotBlank(request.getFirstName())) {
-            brokerUpdateValidator.validateFirstName(request.getFirstName(), user.getLastName());
+            brokerUpdateValidator.validateFirstName(brokerId, request.getFirstName(), user.getLastName());
             user.setFirstName(request.getFirstName());
         } else if (StringUtils.isNotBlank(request.getLastName())) {
-            brokerUpdateValidator.validateLastName(user.getFirstName(), request.getLastName());
+            brokerUpdateValidator.validateLastName(brokerId, user.getFirstName(), request.getLastName());
             user.setLastName(request.getLastName());
         }
         if (request.getDiscountRate() != null) {
