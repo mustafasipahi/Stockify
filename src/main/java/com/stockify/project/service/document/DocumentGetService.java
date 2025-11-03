@@ -10,6 +10,7 @@ import com.stockify.project.service.InvoiceGetService;
 import com.stockify.project.service.pdf.PdfGetService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
@@ -36,31 +37,11 @@ public class DocumentGetService {
         try {
             DocumentEntity document = documentRepository.findByIdAndTenantId(documentId, getTenantId())
                     .orElseThrow(DocumentNotFoundException::new);
-            byte[] documentBytes = pdfGetService.downloadPdf(document.getFileName());
-            ByteArrayInputStream bis = new ByteArrayInputStream(documentBytes);
-            InputStreamResource inputStreamResource = new InputStreamResource(bis);
-            HttpHeaders headers = getHttpHeaders(document, documentBytes);
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .contentLength(documentBytes.length)
-                    .body(inputStreamResource);
-        } catch (Exception e) {
-            throw new DocumentDownloadException();
-        }
-    }
-
-    public ResponseEntity<InputStreamResource> downloadOutFile(Long documentId) {
-        try {
-            DocumentEntity document = documentRepository.findByIdAndTenantId(documentId, getTenantId())
-                    .orElseThrow(DocumentNotFoundException::new);
-            byte[] documentBytes = invoiceGetService.downloadInvoice(document.getOutId());
-            ByteArrayInputStream bis = new ByteArrayInputStream(documentBytes);
-            InputStreamResource inputStreamResource = new InputStreamResource(bis);
-            HttpHeaders headers = getHttpHeaders(document, documentBytes);
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .contentLength(documentBytes.length)
-                    .body(inputStreamResource);
+            if (StringUtils.isNotBlank(document.getOutId())) {
+                return downloadFileFromOut(document);
+            } else {
+                return downloadFileFromDb(document);
+            }
         } catch (Exception e) {
             throw new DocumentDownloadException();
         }
@@ -78,6 +59,28 @@ public class DocumentGetService {
         return documentRepository.findAllByIdInAndTenantId(documentIds, getTenantId()).stream()
                 .map(documentEntity -> DocumentConverter.toResponse(documentEntity, null))
                 .toList();
+    }
+
+    private ResponseEntity<InputStreamResource> downloadFileFromDb(DocumentEntity document) {
+        byte[] documentBytes = pdfGetService.downloadPdf(document.getFileName());
+        ByteArrayInputStream bis = new ByteArrayInputStream(documentBytes);
+        InputStreamResource inputStreamResource = new InputStreamResource(bis);
+        HttpHeaders headers = getHttpHeaders(document, documentBytes);
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(documentBytes.length)
+                .body(inputStreamResource);
+    }
+
+    private ResponseEntity<InputStreamResource> downloadFileFromOut(DocumentEntity document) {
+        byte[] documentBytes = invoiceGetService.downloadInvoice(document.getOutId());
+        ByteArrayInputStream bis = new ByteArrayInputStream(documentBytes);
+        InputStreamResource inputStreamResource = new InputStreamResource(bis);
+        HttpHeaders headers = getHttpHeaders(document, documentBytes);
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(documentBytes.length)
+                .body(inputStreamResource);
     }
 
     private static HttpHeaders getHttpHeaders(DocumentEntity document, byte[] documentBytes) {

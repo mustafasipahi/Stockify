@@ -24,8 +24,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Slf4j
-@RestController
-@RequestMapping("/payment/email/api/test")
+//@RestController
+//@RequestMapping("/payment/email/api/test")
 @RequiredArgsConstructor
 public class PaymentEmailTestController {
 

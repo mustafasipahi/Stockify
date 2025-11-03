@@ -31,11 +31,6 @@ public class DocumentController {
         return documentGetService.downloadFile(documentId);
     }
 
-    @GetMapping(value = "/download/out/{documentId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<InputStreamResource> downloadOutFile(@PathVariable Long documentId) {
-        return documentGetService.downloadOutFile(documentId);
-    }
-
     @GetMapping("/{brokerId}")
     public List<DocumentResponse> getAllDocument(@PathVariable Long brokerId) {
         return documentGetService.getAllDocument(brokerId);

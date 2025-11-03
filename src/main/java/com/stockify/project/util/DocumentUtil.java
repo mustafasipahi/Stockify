@@ -13,21 +13,14 @@ public class DocumentUtil {
         if (document == null) {
             return null;
         }
-        if (document.getOutId() != null) {
-            return ServletUriComponentsBuilder
-                    .fromCurrentContextPath()
-                    .path("/documents/download/out/")
-                    .path(String.valueOf(document.getOutId()))
-                    .toUriString();
+        if (document.getId() == null) {
+            return null;
         }
-        if (document.getId() != null) {
-            return ServletUriComponentsBuilder
-                    .fromCurrentContextPath()
-                    .path("/documents/download/")
-                    .path(String.valueOf(document.getId()))
-                    .toUriString();
-        }
-        return null;
+        return ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/documents/download/")
+                .path(String.valueOf(document.getId()))
+                .toUriString();
     }
 
     public static String replaceCharacter(String originalFileName) {
