@@ -85,6 +85,9 @@ management:
     port: 8080
 
 logging:
+  file:
+    name: ${LOG_FILE}
   level:
+    root: INFO
     com.stockify.project: INFO
     org.springframework.security: INFO
