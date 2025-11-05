@@ -1,37 +1,38 @@
 package com.stockify.project.service.pdf;
 
-import com.stockify.project.configuration.properties.SupabaseProperties;
-import com.stockify.project.enums.TenantType;
 import com.stockify.project.exception.PdfException;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
-import java.time.Duration;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import static com.stockify.project.constant.StockifyConstants.PATH;
-import static com.stockify.project.util.TenantContext.getTenantId;
+import static com.stockify.project.util.TenantContext.getUsername;
 
 @Slf4j
 @Service
-@AllArgsConstructor
 public class PdfGetService {
 
-    private final WebClient supabaseWebClient;
-    private final SupabaseProperties supabaseProperties;
+    @Value("${user.dir}")
+    private String basePath;
+
+    @Value("${pdf.folder-path:/pdfs}")
+    private String folderPath;
 
     public byte[] downloadPdf(String objectName) {
         try {
-            String bucketName = supabaseProperties.getBucket();
-            String path = "/storage/v1/object/" + bucketName + PATH + TenantType.fromValue(getTenantId()) + PATH + objectName;
-            return supabaseWebClient.get()
-                    .uri(path)
-                    .retrieve()
-                    .bodyToMono(byte[].class)
-                    .timeout(Duration.ofSeconds(30))
-                    .block();
-        } catch (Exception e) {
+            String pathFolder = getUsername();
+            Path filePath = Paths.get(basePath + folderPath, pathFolder, objectName);
+            if (!Files.exists(filePath)) {
+                log.error("PDF file not found: {}", filePath);
+                throw new PdfException();
+            }
+            return Files.readAllBytes(filePath);
+        } catch (IOException e) {
+            log.error("Error reading PDF file: {}", objectName, e);
             throw new PdfException();
         }
     }

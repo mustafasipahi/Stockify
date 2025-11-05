@@ -7,12 +7,11 @@ spring:
     username: ${DATABASE_USERNAME:root}
     password: ${DATABASE_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
-
   jpa:
     database: mysql
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:validate}
     properties:
       hibernate:
         jdbc:
@@ -48,13 +47,6 @@ spring:
           timeout: 60000
         debug: false
 
-supabase:
-  url: ${SUPABASE_URL}
-  anon-key: ${SUPABASE_ANON_KEY}
-  service-role-key: ${SUPABASE_SERVICE_ROLE_KEY}
-  bucket: ${SUPABASE_BUCKET}
-  api-base: ${SUPABASE_STORAGE_API_BASE:${SUPABASE_URL}/storage/v1}
-
 security:
   secretKey: ${JWT_SECRET_KEY}
 
@@ -77,6 +69,9 @@ invoice:
   base-url: ${INVOICE_BASE_URL}
   client_id: ${INVOICE_CLIENT_ID}
   tenant: ${INVOICE_TENANT}
+
+pdf:
+  folder-path: /pdfs
 
 management:
   endpoints:
