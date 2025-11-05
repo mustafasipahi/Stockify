@@ -3,15 +3,16 @@ server:
 
 spring:
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/stockify_app}
-    username: ${DATABASE_USERNAME:postgres}
-    password: ${DATABASE_PASSWORD:postgres}
-    driver-class-name: org.postgresql.Driver
+    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/stockify_app?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Europe/Istanbul&characterEncoding=UTF-8}
+    username: ${DATABASE_USERNAME:root}
+    password: ${DATABASE_PASSWORD:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
-    database: postgresql
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:validate}
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
     properties:
       hibernate:
         jdbc:
@@ -20,7 +21,7 @@ spring:
     show-sql: false
   sql:
     init:
-      platform: postgresql
+      platform: mysql
   servlet:
     multipart:
       max-file-size: 50MB
@@ -54,11 +55,9 @@ supabase:
   bucket: ${SUPABASE_BUCKET}
   api-base: ${SUPABASE_STORAGE_API_BASE:${SUPABASE_URL}/storage/v1}
 
-# JWT Security
 security:
   secretKey: ${JWT_SECRET_KEY}
 
-# Application Configuration
 stockify:
   files:
     storage:
@@ -79,7 +78,6 @@ invoice:
   client_id: ${INVOICE_CLIENT_ID}
   tenant: ${INVOICE_TENANT}
 
-# Actuator for health checks (Render requirement)
 management:
   endpoints:
     web:
@@ -91,7 +89,6 @@ management:
   server:
     port: 8080
 
-# Logging configuration
 logging:
   level:
     com.stockify.project: INFO
