@@ -17,7 +17,7 @@ public class DocumentNameGenerator {
         String creatorUserNameLower = getUsername().toLowerCase(Locale.ENGLISH);
         String brokerNameLower = brokerUsername.toLowerCase(Locale.ENGLISH);
         String documentNameDate = LocalDateTime.now().format(DATE_TIME_FORMATTER_1);
-        String fileName = creatorUserNameLower + "_" + brokerNameLower + "_" + documentType + "_" + documentNameDate;
+        String fileName = creatorUserNameLower + "_" + brokerNameLower + "_" + documentType.getLowerName() + "_" + documentNameDate;
         if (!fileName.toLowerCase().endsWith(".pdf")) {
             fileName = fileName + ".pdf";
         }
