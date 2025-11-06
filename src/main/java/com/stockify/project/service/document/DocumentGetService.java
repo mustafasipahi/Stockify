@@ -62,7 +62,7 @@ public class DocumentGetService {
     }
 
     private ResponseEntity<InputStreamResource> downloadFileFromDb(DocumentEntity document) {
-        byte[] documentBytes = pdfGetService.downloadPdf(document.getFileName());
+        byte[] documentBytes = pdfGetService.downloadPdf(document.getFileName(), document.getDocumentType());
         ByteArrayInputStream bis = new ByteArrayInputStream(documentBytes);
         InputStreamResource inputStreamResource = new InputStreamResource(bis);
         HttpHeaders headers = getHttpHeaders(document, documentBytes);

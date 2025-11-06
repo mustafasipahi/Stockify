@@ -23,8 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Map;
-
 import static com.stockify.project.generator.DocumentNameGenerator.createDocumentName;
 import static com.stockify.project.util.NameUtil.getBrokerUsername;
 
@@ -80,19 +78,9 @@ public class DocumentPostService {
     private DocumentResponse uploadFileToCloud(DocumentUploadRequest request, String documentNumber, BrokerDto broker, MultipartFile file) {
         uploadValidator.validate(file, request);
         try {
-            String originalFilename = file.getOriginalFilename();
             String fileName = createDocumentName(getBrokerUsername(broker), request.getDocumentType());
-            Map<String, String> stringObjectMap = pdfPostService.uploadPdf(file, fileName);
-            DocumentEntity document = DocumentConverter.toEntity(
-                    request,
-                    null,
-                    getDocumentNumber(documentNumber),
-                    originalFilename,
-                    stringObjectMap.getOrDefault("bucket", null),
-                    stringObjectMap.getOrDefault("objectName", null),
-                    stringObjectMap.getOrDefault("path", null),
-                    stringObjectMap.getOrDefault("fullPath", null),
-                    null);
+            String path = pdfPostService.uploadPdf(file, fileName, request.getDocumentType());
+            DocumentEntity document = DocumentConverter.toEntity(request, null, getDocumentNumber(documentNumber), fileName, path);
             DocumentEntity savedDocument = documentRepository.save(document);
             return DocumentConverter.toResponse(savedDocument, file);
         } catch (Exception e) {
@@ -102,16 +90,7 @@ public class DocumentPostService {
     }
 
     private DocumentResponse uploadFileToCloud(DocumentUploadRequest request, String documentNumber, InvoiceCreateResponse invoice) {
-        DocumentEntity document = DocumentConverter.toEntity(
-                request,
-                invoice.getEttn(),
-                getDocumentNumber(documentNumber),
-                "invoice",
-                "invoice",
-                "invoice",
-                "/",
-                "/",
-                invoice.getMessage());
+        DocumentEntity document = DocumentConverter.toEntity(request, invoice.getEttn(), getDocumentNumber(documentNumber), "invoice", "/out");
         DocumentEntity savedDocument = documentRepository.save(document);
         return DocumentConverter.toResponse(savedDocument, null);
     }

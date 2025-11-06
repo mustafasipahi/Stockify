@@ -13,20 +13,16 @@ import static com.stockify.project.util.TenantContext.getTenantId;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DocumentConverter {
 
-    public static DocumentEntity toEntity(DocumentUploadRequest request, String outId, String documentNumber, String originalFilename,
-                                          String bucket, String objectName, String path, String fullPath, String message) {
+    public static DocumentEntity toEntity(DocumentUploadRequest request, String outId, String documentNumber,
+                                          String filename, String path) {
         return DocumentEntity.builder()
                 .outId(outId)
                 .brokerId(request.getBrokerId())
-                .originalFilename(originalFilename)
-                .fileName(objectName)
+                .fileName(filename)
                 .documentNumber(documentNumber)
                 .documentType(request.getDocumentType())
-                .bucket(bucket)
                 .path(path)
-                .fullPath(fullPath)
                 .tenantId(getTenantId())
-                .message(message)
                 .build();
     }
 

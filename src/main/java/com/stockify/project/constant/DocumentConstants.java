@@ -6,11 +6,14 @@ import lombok.NoArgsConstructor;
 import java.time.format.DateTimeFormatter;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class DocumentNumberConstants {
+public class DocumentConstants {
 
-    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("ddMMyyyy-HHmmss");
+    public static final DateTimeFormatter DATE_TIME_FORMATTER_1 = DateTimeFormatter.ofPattern("ddMMyyyy_HHmmss");
+    public static final DateTimeFormatter DATE_TIME_FORMATTER_2 = DateTimeFormatter.ofPattern("ddMMyyyy-HHmmss");
 
     public static final String PAYMENT_PREFIX = "PY";
     public static final String SALES_PREFIX = "SL";
     public static final String UNKNOWN_PREFIX = "UKN";
+
+    public static final String PATH_DELIMITER = "/";
 }

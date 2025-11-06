@@ -35,8 +35,9 @@ public class DocumentEntity {
     private Long brokerId;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String originalFilename;
+    private DocumentType documentType;
 
     @NotNull
     @Column(nullable = false)
@@ -46,26 +47,12 @@ public class DocumentEntity {
     @Column(nullable = false)
     private String documentNumber;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private DocumentType documentType;
-
-    @Column(nullable = false)
-    private String bucket;
-
     @Column(nullable = false)
     private String path;
-
-    @Column(nullable = false)
-    private String fullPath;
 
     @NotNull
     @Column(nullable = false)
     private Long tenantId;
-
-    @Column
-    private String message;
 
     @CreatedDate
     private LocalDateTime createdDate;

@@ -7,10 +7,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum DocumentType {
 
-    INVOICE("FATURA"),
-    RECEIPT("MAKBUZ"),
-    VOUCHER("FİŞ"),
-    OTHER("DİĞER");
+    INVOICE("FATURA", "fatura"),
+    RECEIPT("MAKBUZ", "makbuz"),
+    VOUCHER("FİŞ", "fis"),
+    OTHER("DİĞER", "diger");
 
     private final String name;
+    private final String lowerName;
 }

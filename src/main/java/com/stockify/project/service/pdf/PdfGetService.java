@@ -1,5 +1,6 @@
 package com.stockify.project.service.pdf;
 
+import com.stockify.project.enums.DocumentType;
 import com.stockify.project.exception.PdfException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static com.stockify.project.constant.DocumentConstants.PATH_DELIMITER;
 import static com.stockify.project.util.TenantContext.getUsername;
 
 @Slf4j
@@ -22,17 +24,18 @@ public class PdfGetService {
     @Value("${pdf.folder-path:/pdfs}")
     private String folderPath;
 
-    public byte[] downloadPdf(String objectName) {
+    public byte[] downloadPdf(String fileName, DocumentType documentType) {
         try {
-            String pathFolder = getUsername();
-            Path filePath = Paths.get(basePath + folderPath, pathFolder, objectName);
-            if (!Files.exists(filePath)) {
-                log.error("PDF file not found: {}", filePath);
+            String documentPath = folderPath + PATH_DELIMITER + getUsername() + PATH_DELIMITER + documentType.getLowerName();
+            Path path = Paths.get(basePath + documentPath);
+            if (!Files.exists(path)) {
+                log.error("PDF file not found: {}", path);
                 throw new PdfException();
             }
+            Path filePath = path.resolve(fileName);
             return Files.readAllBytes(filePath);
         } catch (IOException e) {
-            log.error("Error reading PDF file: {}", objectName, e);
+            log.error("Error reading PDF file: {}", fileName, e);
             throw new PdfException();
         }
     }
