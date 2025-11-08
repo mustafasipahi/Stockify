@@ -21,7 +21,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 
 import static com.stockify.project.util.DocumentUtil.replaceCharacter;
+import static com.stockify.project.util.NameUtil.getBrokerFullName;
+import static com.stockify.project.util.NameUtil.getUserFullName;
 import static com.stockify.project.util.TenantContext.getTenantId;
+import static com.stockify.project.util.TenantContext.getUser;
 
 @Slf4j
 @Service
@@ -73,15 +76,11 @@ public class PaymentDocumentService {
         html = html.replace("{{payment_amount}}", MONEY_FORMAT.format(paymentDto.getPrice()));
         html = html.replace("{{payment_date}}", paymentDto.getCreatedDate() != null ? paymentDto.getCreatedDate().format(DATE_FORMAT) : "");
 
-        // Broker bilgileri
-        String payerName = "";
-        if (paymentDto.getBroker() != null) {
-            payerName = replaceCharacter(
-                    (paymentDto.getBroker().getFirstName() != null ? paymentDto.getBroker().getFirstName() : "") + " " +
-                            (paymentDto.getBroker().getLastName() != null ? paymentDto.getBroker().getLastName() : "")
-            ).trim();
-        }
-        html = html.replace("{{payer_name}}", payerName);
+        String creatorUserName = getUserFullName(getUser());
+        String brokerName = getBrokerFullName(paymentDto.getBroker());
+
+        html = html.replace("{{creator_user_name}}", creatorUserName);
+        html = html.replace("{{broker_name}}", brokerName);
         html = html.replace("{{currency}}", DEFAULT_CURRENCY);
 
         // Ödeme tipi

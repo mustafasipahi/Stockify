@@ -8,6 +8,8 @@ import com.stockify.project.model.response.PaymentResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 import static com.stockify.project.util.TenantContext.getTenantId;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -18,6 +20,7 @@ public class PaymentConverter {
                 .broker(broker)
                 .price(request.getPaymentPrice())
                 .type(request.getPaymentType())
+                .createdDate(LocalDateTime.now())
                 .build();
     }
 

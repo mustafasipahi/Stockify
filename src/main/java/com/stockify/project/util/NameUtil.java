@@ -1,6 +1,7 @@
 package com.stockify.project.util;
 
 import com.stockify.project.model.dto.BrokerDto;
+import com.stockify.project.model.entity.UserEntity;
 import com.stockify.project.model.request.UserCreationEmailRequest;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,10 @@ import org.apache.commons.lang3.StringUtils;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class NameUtil {
+
+    public static String getUserFullName(UserEntity userEntity) {
+        return getFullName(userEntity.getFirstName(), userEntity.getLastName());
+    }
 
     public static String getUserFullName(UserCreationEmailRequest request) {
         return getFullName(request.getCreatorUserFirstName(), request.getCreatorUserLastName());

@@ -40,9 +40,10 @@ public class DocumentPostService {
     @Transactional
     public DocumentResponse uploadSalesFile(SalesPrepareDto prepareDto) {
         try {
+            String documentNumber = DocumentNumberGenerator.getSalesDocumentNumber();
+            prepareDto.getSales().setDocumentNumber(documentNumber);
             SalesDocumentResponse salesPDF = salesDocumentService.generatePDF(prepareDto);
             DocumentUploadRequest uploadRequest = new DocumentUploadRequest(prepareDto.getBroker().getBrokerId(), DocumentType.VOUCHER);
-            String documentNumber = DocumentNumberGenerator.getSalesDocumentNumber();
             return uploadFileToCloud(uploadRequest, documentNumber, prepareDto.getBroker(), salesPDF.getFile());
         } catch (Exception e) {
             log.error("Upload Sales File Error", e);
@@ -53,9 +54,10 @@ public class DocumentPostService {
     @Transactional
     public DocumentResponse uploadPaymentFile(PaymentDto paymentDto) {
         try {
+            String documentNumber = DocumentNumberGenerator.getPaymentDocumentNumber();
+            paymentDto.setDocumentNumber(documentNumber);
             PaymentDocumentResponse paymentPDF = paymentDocumentService.generatePDF(paymentDto);
             DocumentUploadRequest uploadRequest = new DocumentUploadRequest(paymentDto.getBroker().getBrokerId(), DocumentType.RECEIPT);
-            String documentNumber = DocumentNumberGenerator.getPaymentDocumentNumber();
             return uploadFileToCloud(uploadRequest, documentNumber, paymentDto.getBroker(), paymentPDF.getFile());
         } catch (Exception e) {
             log.error("Upload Payment File Error", e);

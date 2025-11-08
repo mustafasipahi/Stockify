@@ -54,13 +54,13 @@
         .header-left {
             display: table-cell;
             width: 60%;
-            vertical-align: top;
+            vertical-align: middle;
         }
 
         .header-right {
             display: table-cell;
             width: 40%;
-            vertical-align: top;
+            vertical-align: middle;
             text-align: right;
         }
 
@@ -74,13 +74,13 @@
         .logo-left {
             display: table-cell;
             width: 90px;
-            vertical-align: top;
+            vertical-align: middle;
         }
 
         .logo-right {
             display: table-cell;
             width: 120mm;
-            vertical-align: top;
+            vertical-align: middle;
             padding-left: 4mm;
         }
 
@@ -138,8 +138,7 @@
         }
 
         .doc-number-value {
-            font-weight: 700;
-            font-size: 12pt;
+            font-size: 10pt;
         }
 
         /* Çizgiler */
@@ -252,6 +251,11 @@
             margin: 8mm 10mm 1mm 10mm;
         }
 
+        .signature-name {
+            font-size: 9pt;
+            margin-top: 1mm;
+        }
+
         /* Sayfa sonu kontrolleri */
         tr, td, th, .info-row {
             page-break-inside: avoid;
@@ -305,10 +309,6 @@
                 <span class="amount-big">{{payment_amount}} {{currency}}</span>
             </div>
             <div class="info-row">
-                <span class="info-label">Ödeme Yapan:</span>
-                {{payer_name}}
-            </div>
-            <div class="info-row">
                 <span class="info-label">Yalnız:</span>
                 {{amount_in_words}}
             </div>
@@ -316,11 +316,16 @@
                 <span class="info-label">Ödeme Yöntemi:</span>
                 {{payment_type}}
             </div>
+            <div class="info-row">
+                <span class="info-label">Ödeme Yapan:</span>
+                {{broker_name}}
+            </div>
         </div>
 
         <!-- Sağ: Tarih -->
         <div class="payment-info-right">
-            <div class="date-text">{{payment_date}}</div>
+            <span class="date-text">Tarih:</span>
+            <span class="date-text">{{payment_date}}</span>
         </div>
     </div>
 
@@ -383,11 +388,11 @@
         <div class="signature-section">
             <div class="signature-box">
                 <div class="signature-label">Tahsil Eden</div>
-                <div class="signature-line"></div>
+                <div class="signature-name">{{creator_user_name}}</div>
             </div>
             <div class="signature-box">
                 <div class="signature-label">Ödeme Yapan</div>
-                <div class="signature-line"></div>
+                <div class="signature-name">{{broker_name}}</div>
             </div>
         </div>
     </div>

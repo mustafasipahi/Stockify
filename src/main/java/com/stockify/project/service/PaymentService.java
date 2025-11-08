@@ -54,7 +54,6 @@ public class PaymentService {
     private DocumentResponse uploadDocument(PaymentDto paymentDto) {
         DocumentResponse documentResponse = documentPostService.uploadPaymentFile(paymentDto);
         paymentDto.setDocumentId(documentResponse.getDocumentId());
-        paymentDto.setDocumentNumber(documentResponse.getDocumentNumber());
         return documentResponse;
     }
 
