@@ -86,7 +86,7 @@ management:
 
 logging:
   file:
-    name: ${LOG_FILE}
+    name: ${LOG_FILE:/}
   level:
     root: INFO
     com.stockify.project: INFO
