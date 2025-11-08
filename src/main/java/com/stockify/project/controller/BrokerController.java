@@ -48,4 +48,14 @@ public class BrokerController {
     public List<BrokerDto> getAllBrokers() {
         return brokerGetService.getAllBrokers();
     }
+
+    @GetMapping("/all/passive")
+    public List<BrokerDto> getAllPassiveBrokers() {
+        return brokerGetService.getAllPassiveBrokers();
+    }
+
+    @GetMapping("/activate/{id}")
+    public BrokerDto activate(@PathVariable Long id) {
+        return brokerPostService.activate(id);
+    }
 }

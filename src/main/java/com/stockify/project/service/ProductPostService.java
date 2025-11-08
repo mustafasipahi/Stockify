@@ -13,12 +13,15 @@ import com.stockify.project.repository.ProductRepository;
 import com.stockify.project.validator.ProductCreateValidator;
 import com.stockify.project.validator.ProductUpdateValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.stockify.project.util.TenantContext.getTenantId;
+import static com.stockify.project.util.TenantContext.getUsername;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductPostService {
@@ -30,6 +33,7 @@ public class ProductPostService {
     private final InventoryPostService inventoryPostService;
     private final InventoryGetService inventoryGetService;
     private final ToPassiveService toPassiveService;
+    private final ToActiveService toActiveService;
 
     @Transactional
     public ProductDto save(ProductCreateRequest request) {
@@ -37,6 +41,7 @@ public class ProductPostService {
         ProductEntity product = productConverter.toEntity(request);
         ProductEntity savedProduct = productRepository.save(product);
         inventoryPostService.saveDefault(savedProduct.getId());
+        log.info("User {} saved product {}", getUsername(), savedProduct);
         return productConverter.toIdDto(savedProduct);
     }
 
@@ -48,7 +53,7 @@ public class ProductPostService {
         ProductEntity productEntity = productRepository.findByIdAndTenantId(request.getProductId(), getTenantId())
                 .orElseThrow(() -> new ProductNotFoundException(request.getProductId()));
         if (StringUtils.isNotBlank(request.getName()) && !request.getName().equals(productEntity.getName())) {
-            updateValidator.validateName(request.getName());
+            updateValidator.validateName(productEntity.getId(), request.getName());
             productEntity.setName(request.getName());
         }
         if (request.getCategoryId() != null) {
@@ -56,6 +61,7 @@ public class ProductPostService {
             productEntity.setCategoryId(request.getCategoryId());
         }
         ProductEntity updatedProduct = productRepository.save(productEntity);
+        log.info("User {} updated product {}", getUsername(), updatedProduct);
         return productConverter.toIdDto(updatedProduct);
     }
 
@@ -69,7 +75,19 @@ public class ProductPostService {
         productEntity.setStatus(ProductStatus.PASSIVE);
         ProductEntity deletedProduct = productRepository.save(productEntity);
         toPassiveService.updateToPassiveByProductId(productId);
+        log.info("User {} deleted product {}", getUsername(), deletedProduct);
         return productConverter.toIdDto(deletedProduct);
+    }
+
+    @Transactional
+    public ProductDto activate(Long productId) {
+        ProductEntity productEntity = productRepository.findByIdAndTenantId(productId, getTenantId())
+                .orElseThrow(() -> new ProductNotFoundException(productId));
+        productEntity.setStatus(ProductStatus.ACTIVE);
+        ProductEntity activatedProduct = productRepository.save(productEntity);
+        toActiveService.updateToActiveByProductId(productId);
+        log.info("User {} activated product {}", getUsername(), activatedProduct);
+        return productConverter.toIdDto(activatedProduct);
     }
 
     private boolean hasAvailableInventory(Long productId) {

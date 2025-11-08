@@ -36,7 +36,7 @@ public class ProductCreateValidator {
         Long tenantId = getTenantId();
         Optional<ProductEntity> product = productRepository.findByCreatorUserIdAndNameAndTenantId(userId, request.getName(), tenantId);
         if (product.isPresent()) {
-            throw new ProductNameAlreadyUseException();
+            throw new ProductNameAlreadyUseException(product.get().getId());
         }
     }
 

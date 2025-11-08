@@ -10,5 +10,7 @@ public interface InventoryRepository extends JpaRepository<InventoryEntity, Long
 
     Optional<InventoryEntity> findByIdAndTenantId(Long id, Long tenantId);
 
+    Optional<InventoryEntity> findByProductIdAndTenantId(Long productId, Long tenantId);
+
     Optional<InventoryEntity> findByProductIdAndCreatorUserIdAndTenantId(Long productId, Long creatorUserId, Long tenantId);
 }

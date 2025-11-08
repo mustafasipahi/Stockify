@@ -43,4 +43,14 @@ public class ProductController {
     public List<ProductDto> getAll(@ModelAttribute ProductSearchRequest request) {
         return productGetService.getAll(request);
     }
+
+    @GetMapping("/all/passive")
+    public List<ProductDto> getAllPassive() {
+        return productGetService.getAllPassive();
+    }
+
+    @GetMapping("/activate/{id}")
+    public ProductDto activate(@PathVariable Long id) {
+        return productPostService.activate(id);
+    }
 }

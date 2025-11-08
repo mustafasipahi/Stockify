@@ -36,15 +36,13 @@ import static com.stockify.project.generator.UserInfoGenerator.generateUsername;
 public class BrokerPostService {
 
     private final BrokerRepository brokerRepository;
-    private final BrokerCreateValidator brokerCreateValidator;
-    private final BrokerUpdateValidator brokerUpdateValidator;
     private final UserPostService userPostService;
     private final UserGetService userGetService;
     private final UserCreationEmailService userCreationEmailService;
 
     @Transactional
     public BrokerDto save(BrokerCreateRequest request) {
-        brokerCreateValidator.validate(request);
+        BrokerCreateValidator.validate(request);
         String username = generateUsername(request.getFirstName(), request.getLastName());
         String password = generatePassword();
         UserEntity creatorUser = getUser();
@@ -53,6 +51,7 @@ public class BrokerPostService {
         BrokerEntity savedBrokerEntity = brokerRepository.save(brokerEntity);
         UserCreationEmailRequest emailRequest = toEmailRequest(username, password, creatorUser, brokerUser);
         userCreationEmailService.sendUserCreationNotification(emailRequest);
+        log.info("User {} saved to broker {}", getUsername(), savedBrokerEntity);
         return BrokerConverter.toIdDto(savedBrokerEntity);
     }
 
@@ -66,18 +65,15 @@ public class BrokerPostService {
                 .orElseThrow(() -> new BrokerNotFoundException(brokerId));
         UserEntity user = userGetService.findById(broker.getBrokerUserId());
         if (StringUtils.isNotBlank(request.getFirstName()) && StringUtils.isNotBlank(request.getLastName())) {
-            brokerUpdateValidator.validateFirstNameAndLastName(brokerId, request.getFirstName(), request.getLastName());
             user.setFirstName(request.getFirstName());
             user.setLastName(request.getLastName());
         } else if (StringUtils.isNotBlank(request.getFirstName())) {
-            brokerUpdateValidator.validateFirstName(brokerId, request.getFirstName(), user.getLastName());
             user.setFirstName(request.getFirstName());
         } else if (StringUtils.isNotBlank(request.getLastName())) {
-            brokerUpdateValidator.validateLastName(brokerId, user.getFirstName(), request.getLastName());
             user.setLastName(request.getLastName());
         }
         if (request.getDiscountRate() != null) {
-            brokerUpdateValidator.validateDiscountRate(request.getDiscountRate());
+            BrokerUpdateValidator.validateDiscountRate(request.getDiscountRate());
             broker.setDiscountRate(request.getDiscountRate());
         }
         if (StringUtils.isNotBlank(request.getEmail())) {
@@ -91,6 +87,7 @@ public class BrokerPostService {
         }
         BrokerEntity updatedBrokerEntity = brokerRepository.save(broker);
         userPostService.save(user);
+        log.info("User {} updated to broker {}", getUsername(), updatedBrokerEntity);
         return BrokerConverter.toIdDto(updatedBrokerEntity);
     }
 
@@ -100,6 +97,7 @@ public class BrokerPostService {
                 .orElseThrow(() -> new BrokerNotFoundException(brokerId));
         brokerEntity.setStatus(BrokerStatus.PASSIVE);
         BrokerEntity deletedBrokerEntity = brokerRepository.save(brokerEntity);
+        log.info("User {} deleted to broker {}", getUsername(), deletedBrokerEntity);
         return BrokerConverter.toIdDto(deletedBrokerEntity);
     }
 
@@ -118,5 +116,15 @@ public class BrokerPostService {
                 .orElseThrow(() -> new BrokerNotFoundException(request.getBrokerId()));
         brokerEntity.setDiscountRate(request.getDiscountRate());
         brokerRepository.save(brokerEntity);
+    }
+
+    @Transactional
+    public BrokerDto activate(Long brokerId) {
+        BrokerEntity brokerEntity = brokerRepository.findByIdAndTenantId(brokerId, getTenantId())
+                .orElseThrow(() -> new BrokerNotFoundException(brokerId));
+        brokerEntity.setStatus(BrokerStatus.ACTIVE);
+        BrokerEntity deletedBrokerEntity = brokerRepository.save(brokerEntity);
+        log.info("User {} activated to broker {}", getUsername(), deletedBrokerEntity);
+        return BrokerConverter.toIdDto(deletedBrokerEntity);
     }
 }

@@ -38,9 +38,17 @@ public class BrokerGetService {
     }
 
     public List<BrokerDto> getAllBrokers() {
+        return getAllBrokersByStatus(BrokerStatus.ACTIVE);
+    }
+
+    public List<BrokerDto> getAllPassiveBrokers() {
+        return getAllBrokersByStatus(BrokerStatus.PASSIVE);
+    }
+
+    private List<BrokerDto> getAllBrokersByStatus(BrokerStatus status) {
         Long userId = getUserId();
         Long tenantId = getTenantId();
-        List<BrokerEntity> userBrokerList = brokerRepository.getUserBrokerList(userId, BrokerStatus.ACTIVE, tenantId);
+        List<BrokerEntity> userBrokerList = brokerRepository.getUserBrokerList(userId, status, tenantId);
         List<Long> brokerIds = userBrokerList.stream()
                 .map(BrokerEntity::getId)
                 .toList();

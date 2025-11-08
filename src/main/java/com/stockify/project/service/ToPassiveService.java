@@ -37,7 +37,7 @@ public class ToPassiveService {
 
     private void inventoryToPassive(Long productId) {
         Long tenantId = getTenantId();
-        inventoryRepository.findByIdAndTenantId(productId, tenantId)
+        inventoryRepository.findByProductIdAndTenantId(productId, tenantId)
                 .ifPresent(inventory -> {
                     inventory.setActive(false);
                     inventoryRepository.save(inventory);

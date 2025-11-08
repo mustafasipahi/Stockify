@@ -46,6 +46,13 @@ public class ProductGetService {
                 .toList();
     }
 
+    public List<ProductDto> getAllPassive() {
+        Specification<ProductEntity> specification = ProductSpecification.filterAllPassive();
+        return productRepository.findAll(specification).stream()
+                .map(productConverter::toDto)
+                .toList();
+    }
+
     public boolean hasAvailableProducts(Long categoryId) {
         return productRepository.findByCreatorUserIdAndCategoryIdAndTenantIdAndStatus(getUserId(), categoryId, getTenantId(), ProductStatus.ACTIVE)
                 .isPresent();

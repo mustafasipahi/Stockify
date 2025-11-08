@@ -22,11 +22,11 @@ public class ProductUpdateValidator {
     private final ProductRepository productRepository;
     private final CategoryGetService categoryGetService;
 
-    public void validateName(String productName) {
+    public void validateName(Long id, String productName) {
         Long userId = getUserId();
         Long tenantId = getTenantId();
         Optional<ProductEntity> product = productRepository.findByCreatorUserIdAndNameAndTenantId(userId, productName, tenantId);
-        if (product.isPresent()) {
+        if (product.isPresent() && !product.get().getId().equals(id)) {
             throw new ProductNameAlreadyUseException();
         }
     }

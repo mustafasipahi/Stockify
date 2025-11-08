@@ -38,4 +38,14 @@ public class ProductSpecification {
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
+
+    public static Specification<ProductEntity> filterAllPassive() {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(criteriaBuilder.equal(root.get("status"), ProductStatus.PASSIVE));
+            predicates.add(criteriaBuilder.equal(root.get("creatorUserId"), getUserId()));
+            query.orderBy(criteriaBuilder.desc(root.get("createdDate")));
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
 }
