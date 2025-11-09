@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "documents", indexes = {
-        @Index(name = "idx_document_broker_tenant_created", columnList = "brokerId,tenantId,createdDate"),
-        @Index(name = "idx_document_tenant_created", columnList = "tenantId,createdDate")
+        @Index(name = "idx_document_broker_created", columnList = "brokerId,createdDate"),
+        @Index(name = "idx_document_created", columnList = "createdDate")
 })
 @EntityListeners(AuditingEntityListener.class)
 public class DocumentEntity {
@@ -32,6 +32,9 @@ public class DocumentEntity {
 
     @NotNull
     @Column(nullable = false)
+    private Long creatorUserId;
+
+    @Column
     private Long brokerId;
 
     @NotNull
@@ -49,10 +52,6 @@ public class DocumentEntity {
 
     @Column(nullable = false)
     private String path;
-
-    @NotNull
-    @Column(nullable = false)
-    private Long tenantId;
 
     @CreatedDate
     private LocalDateTime createdDate;

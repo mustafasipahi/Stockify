@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import static com.stockify.project.util.DocumentUtil.getDownloadUrl;
-import static com.stockify.project.util.TenantContext.getTenantId;
+import static com.stockify.project.util.LoginContext.getUserId;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DocumentConverter {
@@ -17,12 +17,12 @@ public class DocumentConverter {
                                           String filename, String path) {
         return DocumentEntity.builder()
                 .outId(outId)
-                .brokerId(request.getBrokerId())
+                .creatorUserId(getUserId())
+                .brokerId(request.getBrokerDto() != null ? request.getBrokerDto().getBrokerId() : null)
                 .fileName(filename)
                 .documentNumber(documentNumber)
                 .documentType(request.getDocumentType())
                 .path(path)
-                .tenantId(getTenantId())
                 .build();
     }
 

@@ -1,26 +1,28 @@
 package com.stockify.project.service;
 
-import com.stockify.project.exception.CompanyInfoNotFoundException;
-import com.stockify.project.model.dto.CompanyInfoDto;
-import com.stockify.project.model.entity.CompanyInfoEntity;
-import com.stockify.project.repository.CompanyInfoRepository;
+import com.stockify.project.converter.CompanyConverter;
+import com.stockify.project.exception.CompanyNotFoundException;
+import com.stockify.project.model.dto.CompanyDto;
+import com.stockify.project.model.entity.CompanyEntity;
+import com.stockify.project.repository.CompanyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import static com.stockify.project.util.TenantContext.getTenantId;
+import static com.stockify.project.util.LoginContext.getUserId;
 
 @Service
 @RequiredArgsConstructor
 public class CompanyGetService {
 
-    private final CompanyInfoRepository companyInfoRepository;
+    private final CompanyRepository companyRepository;
 
-    public CompanyInfoDto getCompanyInfo() {
-        CompanyInfoEntity companyInfoEntity = companyInfoRepository.findByTenantId(getTenantId())
-                .orElseThrow(CompanyInfoNotFoundException::new);
-        return CompanyInfoDto.builder()
-                .companyName(companyInfoEntity.getCompanyName())
-                .companyAddress(companyInfoEntity.getCompanyAddress())
-                .build();
+    public CompanyEntity getCompany() {
+        return companyRepository.findByCreatorUserId(getUserId())
+                .orElseThrow(CompanyNotFoundException::new);
+    }
+
+    public CompanyDto getCompanyDetail() {
+        CompanyEntity companyEntity = getCompany();
+        return CompanyConverter.toDto(companyEntity);
     }
 }

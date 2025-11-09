@@ -2,9 +2,9 @@ package com.stockify.project.initialization;
 
 import com.stockify.project.enums.Role;
 import com.stockify.project.model.dto.UserDto;
-import com.stockify.project.model.entity.CompanyInfoEntity;
-import com.stockify.project.repository.CompanyInfoRepository;
-import com.stockify.project.service.UserGetService;
+import com.stockify.project.model.entity.CompanyEntity;
+import com.stockify.project.model.entity.UserEntity;
+import com.stockify.project.service.CompanyPostService;
 import com.stockify.project.service.UserPostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,56 +13,90 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.stockify.project.constant.LoginConstant.*;
-import static com.stockify.project.enums.TenantType.GURME;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class DataInitializerService implements ApplicationRunner {
 
-    private final UserGetService userGetService;
     private final UserPostService userPostService;
-    private final CompanyInfoRepository companyInfoRepository;
+    private final CompanyPostService companyPostService;
 
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        createGurme();
+        //createTest();
+        //createGurme();
+    }
+
+    private void createTest() {
+        UserDto userDto1 = UserDto.builder()
+                .username("test1")
+                .password("test1234")
+                .firstName("Test1")
+                .lastName("User1")
+                .email("test1@user.com")
+                .role(Role.ROLE_ADMIN)
+                .build();
+        UserEntity userEntity1 = userPostService.save(userDto1);
+        CompanyEntity company1 = CompanyEntity.builder()
+                .creatorUserId(userEntity1.getId())
+                .companyName("Test1 Şirketler Grubu Lt.Ş.")
+                .companyAddress("Antalyada Bir Yerde Test1")
+                .invoiceUsername("mehmetali@birhesap.com.tr")
+                .invoicePassword("Abc123456!")
+                .build();
+        companyPostService.save(company1);
+
+        UserDto userDto2 = UserDto.builder()
+                .username("test2")
+                .password("test4321")
+                .firstName("Test2")
+                .lastName("User2")
+                .email("test2@user.com")
+                .role(Role.ROLE_ADMIN)
+                .build();
+        userPostService.save(userDto2);
+        CompanyEntity company2 = CompanyEntity.builder()
+                .creatorUserId(userEntity1.getId())
+                .companyName("Test2 Şirketler Grubu Lt.Ş.")
+                .companyAddress("Antalyada Bir Yerde Test2")
+                .invoiceUsername("mehmetali@birhesap.com.tr")
+                .invoicePassword("Abc123456!")
+                .build();
+        companyPostService.save(company2);
     }
 
     private void createGurme() {
-        if (companyInfoRepository.findByTenantId(GURME.getTenantId()).isEmpty()) {
-            CompanyInfoEntity companyInfo = CompanyInfoEntity.builder()
-                    .companyName("Gurme Şirketler Grubu Lt.Ş.")
-                    .companyAddress("Antalyada Bir Yerde Gülveren Tarafında")
-                    .tenantId(GURME.getTenantId())
-                    .build();
-            companyInfoRepository.save(companyInfo);
-        }
-        if (userGetService.findByUsername(GURME_ADMIN_USER_NAME_1).isEmpty()) {
-            UserDto userDto = UserDto.builder()
-                    .username(GURME_ADMIN_USER_NAME_1)
-                    .password(GURME_ADMIN_USER_PASSWORD_1)
-                    .firstName("Soner")
-                    .lastName("Sekanlı")
-                    .email("sonersekanli@icloud.com")
-                    .tenantId(GURME.getTenantId())
-                    .role(Role.ROLE_ADMIN)
-                    .build();
-            userPostService.create(userDto);
-        }
-        if (userGetService.findByUsername(GURME_ADMIN_USER_NAME_2).isEmpty()) {
-            UserDto userDto = UserDto.builder()
-                    .username(GURME_ADMIN_USER_NAME_2)
-                    .password(GURME_ADMIN_USER_PASSWORD_2)
-                    .firstName("Selçuk")
-                    .lastName("Yılmaz")
-                    .email("selcuk.yilmaz.ant@gmail.com")
-                    .tenantId(GURME.getTenantId())
-                    .role(Role.ROLE_ADMIN)
-                    .build();
-            userPostService.create(userDto);
-        }
+        UserDto userDto1 = UserDto.builder()
+                .username("soner")
+                .password("test1234")
+                .firstName("Soner")
+                .lastName("Sekanlı")
+                .email("sonersekanli@icloud.com")
+                .role(Role.ROLE_ADMIN)
+                .build();
+        UserEntity userEntity1 = userPostService.save(userDto1);
+        CompanyEntity company1 = CompanyEntity.builder()
+                .creatorUserId(userEntity1.getId())
+                .companyName("Gurme Şirketler Grubu Lt.Ş.")
+                .companyAddress("Antalyada Bir Yerde Gülveren Tarafında")
+                .build();
+        companyPostService.save(company1);
+
+        UserDto userDto2 = UserDto.builder()
+                .username("selcuk")
+                .password("test4321")
+                .firstName("Selçuk")
+                .lastName("Yılmaz")
+                .email("selcuk.yilmaz.ant@gmail.com")
+                .role(Role.ROLE_ADMIN)
+                .build();
+        userPostService.save(userDto2);
+        CompanyEntity company2 = CompanyEntity.builder()
+                .creatorUserId(userEntity1.getId())
+                .companyName("Gurme Şirketler Grubu Lt.Ş.")
+                .companyAddress("Antalyada Bir Yerde Gülveren Tarafında")
+                .build();
+        companyPostService.save(company2);
     }
 }

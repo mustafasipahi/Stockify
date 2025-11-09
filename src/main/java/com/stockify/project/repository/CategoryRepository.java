@@ -9,9 +9,7 @@ import java.util.Optional;
 
 public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> {
 
-    Optional<CategoryEntity> findByIdAndTenantId(Long id, Long tenantId);
+    Optional<CategoryEntity> findByNameAndCreatorUserId(String name, Long creatorUserId);
 
-    Optional<CategoryEntity> findByNameAndCreatorUserIdAndTenantId(String name, Long creatorUserId, Long tenantId);
-
-    List<CategoryEntity> findAllByStatusAndTenantIdOrderByCreatedDateDesc(CategoryStatus status, Long tenantId);
+    List<CategoryEntity> findAllByCreatorUserIdAndStatusOrderByCreatedDateDesc(Long creatorUserId, CategoryStatus status);
 }

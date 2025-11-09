@@ -5,8 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.stockify.project.util.TenantContext.getTenantId;
-
 @Service
 @RequiredArgsConstructor
 public class ToActiveService {
@@ -19,8 +17,7 @@ public class ToActiveService {
     }
 
     private void inventoryToActive(Long productId) {
-        Long tenantId = getTenantId();
-        inventoryRepository.findByProductIdAndTenantId(productId, tenantId)
+        inventoryRepository.findByProductId(productId)
                 .ifPresent(inventory -> {
                     inventory.setActive(true);
                     inventoryRepository.save(inventory);

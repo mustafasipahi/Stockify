@@ -19,8 +19,8 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "transaction", indexes = {
-        @Index(name = "idx_transaction_broker_tenant_created", columnList = "brokerId,tenantId,createdDate"),
-        @Index(name = "idx_transaction_tenant_created", columnList = "tenantId,createdDate")
+        @Index(name = "idx_transaction_broker_created", columnList = "brokerId,createdDate"),
+        @Index(name = "idx_transaction_created", columnList = "createdDate")
 })
 @EntityListeners(AuditingEntityListener.class)
 public class TransactionEntity {
@@ -28,6 +28,10 @@ public class TransactionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotNull
+    @Column(nullable = false)
+    private Long creatorUserId;
 
     @NotNull
     @Column(nullable = false)
@@ -65,10 +69,6 @@ public class TransactionEntity {
     @Column
     @Enumerated(EnumType.STRING)
     private PaymentType paymentType;
-
-    @NotNull
-    @Column(nullable = false)
-    private Long tenantId;
 
     @CreatedDate
     private LocalDateTime createdDate;

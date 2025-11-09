@@ -10,8 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.stockify.project.util.TenantContext.getTenantId;
-import static com.stockify.project.util.TenantContext.getUserId;
+import static com.stockify.project.util.LoginContext.getUserId;
 
 @Service
 @RequiredArgsConstructor
@@ -23,8 +22,7 @@ public class ToPassiveService {
     @Transactional
     public void updateToPassiveByCategoryId(Long categoryId) {
         Long userId = getUserId();
-        Long tenantId = getTenantId();
-        List<ProductEntity> productList = productRepository.findByCreatorUserIdAndCategoryIdAndTenantId(userId, categoryId, tenantId).stream()
+        List<ProductEntity> productList = productRepository.findByCreatorUserIdAndCategoryId(userId, categoryId).stream()
                 .peek(product -> product.setStatus(ProductStatus.PASSIVE))
                 .toList();
         productRepository.saveAll(productList).forEach(product -> inventoryToPassive(product.getId()));
@@ -36,8 +34,7 @@ public class ToPassiveService {
     }
 
     private void inventoryToPassive(Long productId) {
-        Long tenantId = getTenantId();
-        inventoryRepository.findByProductIdAndTenantId(productId, tenantId)
+        inventoryRepository.findByProductId(productId)
                 .ifPresent(inventory -> {
                     inventory.setActive(false);
                     inventoryRepository.save(inventory);

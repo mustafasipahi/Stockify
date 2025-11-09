@@ -14,7 +14,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 import static com.stockify.project.constant.DocumentConstants.PATH_DELIMITER;
-import static com.stockify.project.util.TenantContext.getUsername;
+import static com.stockify.project.util.LoginContext.getUsername;
 
 @Slf4j
 @Service
@@ -23,21 +23,21 @@ public class PdfPostService {
     @Value("${user.dir}")
     private String basePath;
 
-    @Value("${pdf.folder-path:/pdfs}")
+    @Value("${document.pdf-path:/pdfs}")
     private String folderPath;
 
-    public String uploadPdf(MultipartFile file, String fileName, DocumentType documentType) {
+    public String uploadPdf(MultipartFile file, String pdfName, DocumentType documentType) {
         try {
-            String documentPath = folderPath + PATH_DELIMITER + getUsername() + PATH_DELIMITER + documentType.getLowerName();
-            Path path = Paths.get(basePath + documentPath);
+            String pdfPath = folderPath + PATH_DELIMITER + getUsername() + PATH_DELIMITER + documentType.getLowerName();
+            Path path = Paths.get(basePath + pdfPath);
             if (!Files.exists(path)) {
                 Files.createDirectories(path);
             }
-            Path filePath = path.resolve(fileName);
+            Path filePath = path.resolve(pdfName);
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-            return documentPath;
+            return pdfPath;
         } catch (IOException e) {
-            log.error("Error uploading PDF file: {}", fileName, e);
+            log.error("Error uploading pdf file: {}", pdfName, e);
             throw new PdfException();
         }
     }

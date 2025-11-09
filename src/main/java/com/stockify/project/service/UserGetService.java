@@ -1,6 +1,8 @@
 package com.stockify.project.service;
 
+import com.stockify.project.converter.UserConverter;
 import com.stockify.project.exception.UserNotFoundException;
+import com.stockify.project.model.dto.UserDto;
 import com.stockify.project.model.entity.UserEntity;
 import com.stockify.project.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+
+import static com.stockify.project.util.LoginContext.getUser;
 
 @Slf4j
 @Service
@@ -22,15 +26,15 @@ public class UserGetService {
                 .orElseThrow(() -> new UserNotFoundException(userId));
     }
 
+    public UserDto getLoginUserDetail() {
+        return UserConverter.toDto(getUser());
+    }
+
     public List<UserEntity> findAllByIdIn(List<Long> userIds) {
         return userRepository.findAllById(userIds);
     }
 
     public Optional<UserEntity> findByUsername(String username) {
         return userRepository.findByUsername(username);
-    }
-
-    public Optional<UserEntity> findByFirstNameAndLastName(String firstName, String lastName) {
-        return userRepository.findByFirstNameAndLastName(firstName, lastName);
     }
 }

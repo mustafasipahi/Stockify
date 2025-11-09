@@ -8,12 +8,12 @@ import java.util.Locale;
 
 import static com.stockify.project.constant.DocumentConstants.DATE_TIME_FORMATTER_1;
 import static com.stockify.project.util.DocumentUtil.replaceCharacterDetail;
-import static com.stockify.project.util.TenantContext.getUsername;
+import static com.stockify.project.util.LoginContext.getUsername;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DocumentNameGenerator {
 
-    public static String createDocumentName(String brokerUsername, DocumentType documentType) {
+    public static String createPdfName(String brokerUsername, DocumentType documentType) {
         String creatorUserNameLower = getUsername().toLowerCase(Locale.ENGLISH);
         String brokerNameLower = brokerUsername.toLowerCase(Locale.ENGLISH);
         String documentNameDate = LocalDateTime.now().format(DATE_TIME_FORMATTER_1);

@@ -2,7 +2,7 @@ package com.stockify.project.service;
 
 import com.stockify.project.converter.PaymentConverter;
 import com.stockify.project.model.dto.BrokerDto;
-import com.stockify.project.model.dto.CompanyInfoDto;
+import com.stockify.project.model.dto.CompanyDto;
 import com.stockify.project.model.dto.PaymentDto;
 import com.stockify.project.model.entity.PaymentEntity;
 import com.stockify.project.model.request.PaymentCreateRequest;
@@ -32,7 +32,7 @@ public class PaymentService {
         PaymentCreateValidator.validate(request);
         BrokerDto broker = getBroker(request.getBrokerId());
         PaymentDto paymentDto = PaymentConverter.toDto(request, broker);
-        addCompanyInfo(paymentDto);
+        addCompany(paymentDto);
         PaymentEntity paymentEntity = PaymentConverter.toEntity(paymentDto);
         DocumentResponse documentResponse = uploadDocument(paymentDto);
         paymentEntity.setDocumentId(documentResponse.getDocumentId());
@@ -46,13 +46,13 @@ public class PaymentService {
         return brokerGetService.getActiveBroker(brokerId);
     }
 
-    private void addCompanyInfo(PaymentDto paymentDto) {
-        CompanyInfoDto companyInfo = companyGetService.getCompanyInfo();
-        paymentDto.setCompanyInfo(companyInfo);
+    private void addCompany(PaymentDto paymentDto) {
+        CompanyDto company = companyGetService.getCompanyDetail();
+        paymentDto.setCompany(company);
     }
 
     private DocumentResponse uploadDocument(PaymentDto paymentDto) {
-        DocumentResponse documentResponse = documentPostService.uploadPaymentFile(paymentDto);
+        DocumentResponse documentResponse = documentPostService.uploadPaymentPdf(paymentDto);
         paymentDto.setDocumentId(documentResponse.getDocumentId());
         return documentResponse;
     }

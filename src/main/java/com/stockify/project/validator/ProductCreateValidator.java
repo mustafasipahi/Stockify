@@ -13,8 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-import static com.stockify.project.util.TenantContext.getTenantId;
-import static com.stockify.project.util.TenantContext.getUserId;
+import static com.stockify.project.util.LoginContext.getUserId;
 
 @Component
 @AllArgsConstructor
@@ -33,8 +32,7 @@ public class ProductCreateValidator {
             throw new ProductNameException();
         }
         Long userId = getUserId();
-        Long tenantId = getTenantId();
-        Optional<ProductEntity> product = productRepository.findByCreatorUserIdAndNameAndTenantId(userId, request.getName(), tenantId);
+        Optional<ProductEntity> product = productRepository.findByCreatorUserIdAndName(userId, request.getName());
         if (product.isPresent()) {
             throw new ProductNameAlreadyUseException(product.get().getId());
         }

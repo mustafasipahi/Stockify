@@ -15,8 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.stockify.project.util.TenantContext.getTenantId;
-import static com.stockify.project.util.TenantContext.getUserId;
+import static com.stockify.project.util.LoginContext.getUserId;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +34,6 @@ public class CategoryPostService {
                 .creatorUserId(getUserId())
                 .name(request.getName())
                 .taxRate(request.getTaxRate())
-                .tenantId(getTenantId())
                 .status(CategoryStatus.ACTIVE)
                 .build();
         categoryRepository.save(categoryEntity);
@@ -46,7 +44,7 @@ public class CategoryPostService {
         if (request.getCategoryId() == null) {
             throw new CategoryIdException();
         }
-        CategoryEntity categoryEntity = categoryRepository.findByIdAndTenantId(request.getCategoryId(), getTenantId())
+        CategoryEntity categoryEntity = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new CategoryNotFoundException(request.getCategoryId()));
         if (StringUtils.isNotBlank(request.getName()) && !request.getName().equals(categoryEntity.getName())) {
             updateValidator.validateName(request.getName());
@@ -63,7 +61,7 @@ public class CategoryPostService {
         if (categoryId == null) {
             throw new CategoryIdException();
         }
-        CategoryEntity categoryEntity = categoryRepository.findByIdAndTenantId(categoryId, getTenantId())
+        CategoryEntity categoryEntity = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(categoryId));
         if (hasAvailableProducts(categoryId)) {
             throw new HasAvailableProductException(categoryId);

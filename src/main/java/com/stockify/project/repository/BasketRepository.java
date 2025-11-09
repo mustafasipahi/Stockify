@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface BasketRepository extends JpaRepository<BasketEntity, Long> {
 
-    List<BasketEntity> findAllByBrokerIdAndTenantIdOrderByCreatedDateAsc(Long brokerId, Long tenantId);
+    List<BasketEntity> findAllByBrokerIdOrderByCreatedDateAsc(Long brokerId);
 
     List<BasketEntity> findAllByCreatedDateBefore(LocalDateTime createdDateBefore);
 }

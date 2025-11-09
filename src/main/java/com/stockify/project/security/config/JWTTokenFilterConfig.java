@@ -2,7 +2,7 @@ package com.stockify.project.security.config;
 
 import com.stockify.project.security.service.JWTTokenService;
 import com.stockify.project.security.userdetail.UserPrincipal;
-import com.stockify.project.util.TenantContext;
+import com.stockify.project.util.LoginContext;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -41,7 +41,7 @@ public class JWTTokenFilterConfig extends OncePerRequestFilter {
                     if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                         UserPrincipal principal = (UserPrincipal) userDetails;
-                        TenantContext.setCurrentUser(principal.getUserEntity());
+                        LoginContext.setCurrentUser(principal.getUserEntity());
                         if (username.equals(userDetails.getUsername()) && expirationDate.after(new Date())) {
                             final UsernamePasswordAuthenticationToken authenticationToken =
                                     new UsernamePasswordAuthenticationToken(
@@ -59,7 +59,7 @@ public class JWTTokenFilterConfig extends OncePerRequestFilter {
         } catch (Exception e) {
             log.error("JWT authentication error: {}", e.getMessage());
         } finally {
-            TenantContext.clear();
+            LoginContext.clear();
         }
     }
 }

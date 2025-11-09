@@ -12,11 +12,13 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDto {
 
+    private Long profileImageId;
     private String username;
     private String password;
     private String firstName;
     private String lastName;
     private String email;
+    private String tkn;
+    private String vkn;
     private Role role;
-    private Long tenantId;
 }

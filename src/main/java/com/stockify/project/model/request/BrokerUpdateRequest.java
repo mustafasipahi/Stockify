@@ -15,10 +15,6 @@ import java.time.DayOfWeek;
 public class BrokerUpdateRequest {
 
     private Long brokerId;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String vkn;
     private BigDecimal discountRate;
     private DayOfWeek targetDayOfWeek;
 }

@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.stockify.project.util.InventoryStatusUtil.isValid;
-import static com.stockify.project.util.TenantContext.getTenantId;
 
 @Service
 @RequiredArgsConstructor
@@ -31,8 +30,7 @@ public class InventoryGetService {
     private final ProductGetService productGetService;
 
     public InventoryDto detail(Long inventoryId) {
-        Long tenantId = getTenantId();
-        InventoryEntity inventory = inventoryRepository.findByIdAndTenantId(inventoryId, tenantId)
+        InventoryEntity inventory = inventoryRepository.findById(inventoryId)
                 .orElseThrow(() -> new InventoryNotFoundException(inventoryId));
         ProductDto productDto = getProductDto(inventory.getProductId());
         InventoryDto inventoryDto = InventoryConverter.toDto(inventory, productDto);

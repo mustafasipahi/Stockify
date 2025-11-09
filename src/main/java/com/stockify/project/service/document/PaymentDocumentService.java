@@ -2,8 +2,9 @@ package com.stockify.project.service.document;
 
 import com.itextpdf.html2pdf.ConverterProperties;
 import com.itextpdf.html2pdf.HtmlConverter;
-import com.stockify.project.enums.TenantType;
 import com.stockify.project.exception.DocumentUploadException;
+import com.stockify.project.model.dto.CompanyDto;
+import com.stockify.project.model.dto.DocumentAsByteDto;
 import com.stockify.project.model.dto.PaymentDto;
 import com.stockify.project.model.other.ByteArrayMultipartFile;
 import com.stockify.project.model.response.PaymentDocumentResponse;
@@ -23,20 +24,20 @@ import java.util.Base64;
 import static com.stockify.project.util.DocumentUtil.replaceCharacter;
 import static com.stockify.project.util.NameUtil.getBrokerFullName;
 import static com.stockify.project.util.NameUtil.getUserFullName;
-import static com.stockify.project.util.TenantContext.getTenantId;
-import static com.stockify.project.util.TenantContext.getUser;
+import static com.stockify.project.util.LoginContext.getUser;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentDocumentService {
 
+    private final DocumentGetService documentGetService;
+
     private static final DecimalFormat MONEY_FORMAT = new DecimalFormat("#,##0.00");
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final String DEFAULT_FILENAME = "payment.pdf";
     private static final String DEFAULT_CONTENT_TYPE = "application/pdf";
     private static final String DEFAULT_CURRENCY = "TL";
-    private static final String LOGO_DIRECTORY = "static/logos/";
 
     public PaymentDocumentResponse generatePDF(PaymentDto paymentDto) throws IOException {
         String htmlTemplate = readHtmlTemplate();
@@ -67,7 +68,7 @@ public class PaymentDocumentService {
         html = html.replace("{{document_number}}", replaceCharacter(paymentDto.getDocumentNumber() != null ? paymentDto.getDocumentNumber() : ""));
 
         // Logo - Base64 olarak embed et
-        String logoBase64 = getCompanyLogoAsBase64();
+        String logoBase64 = getCompanyLogoAsBase64(paymentDto.getCompany());
         html = html.replace("{{company_logo}}", logoBase64);
         // Logo varsa göster, yoksa gizle
         html = html.replace("{{logo_display}}", logoBase64.isEmpty() ? "display:none;" : "");
@@ -101,30 +102,15 @@ public class PaymentDocumentService {
      * PaymentDto içinden company bilgisi alınır ve ona göre logo yüklenir
      * Örnek: resources/static/logos/company_1.png
      */
-    private String getCompanyLogoAsBase64() {
+    private String getCompanyLogoAsBase64(CompanyDto company) {
         try {
-            // PaymentDto'dan company ID veya broker ID'ye göre logo belirle
-            String logoFileName = TenantType.fromValue(getTenantId()) + ".png";
-
-            // Logo dosyasını classpath'ten oku
-            ClassPathResource logoResource = new ClassPathResource(LOGO_DIRECTORY + logoFileName);
-
-            if (!logoResource.exists()) {
-                log.warn("Logo file not found: {}, using default", logoFileName);
-                return ""; // Boş string döndür, HTML'de LOGO yazısı görünsün
-            }
-
-            byte[] logoBytes = logoResource.getInputStream().readAllBytes();
-            String base64Logo = Base64.getEncoder().encodeToString(logoBytes);
-
-            // Dosya uzantısına göre MIME type belirle
-            String mimeType = determineMimeType(logoFileName);
-
+            DocumentAsByteDto documentAsByte = documentGetService.getDocumentAsByte(company.getLogoImageId());
+            String mimeType = determineMimeType(documentAsByte.getDocument().getFileName());
+            String base64Logo = Base64.getEncoder().encodeToString(documentAsByte.getDocumentAsByte());
             return "data:" + mimeType + ";base64," + base64Logo;
-
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("Error reading company logo", e);
-            return ""; // Hata durumunda boş döndür
+            return "";
         }
     }
 

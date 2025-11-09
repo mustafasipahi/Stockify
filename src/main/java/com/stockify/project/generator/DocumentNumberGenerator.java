@@ -35,4 +35,20 @@ public class DocumentNumberGenerator {
         int nextSequence = counter.incrementAndGet();
         return prefix + nextSequence;
     }
+
+    public static String getProfileImageNumber() {
+        LocalDateTime now = LocalDateTime.now();
+        String period = now.format(DATE_TIME_FORMATTER_2);
+        String prefix = PROFILE_IMAGE_PREFIX + "-" + period + "-";
+        int nextSequence = counter.incrementAndGet();
+        return prefix + nextSequence;
+    }
+
+    public static String getCompanyLogoNumber() {
+        LocalDateTime now = LocalDateTime.now();
+        String period = now.format(DATE_TIME_FORMATTER_2);
+        String prefix = COMPANY_LOGO_PREFIX + "-" + period + "-";
+        int nextSequence = counter.incrementAndGet();
+        return prefix + nextSequence;
+    }
 }

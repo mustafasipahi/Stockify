@@ -3,6 +3,7 @@ package com.stockify.project.converter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stockify.project.exception.StockifyRuntimeException;
 import com.stockify.project.model.dto.*;
+import com.stockify.project.model.entity.UserEntity;
 import com.stockify.project.model.request.InvoiceCreateRequest;
 import com.stockify.project.model.response.InvoiceCreateResponse;
 import com.stockify.project.model.response.InvoiceTokenResponse;
@@ -21,6 +22,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.stockify.project.util.LoginContext.getUser;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -73,24 +76,26 @@ public class InvoiceConverter {
         List<SalesItemDto> salesItems = prepareDto.getSalesItems();
         return InvoiceCreateRequest.builder()
                 .masterClientERPReference(null)
-                .masterClientERPCode(getMasterClientCode(broker))
+                .masterClientERPCode(getMasterClientCode())
                 .invoiceERPReference(sales.getDocumentNumber())
                 .invoice(createInvoice(sales, broker))
                 .invoiceLines(createInvoiceLines(salesItems))
                 .build();
     }
 
-    public static String getMasterClientCode(BrokerDto broker) {
-        if (StringUtils.isNotBlank(broker.getVkn())) {
-            return broker.getVkn();
+    public static String getMasterClientCode() {
+        UserEntity user = getUser();
+        if (StringUtils.isNotBlank(user.getVkn())) {
+            return user.getVkn();
         }
-        return broker.getTkn();
+        return user.getTkn();
     }
 
     public static InvoiceCreateRequest.InvoiceRequest createInvoice(SalesDto sales, BrokerDto broker) {
         String fullName = broker.getFirstName() + " " + broker.getLastName();
+        UserEntity user = getUser();
         return InvoiceCreateRequest.InvoiceRequest.builder()
-                .tcknVn(broker.getTkn())
+                .tcknVn(user.getTkn())
                 .taxOffice("")
                 .country(COUNTRY)
                 .city("")
@@ -100,7 +105,7 @@ public class InvoiceConverter {
                 .doorNumber(null)
                 .postCode(null)
                 .streetName("")
-                .email(broker.getEmail())
+                .email(user.getEmail())
                 .phone(null)
                 .fax(null)
                 .webAddress(null)

@@ -11,8 +11,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import static com.stockify.project.util.DateUtil.getTime;
-import static com.stockify.project.util.TenantContext.getTenantId;
-import static com.stockify.project.util.TenantContext.getUserId;
+import static com.stockify.project.util.LoginContext.getUserId;
 
 @Component
 @AllArgsConstructor
@@ -28,7 +27,6 @@ public class ProductConverter {
                 .inventoryCode(inventoryCodeGenerator.generateInventoryCode())
                 .name(request.getName())
                 .status(ProductStatus.ACTIVE)
-                .tenantId(getTenantId())
                 .build();
     }
 

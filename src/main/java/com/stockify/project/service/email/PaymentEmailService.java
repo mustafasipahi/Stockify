@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static com.stockify.project.util.EmailUtil.*;
 import static com.stockify.project.util.NameUtil.getBrokerFullName;
-import static com.stockify.project.util.TenantContext.getEmail;
+import static com.stockify.project.util.LoginContext.getEmail;
 
 @Slf4j
 @Service

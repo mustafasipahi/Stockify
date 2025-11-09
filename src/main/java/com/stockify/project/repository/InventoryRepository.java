@@ -8,9 +8,7 @@ import java.util.Optional;
 
 public interface InventoryRepository extends JpaRepository<InventoryEntity, Long>, JpaSpecificationExecutor<InventoryEntity> {
 
-    Optional<InventoryEntity> findByIdAndTenantId(Long id, Long tenantId);
+    Optional<InventoryEntity> findByProductId(Long productId);
 
-    Optional<InventoryEntity> findByProductIdAndTenantId(Long productId, Long tenantId);
-
-    Optional<InventoryEntity> findByProductIdAndCreatorUserIdAndTenantId(Long productId, Long creatorUserId, Long tenantId);
+    Optional<InventoryEntity> findByProductIdAndCreatorUserId(Long productId, Long creatorUserId);
 }

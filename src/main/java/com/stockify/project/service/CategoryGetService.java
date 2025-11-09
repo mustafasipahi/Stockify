@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.stockify.project.util.TenantContext.getTenantId;
+import static com.stockify.project.util.LoginContext.getUserId;
 
 @Service
 @RequiredArgsConstructor
@@ -19,13 +19,13 @@ public class CategoryGetService {
     private final CategoryRepository categoryRepository;
 
     public CategoryDto detail(Long categoryId) {
-        return categoryRepository.findByIdAndTenantId(categoryId, getTenantId())
+        return categoryRepository.findById(categoryId)
                 .map(CategoryConverter::toDto)
                 .orElseThrow(() -> new CategoryNotFoundException(categoryId));
     }
 
     public List<CategoryDto> getAll() {
-        return categoryRepository.findAllByStatusAndTenantIdOrderByCreatedDateDesc(CategoryStatus.ACTIVE, getTenantId()).stream()
+        return categoryRepository.findAllByCreatorUserIdAndStatusOrderByCreatedDateDesc(getUserId(), CategoryStatus.ACTIVE).stream()
                 .map(CategoryConverter::toDto)
                 .toList();
     }

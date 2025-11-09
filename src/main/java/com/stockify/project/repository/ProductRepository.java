@@ -10,15 +10,13 @@ import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<ProductEntity, Long>, JpaSpecificationExecutor<ProductEntity> {
 
-    Optional<ProductEntity> findByIdAndTenantId(Long id, Long tenantId);
+    List<ProductEntity> findAllByIdIn(List<Long> idList);
 
-    List<ProductEntity> findAllByIdInAndTenantId(List<Long> idList, Long tenantId);
+    Optional<ProductEntity> findByCreatorUserIdAndCategoryId(Long creatorUserId, Long categoryId);
 
-    Optional<ProductEntity> findByCreatorUserIdAndCategoryIdAndTenantIdAndStatus(Long creatorUserId, Long categoryId, Long tenantId, ProductStatus status);
+    Optional<ProductEntity> findByCreatorUserIdAndCategoryIdAndStatus(Long creatorUserId, Long categoryId, ProductStatus status);
 
-    List<ProductEntity> findByCreatorUserIdAndCategoryIdAndTenantId(Long creatorUserId, Long categoryId, Long tenantId);
+    Optional<ProductEntity> findByCreatorUserIdAndName(Long creatorUserId, String name);
 
-    Optional<ProductEntity> findByCreatorUserIdAndNameAndTenantId(Long creatorUserId, String name, Long tenantId);
-
-    Optional<ProductEntity> findFirstByCreatorUserIdAndTenantIdOrderByCreatedDateDesc(Long creatorUserId, Long tenantId);
+    Optional<ProductEntity> findFirstByCreatorUserIdOrderByCreatedDateDesc(Long creatorUserId);
 }

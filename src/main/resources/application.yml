@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/stockify_app?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Europe/Istanbul&characterEncoding=UTF-8}
+    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/stockify_app?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC}
     username: ${DATABASE_USERNAME:root}
     password: ${DATABASE_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -31,8 +31,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${MAIL_SENDER_USERNAME}
-    password: ${MAIL_SENDER_PASSWORD}
+    username: ${MAIL_SENDER_USERNAME:stokify.destek@gmail.com}
+    password: ${MAIL_SENDER_PASSWORD:hfkj bqhf uibj itkl}
     protocol: smtp
     properties:
       mail:
@@ -48,7 +48,7 @@ spring:
         debug: false
 
 security:
-  secretKey: ${JWT_SECRET_KEY}
+  secretKey: ${JWT_SECRET_KEY:test}
 
 stockify:
   files:
@@ -66,12 +66,13 @@ stockify:
       max-file-size: 50MB
 
 invoice:
-  base-url: ${INVOICE_BASE_URL}
-  client_id: ${INVOICE_CLIENT_ID}
-  tenant: ${INVOICE_TENANT}
+  base-url: ${INVOICE_BASE_URL:https://api.fatura.net.tr}
+  client_id: ${INVOICE_CLIENT_ID:xfatura_App}
+  tenant: ${INVOICE_TENANT:TEST}
 
-pdf:
-  folder-path: /pdfs
+document:
+  pdf-path: /pdfs
+  image-path: /images
 
 management:
   endpoints:

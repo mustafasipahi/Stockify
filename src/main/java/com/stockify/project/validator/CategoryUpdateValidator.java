@@ -8,8 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-import static com.stockify.project.util.TenantContext.getTenantId;
-import static com.stockify.project.util.TenantContext.getUserId;
+import static com.stockify.project.util.LoginContext.getUserId;
 
 @Component
 @AllArgsConstructor
@@ -18,10 +17,7 @@ public class CategoryUpdateValidator {
     private final CategoryRepository categoryRepository;
 
     public void validateName(String name) {
-        Optional<CategoryEntity> categoryByName = categoryRepository.findByNameAndCreatorUserIdAndTenantId(
-                name,
-                getUserId(),
-                getTenantId());
+        Optional<CategoryEntity> categoryByName = categoryRepository.findByNameAndCreatorUserId(name, getUserId());
         if (categoryByName.isPresent()) {
             throw new CategoryNameAlreadyUseException();
         }

@@ -18,7 +18,10 @@ public class DocumentUploadValidator {
     private final FileStorageProperties fileStorageProperties;
 
     public void validate(MultipartFile file, DocumentUploadRequest request) {
-        if (request.getBrokerId() == null) {
+        if (request.getBrokerDto() == null) {
+            throw new BrokerIdException();
+        }
+        if (request.getBrokerDto().getBrokerId() == null) {
             throw new BrokerIdException();
         }
         if (request.getDocumentType() == null) {

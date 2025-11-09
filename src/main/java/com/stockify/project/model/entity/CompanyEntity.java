@@ -16,11 +16,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "company_info", indexes = {
-        @Index(name = "idx_company_info_tenant_unique", columnList = "tenantId")
-})
+@Table(name = "company")
 @EntityListeners(AuditingEntityListener.class)
-public class CompanyInfoEntity {
+public class CompanyEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,15 +26,22 @@ public class CompanyInfoEntity {
 
     @NotNull
     @Column(nullable = false)
+    private Long creatorUserId;
+
+    @Column
+    private Long logoImageId;
+
+    @Column
     private String companyName;
 
-    @NotNull
-    @Column(nullable = false)
+    @Column
     private String companyAddress;
 
-    @NotNull
-    @Column(unique = true, nullable = false)
-    private Long tenantId;
+    @Column
+    private String invoiceUsername;
+
+    @Column
+    private String invoicePassword;
 
     @CreatedDate
     private LocalDateTime createdDate;

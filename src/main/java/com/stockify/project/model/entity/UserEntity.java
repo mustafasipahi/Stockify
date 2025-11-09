@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "users", indexes = {
         @Index(name = "idx_users_username_unique", columnList = "username"),
-        @Index(name = "idx_users_tenant_created", columnList = "tenantId,createdDate")
+        @Index(name = "idx_users_created", columnList = "createdDate")
 })
 @EntityListeners(AuditingEntityListener.class)
 public class UserEntity implements Serializable {
@@ -28,8 +28,11 @@ public class UserEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column
+    private Long profileImageId;
+
     @NotNull
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String username;
 
     @NotNull
@@ -47,14 +50,16 @@ public class UserEntity implements Serializable {
     @Column
     private String email;
 
+    @Column
+    private String tkn;
+
+    @Column
+    private String vkn;
+
     @NotNull
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
-
-    @NotNull
-    @Column(nullable = false)
-    private Long tenantId;
 
     @CreatedDate
     private LocalDateTime createdDate;

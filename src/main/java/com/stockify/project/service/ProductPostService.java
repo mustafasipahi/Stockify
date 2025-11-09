@@ -18,8 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.stockify.project.util.TenantContext.getTenantId;
-import static com.stockify.project.util.TenantContext.getUsername;
+import static com.stockify.project.util.LoginContext.getUsername;
 
 @Slf4j
 @Service
@@ -50,7 +49,7 @@ public class ProductPostService {
         if (request.getProductId() == null) {
             throw new ProductIdException();
         }
-        ProductEntity productEntity = productRepository.findByIdAndTenantId(request.getProductId(), getTenantId())
+        ProductEntity productEntity = productRepository.findById(request.getProductId())
                 .orElseThrow(() -> new ProductNotFoundException(request.getProductId()));
         if (StringUtils.isNotBlank(request.getName()) && !request.getName().equals(productEntity.getName())) {
             updateValidator.validateName(productEntity.getId(), request.getName());
@@ -67,7 +66,7 @@ public class ProductPostService {
 
     @Transactional
     public ProductDto delete(Long productId) {
-        ProductEntity productEntity = productRepository.findByIdAndTenantId(productId, getTenantId())
+        ProductEntity productEntity = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(productId));
         if (hasAvailableInventory(productId)) {
             throw new HasAvailableInventoryException(productId);
@@ -81,7 +80,7 @@ public class ProductPostService {
 
     @Transactional
     public ProductDto activate(Long productId) {
-        ProductEntity productEntity = productRepository.findByIdAndTenantId(productId, getTenantId())
+        ProductEntity productEntity = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(productId));
         productEntity.setStatus(ProductStatus.ACTIVE);
         ProductEntity activatedProduct = productRepository.save(productEntity);

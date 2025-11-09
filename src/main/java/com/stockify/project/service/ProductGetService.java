@@ -17,8 +17,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.stockify.project.util.TenantContext.getTenantId;
-import static com.stockify.project.util.TenantContext.getUserId;
+import static com.stockify.project.util.LoginContext.getUserId;
 
 @Service
 @RequiredArgsConstructor
@@ -28,13 +27,13 @@ public class ProductGetService {
     private final ProductConverter productConverter;
 
     public ProductDto detail(Long productId) {
-        return productRepository.findByIdAndTenantId(productId, getTenantId())
+        return productRepository.findById(productId)
                 .map(productConverter::toDto)
                 .orElseThrow(() -> new ProductNotFoundException(productId));
     }
 
     public Map<Long, ProductDto> detailMap(List<Long> productIdList) {
-        return productRepository.findAllByIdInAndTenantId(productIdList, getTenantId()).stream()
+        return productRepository.findAllByIdIn(productIdList).stream()
                 .map(productConverter::toDto)
                 .collect(Collectors.toMap(ProductDto::getProductId, Function.identity()));
     }
@@ -54,7 +53,7 @@ public class ProductGetService {
     }
 
     public boolean hasAvailableProducts(Long categoryId) {
-        return productRepository.findByCreatorUserIdAndCategoryIdAndTenantIdAndStatus(getUserId(), categoryId, getTenantId(), ProductStatus.ACTIVE)
+        return productRepository.findByCreatorUserIdAndCategoryIdAndStatus(getUserId(), categoryId, ProductStatus.ACTIVE)
                 .isPresent();
     }
 }

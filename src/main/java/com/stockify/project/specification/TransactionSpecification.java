@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.stockify.project.util.DateUtil.getLocalDateTime;
-import static com.stockify.project.util.TenantContext.getTenantId;
+import static com.stockify.project.util.LoginContext.getUserId;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TransactionSpecification {
@@ -21,7 +21,7 @@ public class TransactionSpecification {
     public static Specification<TransactionEntity> filter(TransactionSearchRequest request) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.add(criteriaBuilder.equal(root.get("tenantId"), getTenantId()));
+            predicates.add(criteriaBuilder.equal(root.get("creatorUserId"), getUserId()));
             predicates.add(criteriaBuilder.equal(root.get("brokerId"), request.getBrokerId()));
             LocalDateTime now = LocalDateTime.now();
             LocalDateTime startDate = Optional.ofNullable(getLocalDateTime(request.getStartDate()))

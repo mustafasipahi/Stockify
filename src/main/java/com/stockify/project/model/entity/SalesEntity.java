@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "sales", indexes = {
-        @Index(name = "idx_sales_broker_tenant_created", columnList = "brokerId,tenantId,createdDate"),
-        @Index(name = "idx_sales_tenant_created", columnList = "tenantId,createdDate")
+        @Index(name = "idx_sales_broker_created", columnList = "brokerId,createdDate"),
+        @Index(name = "idx_sales_created", columnList = "createdDate")
 })
 @EntityListeners(AuditingEntityListener.class)
 public class SalesEntity {
@@ -26,6 +26,10 @@ public class SalesEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotNull
+    @Column(nullable = false)
+    private Long creatorUserId;
 
     @NotNull
     @Column(nullable = false)
@@ -61,10 +65,6 @@ public class SalesEntity {
     @NotNull
     @Column(nullable = false)
     private BigDecimal totalPriceWithTax;
-
-    @NotNull
-    @Column(nullable = false)
-    private Long tenantId;
 
     @CreatedDate
     private LocalDateTime createdDate;

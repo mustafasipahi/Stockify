@@ -41,7 +41,7 @@ public class JWTTokenService {
     public String generateToken(UserPrincipal userPrincipal, boolean rememberMe) {
         return Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
-                .claim("tenantId", userPrincipal.getUserEntity().getTenantId())
+                .claim("userId", userPrincipal.getUserEntity().getId())
                 .setIssuedAt(new Date())
                 .setExpiration(getTokenExpirationDate(rememberMe))
                 .signWith(getSecretKey(), SignatureAlgorithm.HS256)
@@ -60,10 +60,6 @@ public class JWTTokenService {
             return "";
         }
         return authorizationHeaderValue.substring(7);
-    }
-
-    public Long extractCompanySchemaFromToken(String token) {
-        return exportToken(token, claims -> claims.get("tenantId", Long.class));
     }
 
     public boolean validateToken(final String token) {

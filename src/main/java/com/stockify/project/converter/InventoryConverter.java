@@ -13,8 +13,7 @@ import java.math.BigDecimal;
 
 import static com.stockify.project.util.DateUtil.getTime;
 import static com.stockify.project.util.InventoryStatusUtil.getInventoryStatus;
-import static com.stockify.project.util.TenantContext.getTenantId;
-import static com.stockify.project.util.TenantContext.getUserId;
+import static com.stockify.project.util.LoginContext.getUserId;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class InventoryConverter {
@@ -28,7 +27,6 @@ public class InventoryConverter {
                 .productCount(0)
                 .criticalProductCount(0)
                 .status(InventoryStatus.OUT_OF_INVENTORY)
-                .tenantId(getTenantId())
                 .build();
     }
 
@@ -41,7 +39,6 @@ public class InventoryConverter {
                 .productCount(request.getProductCount())
                 .criticalProductCount(request.getCriticalProductCount())
                 .status(getInventoryStatus(request.getProductCount(), request.getCriticalProductCount()))
-                .tenantId(getTenantId())
                 .build();
     }
 

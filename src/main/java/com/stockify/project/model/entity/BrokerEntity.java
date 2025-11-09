@@ -31,19 +31,11 @@ public class BrokerEntity {
 
     @NotNull
     @Column(nullable = false)
-    private Long brokerUserId;
-
-    @NotNull
-    @Column(nullable = false)
     private Long creatorUserId;
 
     @NotNull
     @Column(nullable = false)
-    private String tkn;
-
-    @NotNull
-    @Column(nullable = false)
-    private String vkn;
+    private Long brokerUserId;
 
     @Column
     private BigDecimal discountRate;
@@ -52,10 +44,6 @@ public class BrokerEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private BrokerStatus status;
-
-    @NotNull
-    @Column(nullable = false)
-    private Long tenantId;
 
     @Column
     private DayOfWeek targetDayOfWeek;

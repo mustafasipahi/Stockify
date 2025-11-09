@@ -12,11 +12,16 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class CompanyInfoDto implements Serializable {
+public class CompanyDto implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    private Long companyId;
+    private Long creatorUserId;
+    private Long logoImageId;
     private String companyName;
     private String companyAddress;
+    private String invoiceUsername;
+    private String invoicePassword;
 }

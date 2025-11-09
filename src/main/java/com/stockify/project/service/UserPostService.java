@@ -1,14 +1,20 @@
 package com.stockify.project.service;
 
 import com.stockify.project.converter.UserConverter;
+import com.stockify.project.generator.UserInfoGenerator;
 import com.stockify.project.model.dto.UserDto;
+import com.stockify.project.model.dto.UserSecurityDto;
 import com.stockify.project.model.entity.UserEntity;
 import com.stockify.project.model.request.BrokerCreateRequest;
 import com.stockify.project.repository.UserRepository;
+import com.stockify.project.service.email.UserCreationEmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.stockify.project.converter.EmailConverter.toEmailRequest;
 
 @Slf4j
 @Service
@@ -16,7 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserPostService {
 
     private final UserRepository userRepository;
-    private final UserConverter userConverter;
+    private final CompanyPostService companyPostService;
+    private final UserInfoGenerator userInfoGenerator;
+    private final UserCreationEmailService userCreationEmailService;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public void save(UserEntity user) {
@@ -24,14 +33,19 @@ public class UserPostService {
     }
 
     @Transactional
-    public void create(UserDto userDto) {
-        userRepository.save(userConverter.toEntity(userDto));
+    public UserEntity save(UserDto userDto) {
+        String encryptedPassword = passwordEncoder.encode(userDto.getPassword());
+        return userRepository.save(UserConverter.toEntity(userDto, userDto.getUsername(), encryptedPassword));
     }
 
     @Transactional
-    public UserEntity saveBrokerUser(BrokerCreateRequest request, String username, String password) {
-        UserDto userDto = userConverter.toDto(request, username, password);
-        UserEntity user = userConverter.toEntity(userDto);
-        return userRepository.save(user);
+    public UserEntity createNewUser(BrokerCreateRequest request) {
+        UserSecurityDto userSecurity = userInfoGenerator.generate(request.getFirstName(), request.getLastName());
+        String encryptedPassword = passwordEncoder.encode(userSecurity.getPassword());
+        UserEntity userEntity = UserConverter.toEntity(request, userSecurity.getUsername(), encryptedPassword);
+        UserEntity savedNewUser = userRepository.save(userEntity);
+        companyPostService.saveBrokerCompany(savedNewUser.getId());
+        userCreationEmailService.sendUserCreationNotification(toEmailRequest(userSecurity, savedNewUser));
+        return savedNewUser;
     }
 }

@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
+import static com.stockify.project.util.LoginContext.getUserId;
+
 @Service
 @RequiredArgsConstructor
 public class TransactionPostService {
@@ -23,7 +25,7 @@ public class TransactionPostService {
         BigDecimal currentBalance = balanceService.getBrokerCurrentBalance(salesEntity.getBrokerId());
         BigDecimal newBalance = currentBalance.add(salesEntity.getTotalPrice());
         TransactionEntity transaction = TransactionEntity.builder()
-                .tenantId(salesEntity.getTenantId())
+                .creatorUserId(getUserId())
                 .brokerId(salesEntity.getBrokerId())
                 .documentId(salesEntity.getDocumentId())
                 .invoiceId(salesEntity.getInvoiceId())
@@ -41,7 +43,7 @@ public class TransactionPostService {
         BigDecimal currentBalance = balanceService.getBrokerCurrentBalance(paymentEntity.getBrokerId());
         BigDecimal newBalance = currentBalance.subtract(paymentEntity.getPrice());
         TransactionEntity transaction = TransactionEntity.builder()
-                .tenantId(paymentEntity.getTenantId())
+                .creatorUserId(getUserId())
                 .brokerId(paymentEntity.getBrokerId())
                 .documentId(paymentEntity.getDocumentId())
                 .type(TransactionType.PAYMENT)

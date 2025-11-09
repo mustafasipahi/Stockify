@@ -14,9 +14,9 @@ import java.time.LocalDateTime;
 public class BasketDto {
 
     private Long id;
+    private Long creatorUserId;
     private Long brokerId;
     private Long productId;
     private Integer productCount;
-    private Long tenantId;
     private LocalDateTime createdDate;
 }

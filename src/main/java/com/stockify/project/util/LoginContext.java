@@ -6,7 +6,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class TenantContext {
+public class LoginContext {
 
     private static final ThreadLocal<UserEntity> currentUser = new ThreadLocal<>();
 
@@ -20,10 +20,6 @@ public class TenantContext {
 
     public static Long getUserId() {
         return currentUser.get().getId();
-    }
-
-    public static Long getTenantId() {
-        return currentUser.get().getTenantId();
     }
 
     public static String getUsername() {

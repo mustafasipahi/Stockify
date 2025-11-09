@@ -10,18 +10,16 @@ import java.util.Optional;
 
 public interface TransactionRepository extends JpaRepository<TransactionEntity, Long>, JpaSpecificationExecutor<TransactionEntity> {
 
-    Optional<TransactionEntity> findTopByBrokerIdAndTenantIdOrderByCreatedDateDesc(Long brokerId, Long tenantId);
+    Optional<TransactionEntity> findTopByBrokerIdOrderByCreatedDateDesc(Long brokerId);
 
     @Query("""
         SELECT t FROM TransactionEntity t
         WHERE t.brokerId IN :brokerIds
-        AND t.tenantId = :tenantId
         AND t.createdDate = (
             SELECT MAX(t2.createdDate)
             FROM TransactionEntity t2
             WHERE t2.brokerId = t.brokerId
-            AND t2.tenantId = :tenantId
         )
         """)
-    List<TransactionEntity> findLatestTransactionsByBrokerIds(List<Long> brokerIds, Long tenantId);
+    List<TransactionEntity> findLatestTransactionsByBrokerIds(List<Long> brokerIds);
 }

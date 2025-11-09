@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "basket", indexes = {
-        @Index(name = "idx_basket_broker_tenant_created", columnList = "brokerId,tenantId,createdDate")
+        @Index(name = "idx_basket_broker_created", columnList = "brokerId,createdDate")
 })
 @EntityListeners(AuditingEntityListener.class)
 public class BasketEntity {
@@ -24,6 +24,10 @@ public class BasketEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotNull
+    @Column(nullable = false)
+    private Long creatorUserId;
 
     @NotNull
     @Column(nullable = false)
@@ -36,10 +40,6 @@ public class BasketEntity {
     @NotNull
     @Column(nullable = false)
     private Integer productCount;
-
-    @NotNull
-    @Column(nullable = false)
-    private Long tenantId;
 
     @CreatedDate
     private LocalDateTime createdDate;

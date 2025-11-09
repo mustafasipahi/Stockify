@@ -12,8 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-import static com.stockify.project.util.TenantContext.getTenantId;
-import static com.stockify.project.util.TenantContext.getUserId;
+import static com.stockify.project.util.LoginContext.getUserId;
 
 @Component
 @AllArgsConstructor
@@ -24,8 +23,7 @@ public class ProductUpdateValidator {
 
     public void validateName(Long id, String productName) {
         Long userId = getUserId();
-        Long tenantId = getTenantId();
-        Optional<ProductEntity> product = productRepository.findByCreatorUserIdAndNameAndTenantId(userId, productName, tenantId);
+        Optional<ProductEntity> product = productRepository.findByCreatorUserIdAndName(userId, productName);
         if (product.isPresent() && !product.get().getId().equals(id)) {
             throw new ProductNameAlreadyUseException();
         }

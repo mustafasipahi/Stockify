@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.stockify.project.util.DateUtil.getTime;
-import static com.stockify.project.util.TenantContext.getTenantId;
+import static com.stockify.project.util.LoginContext.getUserId;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SalesConverter {
@@ -67,6 +67,7 @@ public class SalesConverter {
 
     public static SalesEntity toSalesEntity(SalesDto sales) {
         return SalesEntity.builder()
+                .creatorUserId(getUserId())
                 .brokerId(sales.getBrokerId())
                 .documentId(sales.getDocumentId())
                 .subtotalPrice(sales.getSubtotalPrice())
@@ -75,7 +76,6 @@ public class SalesConverter {
                 .totalPrice(sales.getTotalPrice())
                 .totalTaxPrice(sales.getTotalTaxPrice())
                 .totalPriceWithTax(sales.getTotalPriceWithTax())
-                .tenantId(getTenantId())
                 .build();
     }
 
@@ -96,7 +96,6 @@ public class SalesConverter {
                         .taxRate(salesItem.getTaxRate())
                         .taxPrice(salesItem.getTaxPrice())
                         .totalPriceWithTax(salesItem.getTotalPriceWithTax())
-                        .tenantId(getTenantId())
                         .build())
                 .toList();
     }

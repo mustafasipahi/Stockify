@@ -16,5 +16,5 @@ public class SalesPrepareDto {
     private SalesDto sales;
     private List<SalesItemDto> salesItems;
     private BrokerDto broker;
-    private CompanyInfoDto companyInfo;
+    private CompanyDto company;
 }

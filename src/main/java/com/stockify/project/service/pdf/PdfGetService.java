@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static com.stockify.project.constant.DocumentConstants.PATH_DELIMITER;
-import static com.stockify.project.util.TenantContext.getUsername;
+import static com.stockify.project.util.LoginContext.getUsername;
 
 @Slf4j
 @Service
@@ -21,13 +21,13 @@ public class PdfGetService {
     @Value("${user.dir}")
     private String basePath;
 
-    @Value("${pdf.folder-path:/pdfs}")
+    @Value("${document.pdf-path:/pdfs}")
     private String folderPath;
 
     public byte[] downloadPdf(String fileName, DocumentType documentType) {
         try {
-            String documentPath = folderPath + PATH_DELIMITER + getUsername() + PATH_DELIMITER + documentType.getLowerName();
-            Path path = Paths.get(basePath + documentPath);
+            String pdfPath = folderPath + PATH_DELIMITER + getUsername() + PATH_DELIMITER + documentType.getLowerName();
+            Path path = Paths.get(basePath + pdfPath);
             if (!Files.exists(path)) {
                 log.error("PDF file not found: {}", path);
                 throw new PdfException();

@@ -9,8 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.stockify.project.util.TenantContext.getTenantId;
-
 @Service
 @RequiredArgsConstructor
 public class BasketGetService {
@@ -18,11 +16,11 @@ public class BasketGetService {
     private final BasketRepository basketRepository;
 
     public List<BasketEntity> getBrokerBasket(Long brokerId) {
-        return basketRepository.findAllByBrokerIdAndTenantIdOrderByCreatedDateAsc(brokerId, getTenantId());
+        return basketRepository.findAllByBrokerIdOrderByCreatedDateAsc(brokerId);
     }
 
     public List<BasketDto> getBrokerAllBasket(Long brokerId) {
-        return basketRepository.findAllByBrokerIdAndTenantIdOrderByCreatedDateAsc(brokerId, getTenantId()).stream()
+        return basketRepository.findAllByBrokerIdOrderByCreatedDateAsc(brokerId).stream()
                 .map(BasketConverter::toDto)
                 .toList();
     }

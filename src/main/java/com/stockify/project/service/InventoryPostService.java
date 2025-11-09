@@ -22,8 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.stockify.project.util.InventoryStatusUtil.getInventoryStatus;
-import static com.stockify.project.util.TenantContext.getTenantId;
-import static com.stockify.project.util.TenantContext.getUserId;
+import static com.stockify.project.util.LoginContext.getUserId;
 
 @Service
 @RequiredArgsConstructor
@@ -36,8 +35,7 @@ public class InventoryPostService {
     @Transactional
     public void saveDefault(Long productId) {
         Long userId = getUserId();
-        Long tenantId = getTenantId();
-        Optional<InventoryEntity> optionalInventory = inventoryRepository.findByProductIdAndCreatorUserIdAndTenantId(productId, userId, tenantId);
+        Optional<InventoryEntity> optionalInventory = inventoryRepository.findByProductIdAndCreatorUserId(productId, userId);
         InventoryEntity inventoryEntity;
         if (optionalInventory.isPresent()) {
             inventoryEntity = optionalInventory.get();
@@ -61,8 +59,7 @@ public class InventoryPostService {
         if (request.getInventoryId() == null) {
             throw new InventoryIdException();
         }
-        Long tenantId = getTenantId();
-        InventoryEntity inventoryEntity = inventoryRepository.findByIdAndTenantId(request.getInventoryId(), tenantId)
+        InventoryEntity inventoryEntity = inventoryRepository.findById(request.getInventoryId())
                 .orElseThrow(() -> new InventoryNotFoundException(request.getInventoryId()));
         if (request.getPrice() != null) {
             inventoryUpdateValidator.validatePrice(request.getPrice());
@@ -92,8 +89,7 @@ public class InventoryPostService {
             Long productId = entry.getKey();
             Integer decreaseProductCount = entry.getValue();
             Long userId = getUserId();
-            Long tenantId = getTenantId();
-            InventoryEntity inventoryEntity = inventoryRepository.findByProductIdAndCreatorUserIdAndTenantId(productId, userId, tenantId)
+            InventoryEntity inventoryEntity = inventoryRepository.findByProductIdAndCreatorUserId(productId, userId)
                     .orElseThrow(() -> new InventoryNotFoundException(productId));
             Integer newProductCount = inventoryEntity.getProductCount() - decreaseProductCount;
             InventoryStatus newStatus = getInventoryStatus(newProductCount, inventoryEntity.getCriticalProductCount());

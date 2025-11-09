@@ -54,7 +54,7 @@ public class SalesService {
     @Transactional
     public SalesResponse salesConfirm(SalesRequest request) {
         SalesPrepareDto prepareDto = prepareSalesFlow(request);
-        addCompanyInfo(prepareDto);
+        addCompany(prepareDto);
         SalesEntity salesEntity = SalesConverter.toSalesEntity(prepareDto.getSales());
         DocumentResponse documentResponse = uploadDocument(prepareDto);
         DocumentResponse invoiceResponse = uploadInvoice(prepareDto, request.isCreateInvoice());
@@ -133,13 +133,13 @@ public class SalesService {
         inventoryPostService.decreaseInventory(prepareDto);
     }
 
-    private void addCompanyInfo(SalesPrepareDto prepareDto) {
-        CompanyInfoDto companyInfo = companyGetService.getCompanyInfo();
-        prepareDto.setCompanyInfo(companyInfo);
+    private void addCompany(SalesPrepareDto prepareDto) {
+        CompanyDto company = companyGetService.getCompanyDetail();
+        prepareDto.setCompany(company);
     }
 
     private DocumentResponse uploadDocument(SalesPrepareDto prepareDto) {
-        DocumentResponse documentResponse = documentPostService.uploadSalesFile(prepareDto);
+        DocumentResponse documentResponse = documentPostService.uploadSalesPdf(prepareDto);
         prepareDto.getSales().setDocumentId(documentResponse.getDocumentId());
         return documentResponse;
     }
@@ -147,7 +147,7 @@ public class SalesService {
     private DocumentResponse uploadInvoice(SalesPrepareDto prepareDto, boolean createInvoice) {
         if (createInvoice) {
             InvoiceCreateResponse invoice = invoiceCreateService.createInvoice(prepareDto);
-            return documentPostService.uploadInvoiceFile(prepareDto, invoice);
+            return documentPostService.uploadInvoicePdf(prepareDto, invoice);
         }
         return new DocumentResponse();
     }

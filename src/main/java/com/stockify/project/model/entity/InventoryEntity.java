@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 @Audited
 @Table(name = "inventory", indexes = {
         @Index(name = "idx_inventory_product_unique", columnList = "productId"),
-        @Index(name = "idx_inventory_tenant_status", columnList = "tenantId,status")
+        @Index(name = "idx_inventory_status", columnList = "status")
 })
 @AuditTable(value = "inventory_audit")
 @EntityListeners(AuditingEntityListener.class)
@@ -59,10 +59,6 @@ public class InventoryEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private InventoryStatus status;
-
-    @NotNull
-    @Column(nullable = false)
-    private Long tenantId;
 
     @CreatedDate
     private LocalDateTime createdDate;

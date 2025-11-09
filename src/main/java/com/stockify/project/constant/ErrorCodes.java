@@ -44,6 +44,9 @@ public class ErrorCodes {
     public static final int HAS_AVAILABLE_INVENTORY = 1036;
     public static final int HAS_AVAILABLE_PRODUCT = 1037;
     public static final int BROKER_TKN_REQUIRED = 1038;
+    public static final int USERNAME_ALREADY_USED = 1039;
+    public static final int INVALID_IMAGE_TYPE = 1040;
+    public static final int IMAGE_ERROR = 1041;
 
     public static final int UNKNOWN_ERROR = 9999;
 }

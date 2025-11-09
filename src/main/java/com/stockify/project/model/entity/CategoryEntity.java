@@ -18,8 +18,8 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "category", indexes = {
-        @Index(name = "idx_category_name_tenant", columnList = "name,tenantId"),
-        @Index(name = "idx_category_status_tenant_created", columnList = "status,tenantId,createdDate")
+        @Index(name = "idx_category_name", columnList = "name"),
+        @Index(name = "idx_category_status_created", columnList = "status,createdDate")
 })
 @EntityListeners(AuditingEntityListener.class)
 public class CategoryEntity {
@@ -44,10 +44,6 @@ public class CategoryEntity {
     @NotNull
     @Column(nullable = false)
     private BigDecimal taxRate;
-
-    @NotNull
-    @Column(nullable = false)
-    private Long tenantId;
 
     @CreatedDate
     private LocalDateTime createdDate;

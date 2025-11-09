@@ -4,44 +4,51 @@ import com.stockify.project.enums.Role;
 import com.stockify.project.model.entity.UserEntity;
 import com.stockify.project.model.dto.UserDto;
 import com.stockify.project.model.request.BrokerCreateRequest;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
-import static com.stockify.project.util.TenantContext.getTenantId;
-import static com.stockify.project.util.TenantContext.getUserRole;
+import static com.stockify.project.util.LoginContext.getUserRole;
 
-@Component
-@RequiredArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserConverter {
 
-    private final PasswordEncoder passwordEncoder;
-
-    public UserDto toDto(BrokerCreateRequest request, String username, String password) {
+    public static UserDto toDto(UserEntity userEntity) {
         return UserDto.builder()
+                .profileImageId(userEntity.getProfileImageId())
+                .username(userEntity.getUsername())
+                .firstName(userEntity.getFirstName())
+                .lastName(userEntity.getLastName())
+                .email(userEntity.getEmail())
+                .tkn(userEntity.getTkn())
+                .vkn(userEntity.getVkn())
+                .build();
+    }
+
+    public static UserEntity toEntity(BrokerCreateRequest request, String username, String encryptedPassword) {
+        return UserEntity.builder()
                 .username(username)
-                .password(password)
+                .password(encryptedPassword)
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
-                .tenantId(getTenantId())
+                .tkn(request.getTkn())
+                .vkn(request.getVkn())
                 .role(getRole())
                 .build();
     }
 
-    public UserEntity toEntity(UserDto userDto) {
+    public static UserEntity toEntity(UserDto userDto, String username, String encryptedPassword) {
         return UserEntity.builder()
-                .username(userDto.getUsername())
-                .password(passwordEncoder.encode(userDto.getPassword()))
+                .username(username)
+                .password(encryptedPassword)
                 .firstName(userDto.getFirstName())
                 .lastName(userDto.getLastName())
                 .email(userDto.getEmail())
-                .tenantId(userDto.getTenantId())
                 .role(userDto.getRole())
                 .build();
     }
 
-    private Role getRole() {
+    private static Role getRole() {
         Role role = getUserRole();
         boolean isCreatorAdmin = role == Role.ROLE_ADMIN;
         if (isCreatorAdmin) {

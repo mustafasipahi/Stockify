@@ -16,8 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.stockify.project.util.TenantContext.getTenantId;
-import static com.stockify.project.util.TenantContext.getUserId;
+import static com.stockify.project.util.LoginContext.getUserId;
 
 @Slf4j
 @Service
@@ -29,8 +28,7 @@ public class BrokerGetService {
     private final UserGetService userGetService;
 
     public BrokerDto getActiveBroker(Long brokerId) {
-        Long tenantId = getTenantId();
-        BrokerEntity brokerEntity = brokerRepository.findByIdAndTenantId(brokerId, tenantId)
+        BrokerEntity brokerEntity = brokerRepository.findById(brokerId)
                 .filter(broker -> broker.getStatus() == BrokerStatus.ACTIVE)
                 .orElseThrow(() -> new BrokerNotFoundException(brokerId));
         UserEntity brokerUser = userGetService.findById(brokerEntity.getBrokerUserId());
@@ -47,8 +45,7 @@ public class BrokerGetService {
 
     private List<BrokerDto> getAllBrokersByStatus(BrokerStatus status) {
         Long userId = getUserId();
-        Long tenantId = getTenantId();
-        List<BrokerEntity> userBrokerList = brokerRepository.getUserBrokerList(userId, status, tenantId);
+        List<BrokerEntity> userBrokerList = brokerRepository.getUserBrokerList(userId, status);
         List<Long> brokerIds = userBrokerList.stream()
                 .map(BrokerEntity::getId)
                 .toList();

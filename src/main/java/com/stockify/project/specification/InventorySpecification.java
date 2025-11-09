@@ -11,8 +11,7 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.stockify.project.util.TenantContext.getTenantId;
-import static com.stockify.project.util.TenantContext.getUserId;
+import static com.stockify.project.util.LoginContext.getUserId;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class InventorySpecification {
@@ -24,7 +23,6 @@ public class InventorySpecification {
                 predicates.add(root.get("status").in(request.getStatusList()));
             }
             predicates.add(criteriaBuilder.equal(root.get("active"), true));
-            predicates.add(criteriaBuilder.equal(root.get("tenantId"), getTenantId()));
             predicates.add(criteriaBuilder.equal(root.get("creatorUserId"), getUserId()));
             query.orderBy(criteriaBuilder.desc(root.get("createdDate")));
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

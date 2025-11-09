@@ -2,6 +2,7 @@ package com.stockify.project.service;
 
 import com.stockify.project.configuration.properties.InvoiceProperties;
 import com.stockify.project.exception.StockifyRuntimeException;
+import com.stockify.project.model.dto.CompanyDto;
 import com.stockify.project.model.response.InvoiceTokenResponse;
 import com.stockify.project.model.dto.SalesPrepareDto;
 import com.stockify.project.model.request.InvoiceCreateRequest;
@@ -24,7 +25,8 @@ public class InvoiceCreateService {
     private final InvoiceTokenService invoiceTokenService;
 
     public InvoiceCreateResponse createInvoice(SalesPrepareDto prepareDto) {
-        InvoiceTokenResponse invoiceTokenResponse = invoiceTokenService.prepareToken("mehmetali@birhesap.com.tr", "Abc123456!");
+        CompanyDto company = prepareDto.getCompany();
+        InvoiceTokenResponse invoiceTokenResponse = invoiceTokenService.prepareToken(company.getInvoiceUsername(), company.getInvoicePassword());
         InvoiceCreateResponse invoiceCreateResponse = prepareInvoice(prepareDto, invoiceTokenResponse);
         log.info("Fatura oluşturma işlemi başarılı: {}", invoiceCreateResponse);
         return invoiceCreateResponse;

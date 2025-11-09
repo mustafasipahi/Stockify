@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-import static com.stockify.project.util.TenantContext.getTenantId;
+import static com.stockify.project.util.LoginContext.getUserId;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PaymentConverter {
@@ -26,10 +26,10 @@ public class PaymentConverter {
 
     public static PaymentEntity toEntity(PaymentDto paymentDto) {
         return PaymentEntity.builder()
+                .creatorUserId(getUserId())
                 .brokerId(paymentDto.getBroker().getBrokerId())
                 .price(paymentDto.getPrice())
                 .type(paymentDto.getType())
-                .tenantId(getTenantId())
                 .build();
     }
 

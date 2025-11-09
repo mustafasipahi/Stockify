@@ -73,7 +73,7 @@ public class SalesDocumentService {
         SalesDto sales = prepareDto.getSales();
         List<SalesItemDto> salesItems = prepareDto.getSalesItems();
         BrokerDto broker = prepareDto.getBroker();
-        CompanyInfoDto companyInfo = prepareDto.getCompanyInfo();
+        CompanyDto company = prepareDto.getCompany();
         LocalDateTime now = LocalDateTime.now();
         String html = template;
 
@@ -82,8 +82,8 @@ public class SalesDocumentService {
         html = html.replace("{{page_size}}", pageSizeCSS);
 
         // Şirket ve müşteri bilgileri
-        html = html.replace("{{brand}}", replaceCharacter(companyInfo.getCompanyName()));
-        html = html.replace("{{address}}", replaceCharacter(companyInfo.getCompanyAddress()));
+        html = html.replace("{{brand}}", replaceCharacter(company.getCompanyName()));
+        html = html.replace("{{address}}", replaceCharacter(company.getCompanyAddress()));
         html = html.replace("{{customer}}", replaceCharacter(broker.getFirstName() + " " + broker.getLastName()));
         html = html.replace("{{issued_date}}", now.format(DATE_FORMAT));
         html = html.replace("{{issued_time}}", now.format(TIME_FORMAT));
