@@ -57,7 +57,7 @@ public class PaymentDocumentService {
         String html = template;
         html = html.replace("{{company_name}}", replaceCharacter(paymentDto.getCompany().getName()));
         html = html.replace("{{company_address}}", replaceCharacter(paymentDto.getCompany().getAddress()));
-        html = html.replace("{{company_phone}}", paymentDto.getCompany().getPhoneNumber());
+        html = html.replace("{{company_phone}}", replaceCharacter(paymentDto.getCompany().getPhoneNumber()));
         html = html.replace("{{document_title}}", "TAHSILAT MAKBUZU");
         html = html.replace("{{document_number}}", replaceCharacter(paymentDto.getDocumentNumber() != null ? paymentDto.getDocumentNumber() : ""));
 
