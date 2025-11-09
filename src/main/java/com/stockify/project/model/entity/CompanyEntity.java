@@ -32,10 +32,13 @@ public class CompanyEntity {
     private Long logoImageId;
 
     @Column
-    private String companyName;
+    private String name;
 
     @Column
-    private String companyAddress;
+    private String address;
+
+    @Column
+    private String phoneNumber;
 
     @Column
     private String invoiceUsername;

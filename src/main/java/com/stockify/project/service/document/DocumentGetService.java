@@ -90,8 +90,8 @@ public class DocumentGetService {
 
     public ImageDto getImages(Long profileImageId, Long companyLogoId) {
         return ImageDto.builder()
-                .profileImageDownloadUr(getDocument(profileImageId).getDownloadUrl())
-                .companyLogoDownloadUrl(getDocument(companyLogoId).getDownloadUrl())
+                .profileImageDownloadUr(profileImageId != null ? getDocument(profileImageId).getDownloadUrl() : null)
+                .companyLogoDownloadUrl(companyLogoId != null ? getDocument(companyLogoId).getDownloadUrl() : null)
                 .build();
     }
 

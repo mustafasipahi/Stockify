@@ -227,6 +227,15 @@
             margin-top: 1mm;
         }
 
+        .brandline {
+            display: table;
+            width: 100%;
+            font-size: 5pt;
+            margin: 0.5mm 0 0 0;
+            font-weight: 600;
+            table-layout: fixed;
+        }
+
         .signature-section {
             display: table;
             width: 100%;
@@ -395,6 +404,11 @@
                 <div class="signature-name">{{broker_name}}</div>
             </div>
         </div>
+    </div>
+
+    <div class="brandline">
+        <div class="left">{{brand_short}}</div>
+        <div class="right">{{brand_url}}</div>
     </div>
 </div>
 </body>

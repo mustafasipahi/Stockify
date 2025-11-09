@@ -40,8 +40,8 @@ public class DataInitializerService implements ApplicationRunner {
         UserEntity userEntity1 = userPostService.save(userDto1);
         CompanyEntity company1 = CompanyEntity.builder()
                 .creatorUserId(userEntity1.getId())
-                .companyName("Test1 Şirketler Grubu Lt.Ş.")
-                .companyAddress("Antalyada Bir Yerde Test1")
+                .name("Test1 Şirketler Grubu Lt.Ş.")
+                .address("Antalyada Bir Yerde Test1")
                 .invoiceUsername("mehmetali@birhesap.com.tr")
                 .invoicePassword("Abc123456!")
                 .build();
@@ -58,8 +58,8 @@ public class DataInitializerService implements ApplicationRunner {
         UserEntity userEntity2 = userPostService.save(userDto2);
         CompanyEntity company2 = CompanyEntity.builder()
                 .creatorUserId(userEntity2.getId())
-                .companyName("Test2 Şirketler Grubu Lt.Ş.")
-                .companyAddress("Antalyada Bir Yerde Test2")
+                .name("Test2 Şirketler Grubu Lt.Ş.")
+                .address("Antalyada Bir Yerde Test2")
                 .invoiceUsername("mehmetali@birhesap.com.tr")
                 .invoicePassword("Abc123456!")
                 .build();
@@ -78,8 +78,8 @@ public class DataInitializerService implements ApplicationRunner {
         UserEntity userEntity1 = userPostService.save(userDto1);
         CompanyEntity company1 = CompanyEntity.builder()
                 .creatorUserId(userEntity1.getId())
-                .companyName("Gurme Şirketler Grubu Lt.Ş.")
-                .companyAddress("Antalyada Bir Yerde Gülveren Tarafında")
+                .name("Gurme Şirketler Grubu Lt.Ş.")
+                .address("Antalyada Bir Yerde Gülveren Tarafında")
                 .build();
         companyPostService.save(company1);
 
@@ -94,8 +94,8 @@ public class DataInitializerService implements ApplicationRunner {
         UserEntity userEntity2 = userPostService.save(userDto2);
         CompanyEntity company2 = CompanyEntity.builder()
                 .creatorUserId(userEntity2.getId())
-                .companyName("Gurme Şirketler Grubu Lt.Ş.")
-                .companyAddress("Antalyada Bir Yerde Gülveren Tarafında")
+                .name("Gurme Şirketler Grubu Lt.Ş.")
+                .address("Antalyada Bir Yerde Gülveren Tarafında")
                 .build();
         companyPostService.save(company2);
     }

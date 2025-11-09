@@ -40,7 +40,7 @@ public class DocumentUploadValidator {
     }
 
     private boolean isAllowedContentType(String contentType) {
-        if (StringUtils.isEmpty(contentType)) {
+        if (StringUtils.isBlank(contentType)) {
             return false;
         }
         List<String> allowedTypes = fileStorageProperties.getAllowedTypes();

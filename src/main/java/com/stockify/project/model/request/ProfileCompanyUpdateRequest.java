@@ -15,6 +15,7 @@ public class ProfileCompanyUpdateRequest {
 
     private String companyName;
     private String companyAddress;
+    private String phoneNumber;
     private String invoiceUsername;
     private String invoicePassword;
 }

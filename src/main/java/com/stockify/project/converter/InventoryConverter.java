@@ -60,6 +60,7 @@ public class InventoryConverter {
     public static InventoryDto toIdDto(InventoryEntity inventoryEntity) {
         return InventoryDto.builder()
                 .inventoryId(inventoryEntity.getId())
+                .active(inventoryEntity.isActive())
                 .build();
     }
 }

@@ -18,8 +18,9 @@ public class CompanyConverter {
         return CompanyDto.builder()
                 .logoImageId(companyEntity.getLogoImageId())
                 .creatorUserId(companyEntity.getCreatorUserId())
-                .companyName(companyEntity.getCompanyName())
-                .companyAddress(companyEntity.getCompanyAddress())
+                .name(companyEntity.getName())
+                .address(companyEntity.getAddress())
+                .phoneNumber(companyEntity.getPhoneNumber())
                 .invoiceUsername(companyEntity.getInvoiceUsername())
                 .invoicePassword(companyEntity.getInvoicePassword())
                 .build();

@@ -56,8 +56,8 @@ public class SalesService {
         SalesPrepareDto prepareDto = prepareSalesFlow(request);
         addCompany(prepareDto);
         SalesEntity salesEntity = SalesConverter.toSalesEntity(prepareDto.getSales());
-        DocumentResponse documentResponse = uploadDocument(prepareDto);
         DocumentResponse invoiceResponse = uploadInvoice(prepareDto, request.isCreateInvoice());
+        DocumentResponse documentResponse = uploadDocument(prepareDto);
         salesEntity.setDocumentId(documentResponse.getDocumentId());
         salesEntity.setInvoiceId(invoiceResponse.getDocumentId());
         SalesEntity savedSalesEntity = saveSalesEntity(salesEntity);

@@ -10,6 +10,7 @@ import com.stockify.project.model.other.ByteArrayMultipartFile;
 import com.stockify.project.model.response.PaymentDocumentResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,10 +18,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.text.DecimalFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 
+import static com.stockify.project.constant.DocumentConstants.*;
+import static com.stockify.project.util.DocumentUtil.convertNumberToWords;
 import static com.stockify.project.util.DocumentUtil.replaceCharacter;
 import static com.stockify.project.util.NameUtil.getBrokerFullName;
 import static com.stockify.project.util.NameUtil.getUserFullName;
@@ -32,12 +33,6 @@ import static com.stockify.project.util.LoginContext.getUser;
 public class PaymentDocumentService {
 
     private final DocumentGetService documentGetService;
-
-    private static final DecimalFormat MONEY_FORMAT = new DecimalFormat("#,##0.00");
-    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    private static final String DEFAULT_FILENAME = "payment.pdf";
-    private static final String DEFAULT_CONTENT_TYPE = "application/pdf";
-    private static final String DEFAULT_CURRENCY = "TL";
 
     public PaymentDocumentResponse generatePDF(PaymentDto paymentDto) throws IOException {
         String htmlTemplate = readHtmlTemplate();
@@ -59,21 +54,16 @@ public class PaymentDocumentService {
 
     private String fillTemplate(String template, PaymentDto paymentDto) {
         String html = template;
-
-        // Şirket bilgileri (hardcoded veya configuration'dan alınabilir)
-        html = html.replace("{{company_name}}", "STOCKIFY YAZILIM A.S.");
-        html = html.replace("{{company_address}}", replaceCharacter("Teknokent Mah. Silikon Vadisi Cad. No:123/A\nAnkara/TURKIYE"));
-        html = html.replace("{{company_phone}}", "0312 123 45 67");
+        html = html.replace("{{company_name}}", replaceCharacter(paymentDto.getCompany().getName()));
+        html = html.replace("{{company_address}}", replaceCharacter(paymentDto.getCompany().getAddress()));
+        html = html.replace("{{company_phone}}", paymentDto.getCompany().getPhoneNumber());
         html = html.replace("{{document_title}}", "TAHSILAT MAKBUZU");
         html = html.replace("{{document_number}}", replaceCharacter(paymentDto.getDocumentNumber() != null ? paymentDto.getDocumentNumber() : ""));
 
-        // Logo - Base64 olarak embed et
         String logoBase64 = getCompanyLogoAsBase64(paymentDto.getCompany());
         html = html.replace("{{company_logo}}", logoBase64);
-        // Logo varsa göster, yoksa gizle
-        html = html.replace("{{logo_display}}", logoBase64.isEmpty() ? "display:none;" : "");
+        html = html.replace("{{logo_display}}", StringUtils.isBlank(logoBase64) ? "display:none;" : "");
 
-        // Ödeme bilgileri
         html = html.replace("{{payment_amount}}", MONEY_FORMAT.format(paymentDto.getPrice()));
         html = html.replace("{{payment_date}}", paymentDto.getCreatedDate() != null ? paymentDto.getCreatedDate().format(DATE_FORMAT) : "");
 
@@ -84,24 +74,14 @@ public class PaymentDocumentService {
         html = html.replace("{{broker_name}}", brokerName);
         html = html.replace("{{currency}}", DEFAULT_CURRENCY);
 
-        // Ödeme tipi
-        String paymentType = "";
-        if (paymentDto.getType() != null) {
-            paymentType = replaceCharacter(paymentDto.getType().getName());
-        }
-        html = html.replace("{{payment_type}}", paymentType);
-
-        // Yazı ile tutar
+        html = html.replace("{{payment_type}}", paymentDto.getType() != null ? replaceCharacter(paymentDto.getType().getName()) : "");
         html = html.replace("{{amount_in_words}}", convertToWords(paymentDto.getPrice()));
 
+        html = html.replace("{{brand_short}}", DEFAULT_BRAND_NAME);
+        html = html.replace("{{brand_url}}", DEFAULT_BRAND_URL);
         return html;
     }
 
-    /**
-     * Şirket logosunu Base64 formatında döndürür
-     * PaymentDto içinden company bilgisi alınır ve ona göre logo yüklenir
-     * Örnek: resources/static/logos/company_1.png
-     */
     private String getCompanyLogoAsBase64(CompanyDto company) {
         try {
             DocumentAsByteDto documentAsByte = documentGetService.getDocumentAsByte(company.getLogoImageId());
@@ -114,9 +94,6 @@ public class PaymentDocumentService {
         }
     }
 
-    /**
-     * Dosya uzantısına göre MIME type döndürür
-     */
     private String determineMimeType(String fileName) {
         String lowerFileName = fileName.toLowerCase();
         if (lowerFileName.endsWith(".png")) {
@@ -128,51 +105,20 @@ public class PaymentDocumentService {
         } else if (lowerFileName.endsWith(".svg")) {
             return "image/svg+xml";
         }
-        return "image/png"; // Default
+        return "image/png";
     }
 
-    /**
-     * Sayıyı yazıya çevirir (basit implementasyon)
-     */
     private String convertToWords(BigDecimal amount) {
-        if (amount == null) return "Sifir TL";
-
+        if (amount == null) return "Sifir " + DEFAULT_CURRENCY;
         int intPart = amount.intValue();
         int decimalPart = amount.remainder(BigDecimal.ONE).multiply(new BigDecimal("100")).intValue();
-
-        return convertNumberToWords(intPart) + " TL" +
-                (decimalPart > 0 ? " " + convertNumberToWords(decimalPart) + " Kr" : "");
-    }
-
-    private String convertNumberToWords(int number) {
-        if (number == 0) return "Sifir";
-        if (number < 0) return "Eksi " + convertNumberToWords(-number);
-
-        String[] ones = {"", "Bir", "Iki", "Uc", "Dort", "Bes", "Alti", "Yedi", "Sekiz", "Dokuz"};
-        String[] tens = {"", "On", "Yirmi", "Otuz", "Kirk", "Elli", "Altmis", "Yetmis", "Seksen", "Doksan"};
-        String[] hundreds = {"", "Yuz", "Ikiyuz", "Ucyuz", "Dortyuz", "Besyuz", "Altiyuz", "Yediyuz", "Sekizyuz", "Dokuzyuz"};
-
-        if (number < 10) return ones[number];
-        if (number < 100) return tens[number / 10] + ones[number % 10];
-        if (number < 1000) return hundreds[number / 100] + tens[(number % 100) / 10] + ones[number % 10];
-        if (number < 10000) {
-            int thousands = number / 1000;
-            return (thousands == 1 ? "Bin" : ones[thousands] + "Bin") + convertNumberToWords(number % 1000);
-        }
-        if (number < 1000000) {
-            return convertNumberToWords(number / 1000) + "Bin" + convertNumberToWords(number % 1000);
-        }
-        if (number < 1000000000) {
-            return convertNumberToWords(number / 1000000) + "Milyon" + convertNumberToWords(number % 1000000);
-        }
-
-        return convertNumberToWords(number / 1000000000) + "Milyar" + convertNumberToWords(number % 1000000000);
+        return convertNumberToWords(intPart) + " " + DEFAULT_CURRENCY + (decimalPart > 0 ? " " + convertNumberToWords(decimalPart) + " " + DEFAULT_CURRENCY_FRACTION : "");
     }
 
     private PaymentDocumentResponse generate(String html) {
         try {
             byte[] pdfBytes = createPDFAsBytes(html);
-            MultipartFile pdfFile = new ByteArrayMultipartFile(pdfBytes, DEFAULT_FILENAME, DEFAULT_CONTENT_TYPE);
+            MultipartFile pdfFile = new ByteArrayMultipartFile(pdfBytes, DEFAULT_PAYMENT_FILENAME, DEFAULT_CONTENT_TYPE);
             return PaymentDocumentResponse.builder()
                     .file(pdfFile)
                     .build();

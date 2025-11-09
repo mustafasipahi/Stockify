@@ -98,10 +98,13 @@ public class ProfilePostService {
 
     private void updateCompanyDetail(ProfileCompanyUpdateRequest companyRequest, CompanyEntity companyEntity) {
         if (StringUtils.isNotBlank(companyRequest.getCompanyName())) {
-            companyEntity.setCompanyName(companyRequest.getCompanyName());
+            companyEntity.setName(companyRequest.getCompanyName());
         }
         if (StringUtils.isNotBlank(companyRequest.getCompanyAddress())) {
-            companyEntity.setCompanyAddress(companyRequest.getCompanyAddress());
+            companyEntity.setAddress(companyRequest.getCompanyAddress());
+        }
+        if (StringUtils.isNotBlank(companyRequest.getPhoneNumber())) {
+            companyEntity.setPhoneNumber(companyRequest.getPhoneNumber());
         }
         if (StringUtils.isNotBlank(companyRequest.getInvoiceUsername())) {
             companyEntity.setInvoiceUsername(companyRequest.getInvoiceUsername());

@@ -20,8 +20,9 @@ public class CompanyDto implements Serializable {
     private Long companyId;
     private Long creatorUserId;
     private Long logoImageId;
-    private String companyName;
-    private String companyAddress;
+    private String name;
+    private String address;
+    private String phoneNumber;
     private String invoiceUsername;
     private String invoicePassword;
 }
