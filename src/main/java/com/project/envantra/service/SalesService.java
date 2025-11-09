@@ -1,6 +1,7 @@
 package com.project.envantra.service;
 
 import com.project.envantra.converter.SalesConverter;
+import com.project.envantra.exception.InvoiceInfoException;
 import com.project.envantra.model.dto.*;
 import com.project.envantra.model.entity.SalesEntity;
 import com.project.envantra.model.request.SalesRequest;
@@ -53,6 +54,7 @@ public class SalesService {
 
     @Transactional
     public SalesResponse salesConfirm(SalesRequest request) {
+        checkInvoiceInfo(request.isCreateInvoice());
         SalesPrepareDto prepareDto = prepareSalesFlow(request);
         addCompany(prepareDto);
         SalesEntity salesEntity = SalesConverter.toSalesEntity(prepareDto.getSales());
@@ -103,6 +105,15 @@ public class SalesService {
         SalesPriceDto salesPriceDto = calculateTaxAndDiscount(salesItems, discountRate);
         SalesDto sales = SalesConverter.toSalesDto(request.getBrokerId(), salesPriceDto);
         return SalesConverter.toPrepareDto(sales, salesItems, broker);
+    }
+
+    private void checkInvoiceInfo(boolean createInvoice) {
+        if (createInvoice) {
+            boolean hasInvoiceInfo = companyGetService.hasInvoiceInfo();
+            if (!hasInvoiceInfo) {
+                throw new InvoiceInfoException();
+            }
+        }
     }
 
     private List<BasketDto> getBrokerBasket(Long brokerId) {

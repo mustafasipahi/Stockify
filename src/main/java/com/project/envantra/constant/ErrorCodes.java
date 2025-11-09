@@ -47,6 +47,7 @@ public class ErrorCodes {
     public static final int USERNAME_ALREADY_USED = 1039;
     public static final int INVALID_IMAGE_TYPE = 1040;
     public static final int IMAGE_ERROR = 1041;
+    public static final int INVOICE_INFO_REQUIRED = 1042;
 
     public static final int UNKNOWN_ERROR = 9999;
 }
