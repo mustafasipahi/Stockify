@@ -55,9 +55,9 @@ public class DataInitializerService implements ApplicationRunner {
                 .email("test2@user.com")
                 .role(Role.ROLE_ADMIN)
                 .build();
-        userPostService.save(userDto2);
+        UserEntity userEntity2 = userPostService.save(userDto2);
         CompanyEntity company2 = CompanyEntity.builder()
-                .creatorUserId(userEntity1.getId())
+                .creatorUserId(userEntity2.getId())
                 .companyName("Test2 Şirketler Grubu Lt.Ş.")
                 .companyAddress("Antalyada Bir Yerde Test2")
                 .invoiceUsername("mehmetali@birhesap.com.tr")
@@ -91,9 +91,9 @@ public class DataInitializerService implements ApplicationRunner {
                 .email("selcuk.yilmaz.ant@gmail.com")
                 .role(Role.ROLE_ADMIN)
                 .build();
-        userPostService.save(userDto2);
+        UserEntity userEntity2 = userPostService.save(userDto2);
         CompanyEntity company2 = CompanyEntity.builder()
-                .creatorUserId(userEntity1.getId())
+                .creatorUserId(userEntity2.getId())
                 .companyName("Gurme Şirketler Grubu Lt.Ş.")
                 .companyAddress("Antalyada Bir Yerde Gülveren Tarafında")
                 .build();

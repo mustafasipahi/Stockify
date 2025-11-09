@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/profile")
@@ -26,13 +28,13 @@ public class ProfileController {
         return profileGetService.detail();
     }
 
-    @PostMapping("/upload/profile-image")
-    public void uploadProfileImage(@RequestParam("file") MultipartFile file) {
+    @PostMapping(value = "/upload/profile-image", consumes = MULTIPART_FORM_DATA_VALUE)
+    public void uploadProfileImage(@RequestPart(name = "file") MultipartFile file) {
         profilePostService.uploadProfileImage(file);
     }
 
-    @PostMapping("/upload/company-logo")
-    public void uploadCompanyLogo(@RequestParam("file") MultipartFile file) {
+    @PostMapping(value = "/upload/company-logo", consumes = MULTIPART_FORM_DATA_VALUE)
+    public void uploadCompanyLogo(@RequestPart(name = "file") MultipartFile file) {
         profilePostService.uploadCompanyLogo(file);
     }
 }
