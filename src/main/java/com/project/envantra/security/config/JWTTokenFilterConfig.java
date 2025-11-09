@@ -1,0 +1,65 @@
+package com.project.envantra.security.config;
+
+import com.project.envantra.security.service.JWTTokenService;
+import com.project.envantra.security.userdetail.UserPrincipal;
+import com.project.envantra.util.LoginContext;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.lang.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.util.Date;
+
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class JWTTokenFilterConfig extends OncePerRequestFilter {
+
+    private final JWTTokenService jwtTokenService;
+    private final UserDetailsService userDetailsService;
+
+    @Override
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain) {
+        final String header = request.getHeader("Authorization");
+        try {
+            if (header != null && header.startsWith("Bearer ")) {
+                final String token = jwtTokenService.extractTokenFromAuthorizationHeader(header);
+                if (jwtTokenService.validateToken(token)) {
+                    final String username = jwtTokenService.findUsernameFromToken(token);
+                    final Date expirationDate = jwtTokenService.findExpirationFromToken(token);
+                    if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                        UserPrincipal principal = (UserPrincipal) userDetails;
+                        LoginContext.setCurrentUser(principal.getUserEntity());
+                        if (username.equals(userDetails.getUsername()) && expirationDate.after(new Date())) {
+                            final UsernamePasswordAuthenticationToken authenticationToken =
+                                    new UsernamePasswordAuthenticationToken(
+                                            userDetails,
+                                            null,
+                                            userDetails.getAuthorities()
+                                    );
+                            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                        }
+                    }
+                }
+            }
+            filterChain.doFilter(request, response);
+        } catch (Exception e) {
+            log.error("JWT authentication error: {}", e.getMessage());
+        } finally {
+            LoginContext.clear();
+        }
+    }
+}

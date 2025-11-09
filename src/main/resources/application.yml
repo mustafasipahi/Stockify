@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/stockify_app?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC}
+    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/envantra_app?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC}
     username: ${DATABASE_USERNAME:root}
     password: ${DATABASE_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -31,7 +31,7 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${MAIL_SENDER_USERNAME:stokify.destek@gmail.com}
+    username: ${MAIL_SENDER_USERNAME:envantra.destek@gmail.com}
     password: ${MAIL_SENDER_PASSWORD:hfkj bqhf uibj itkl}
     protocol: smtp
     properties:
@@ -50,7 +50,7 @@ spring:
 security:
   secretKey: ${JWT_SECRET_KEY:mZ1p8Q9kT+L3s5vR1w6nV7yXf2aU0h3JqP4s8bYtQ1w=}
 
-stockify:
+envantra:
   files:
     storage:
       allowed-types:
@@ -90,5 +90,5 @@ logging:
     name: ${LOG_FILE:/}
   level:
     root: INFO
-    com.stockify.project: INFO
+    com.project.envantra: INFO
     org.springframework.security: INFO

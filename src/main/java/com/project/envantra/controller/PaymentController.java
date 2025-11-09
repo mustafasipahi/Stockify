@@ -1,0 +1,23 @@
+package com.project.envantra.controller;
+
+import com.project.envantra.model.request.PaymentCreateRequest;
+import com.project.envantra.model.response.PaymentResponse;
+import com.project.envantra.service.PaymentService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/payment")
+public class PaymentController {
+
+    private final PaymentService paymentService;
+
+    @PostMapping("/save")
+    public PaymentResponse save(@RequestBody PaymentCreateRequest request) {
+        return paymentService.save(request);
+    }
+}

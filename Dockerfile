@@ -20,4 +20,4 @@ RUN mvn clean package -DskipTests
 EXPOSE 8080
 
 # Run the application
-CMD ["java", "-jar", "target/Stockify-1.0-SNAPSHOT.jar"]
+CMD ["java", "-jar", "target/Envantra-1.0-SNAPSHOT.jar"]

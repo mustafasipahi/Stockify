@@ -1,0 +1,58 @@
+package com.project.envantra.model.entity;
+
+import com.project.envantra.enums.DocumentType;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Entity
+@Table(name = "documents", indexes = {
+        @Index(name = "idx_document_broker_created", columnList = "brokerId,createdDate"),
+        @Index(name = "idx_document_created", columnList = "createdDate")
+})
+@EntityListeners(AuditingEntityListener.class)
+public class DocumentEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column
+    private String outId;
+
+    @NotNull
+    @Column(nullable = false)
+    private Long creatorUserId;
+
+    @Column
+    private Long brokerId;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DocumentType documentType;
+
+    @NotNull
+    @Column(nullable = false)
+    private String fileName;
+
+    @NotNull
+    @Column(nullable = false)
+    private String documentNumber;
+
+    @Column(nullable = false)
+    private String path;
+
+    @CreatedDate
+    private LocalDateTime createdDate;
+}

@@ -4,9 +4,9 @@
 version: '3.8'
 services:
 
-  stockify-app:
-    container_name: stockify-app
-    image: stockify-app:1
+  envantra-app:
+    container_name: envantra-app
+    image: envantra-app:1
     restart: always
     build:
       context: ./
@@ -15,7 +15,7 @@ services:
       - "8080:8080"
     environment:
       # Local development database
-      DATABASE_URL: jdbc:postgresql://stockify_user:postgres@stockify-app-postgresql:5432/stockify_app
+      DATABASE_URL: jdbc:postgresql://envantra_user:postgres@envantra-app-postgresql:5432/envantra_app
       CLOUDINARY_CLOUD_NAME: dd8d5yvdv
       CLOUDINARY_API_KEY: 424539718517918
       CLOUDINARY_API_SECRET: FriIuvdVVf181Wrmvw-7ZJHMMrQ
@@ -23,22 +23,22 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       JAVA_OPTS: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
     depends_on:
-      stockify-app-postgresql:
+      envantra-app-postgresql:
         condition: service_healthy
 
   # Local PostgreSQL for development
-  stockify-app-postgresql:
-    container_name: stockify-app-postgresql
+  envantra-app-postgresql:
+    container_name: envantra-app-postgresql
     image: postgres:15-alpine
     restart: always
     environment:
-      POSTGRES_DB: stockify_app
-      POSTGRES_USER: stockify_user
+      POSTGRES_DB: envantra_app
+      POSTGRES_USER: envantra_user
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U stockify_user -d stockify_app"]
+      test: ["CMD-SHELL", "pg_isready -U envantra_user -d envantra_app"]
       timeout: 10s
       retries: 5
       interval: 10s
