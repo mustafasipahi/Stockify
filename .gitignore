@@ -1,42 +1,63 @@
-HELP.md
+# ==============================
+# Maven / Gradle / Build
+# ==============================
 target/
-.mvn
+build/
+out/
+.mvn/
 mvnw*
 !.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**
-!**/src/test/**
 
-### STS ###
-.apt_generated
+# ==============================
+# STS / Eclipse
+# ==============================
+.apt_generated/
 .classpath
 .factorypath
 .project
-.settings
-.springBeans
-.sts4-cache
-.metadata
+.settings/
+.springBeans/
+.sts4-cache/
+.metadata/
 
-### IntelliJ IDEA ###
-.idea
+# ==============================
+# IntelliJ IDEA
+# ==============================
+.idea/
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
+# ==============================
+# NetBeans
+# ==============================
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
 
-### VS Code ###
+# ==============================
+# VS Code
+# ==============================
 .vscode/
 
-# Mac OS Files
+# ==============================
+# System Files
+# ==============================
+# macOS
 .DS_Store
 .AppleDouble
 .LSOverride
-
-# Thumbnails
 ._*
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ==============================
+# Logs and temporary files
+# ==============================
+*.log
+*.tmp
+*.swp
