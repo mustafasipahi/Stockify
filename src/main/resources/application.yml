@@ -48,7 +48,7 @@ spring:
         debug: false
 
 security:
-  secretKey: ${JWT_SECRET_KEY:test}
+  secretKey: ${JWT_SECRET_KEY:mZ1p8Q9kT+L3s5vR1w6nV7yXf2aU0h3JqP4s8bYtQ1w=}
 
 stockify:
   files:
