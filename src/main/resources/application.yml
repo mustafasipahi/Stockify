@@ -11,7 +11,7 @@ spring:
     database: mysql
     database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:validate}
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
     properties:
       hibernate:
         jdbc:
@@ -42,7 +42,6 @@ spring:
             enable: true
             required: true
           ssl:
-            enable: true
             protocols: TLSv1.2
             trust: smtp.gmail.com
           timeout: 30000
