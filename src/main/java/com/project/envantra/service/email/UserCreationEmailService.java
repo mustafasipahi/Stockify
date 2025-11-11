@@ -6,16 +6,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import static com.project.envantra.constant.DocumentConstants.DEFAULT_BRAND_NAME;
-import static com.project.envantra.constant.TemplateUtil.USER_CREATION_TEMPLATE;
+import static com.project.envantra.constant.TemplateConstant.USER_CREATION_TEMPLATE;
 import static com.project.envantra.util.NameUtil.getBrokerFullName;
 import static com.project.envantra.util.NameUtil.getUserFullName;
 
@@ -63,13 +63,14 @@ public class UserCreationEmailService {
     }
 
     private String createUserCreationEmailContent(UserCreationEmailRequest request) throws MessagingException {
+        String template = USER_CREATION_TEMPLATE;
         try {
-            String htmlTemplate = loadTemplate();
+            String htmlTemplate = loadTemplate(template);
             Map<String, String> templateVariables = buildUserCreationVariables(request);
             return replacePlaceholders(htmlTemplate, templateVariables);
         } catch (IOException e) {
             log.error("Load Template Error!", e);
-            throw new MessagingException(USER_CREATION_TEMPLATE, e);
+            throw new MessagingException(template, e);
         }
     }
 
@@ -83,13 +84,14 @@ public class UserCreationEmailService {
         return variables;
     }
 
-    private String loadTemplate() throws IOException {
-        ClassPathResource resource = new ClassPathResource(USER_CREATION_TEMPLATE);
-        if (!resource.exists()) {
-            log.error("Template not found: {}", USER_CREATION_TEMPLATE);
-            throw new IOException("Template not found: " + USER_CREATION_TEMPLATE);
+    private String loadTemplate(String templatePath) throws IOException {
+        try (InputStream inputStream = UserCreationEmailService.class.getClassLoader().getResourceAsStream(templatePath)) {
+            if (inputStream == null) {
+                log.error("Template not found in classpath: {}", templatePath);
+                throw new IOException("Template not found: " + templatePath);
+            }
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         }
-        return new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
     }
 
     private String replacePlaceholders(String template, Map<String, String> variables) {

@@ -5,10 +5,10 @@ import com.project.envantra.model.response.DocumentResponse;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
 
 import static com.project.envantra.constant.DocumentConstants.DATE_TIME_FORMATTER_3;
 import static com.project.envantra.constant.DocumentConstants.DEFAULT_BRAND_NAME;
-import static com.project.envantra.constant.TemplateUtil.SALES_EMAIL_BUYER_TEMPLATE;
-import static com.project.envantra.constant.TemplateUtil.SALES_EMAIL_SELLER_TEMPLATE;
+import static com.project.envantra.constant.TemplateConstant.SALES_EMAIL_BUYER_TEMPLATE;
+import static com.project.envantra.constant.TemplateConstant.SALES_EMAIL_SELLER_TEMPLATE;
 import static com.project.envantra.util.EmailUtil.*;
 import static com.project.envantra.util.NameUtil.getBrokerFullName;
 import static com.project.envantra.util.LoginContext.getEmail;
@@ -101,11 +101,13 @@ public class SalesEmailService {
     }
 
     private String loadTemplate(String templatePath) throws IOException {
-        ClassPathResource resource = new ClassPathResource(templatePath);
-        if (!resource.exists()) {
-            log.error("Template not found!");
+        try (InputStream inputStream = SalesEmailService.class.getClassLoader().getResourceAsStream(templatePath)) {
+            if (inputStream == null) {
+                log.error("Template not found in classpath: {}", templatePath);
+                throw new IOException("Template not found: " + templatePath);
+            }
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         }
-        return new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
     }
 
     private Map<String, String> buildTemplateVariables(SalesPrepareDto salesData) {

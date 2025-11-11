@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class TemplateUtil {
+public class TemplateConstant {
 
     public static final String PAYMENT_PDF_DOCUMENT_TEMPLATE = "/templates/payment_document.html";
     public static final String PAYMENT_EMAIL_RECEIVER_TEMPLATE = "templates/payment_receiver_email.html";
@@ -15,8 +15,4 @@ public class TemplateUtil {
     public static final String SALES_EMAIL_BUYER_TEMPLATE = "templates/sales_buyer_email.html";
 
     public static final String USER_CREATION_TEMPLATE = "templates/user_creation_email.html";
-
-
-
-    public static final String AAAA = "templates/email_template.html";
 }

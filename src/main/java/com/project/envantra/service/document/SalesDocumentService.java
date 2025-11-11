@@ -8,7 +8,6 @@ import com.project.envantra.model.other.ByteArrayMultipartFile;
 import com.project.envantra.model.response.SalesDocumentResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,7 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.project.envantra.constant.DocumentConstants.*;
-import static com.project.envantra.constant.TemplateUtil.SALES_PDF_DOCUMENT_TEMPLATE;
+import static com.project.envantra.constant.TemplateConstant.SALES_PDF_DOCUMENT_TEMPLATE;
 import static com.project.envantra.util.DocumentUtil.replaceCharacter;
 
 @Slf4j
@@ -29,20 +28,19 @@ import static com.project.envantra.util.DocumentUtil.replaceCharacter;
 public class SalesDocumentService {
 
     public SalesDocumentResponse generatePDF(SalesPrepareDto prepareDto) throws IOException {
-        String htmlTemplate = readHtmlTemplate();
+        String htmlTemplate = loadTemplate();
         String filledHtml = fillTemplate(htmlTemplate, prepareDto);
         return generate(filledHtml);
     }
 
-    private String readHtmlTemplate() throws IOException {
-        try (InputStream inputStream = new ClassPathResource(SALES_PDF_DOCUMENT_TEMPLATE).getInputStream();
-             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
-            StringBuilder html = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                html.append(line).append("\n");
+    private String loadTemplate() throws IOException {
+        String templatePath = SALES_PDF_DOCUMENT_TEMPLATE;
+        try (InputStream inputStream = SalesDocumentService.class.getClassLoader().getResourceAsStream(templatePath)) {
+            if (inputStream == null) {
+                log.error("Template not found in classpath: {}", templatePath);
+                throw new IOException("Template not found: " + templatePath);
             }
-            return html.toString();
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         }
     }
 
