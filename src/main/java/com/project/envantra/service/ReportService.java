@@ -40,7 +40,7 @@ public class ReportService {
         List<PaymentEntity> paymentList = paymentService.findAllByBrokerId(brokerMap.keySet()).stream()
                 .filter(payment -> isDateInRange(payment.getCreatedDate(), startDate, endDate))
                 .toList();
-        List<BrokerVisitDto> visitInfoList = brokerVisitService.getVisitsByDate(startDate, endDate);
+        List<BrokerVisitDto> visitInfoList = brokerVisitService.getVisitInfoListByDate(startDate, endDate);
         return DailyReportResponse.builder()
                 .dailyBrokerReports(createBrokerReports(salesList, paymentList, visitInfoList, brokerMap))
                 .dailySummaryReports(createSummaryReports(salesList, paymentList))
@@ -174,7 +174,7 @@ public class ReportService {
         }
         return reportMap.values().stream()
                 .sorted(Comparator.comparing(DailyBrokerReportDto::getOrderNo))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private List<DailySummaryDto> createSummaryReports(List<SalesEntity> salesList, List<PaymentEntity> paymentList) {

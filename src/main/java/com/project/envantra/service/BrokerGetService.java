@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -35,8 +37,15 @@ public class BrokerGetService {
                 .filter(broker -> broker.getStatus() == BrokerStatus.ACTIVE)
                 .orElseThrow(() -> new BrokerNotFoundException(brokerId));
         UserEntity brokerUser = userGetService.findById(brokerEntity.getBrokerUserId());
-        BrokerVisitDto visitInfo = brokerVisitService.getVisitByBrokerId(brokerId);
+        BrokerVisitDto visitInfo = brokerVisitService.getVisitInfoByBrokerId(brokerId);
         return BrokerConverter.toDto(brokerEntity, brokerUser, visitInfo, getBrokerCurrentBalance(brokerId));
+    }
+
+    public List<BrokerDto> getTodayBrokers() {
+        DayOfWeek today = LocalDate.now().getDayOfWeek();
+        return getAllBrokers().stream()
+                .filter(broker -> today.equals(broker.getTargetDayOfWeek()))
+                .toList();
     }
 
     public List<BrokerDto> getAllBrokers() {
@@ -85,7 +94,7 @@ public class BrokerGetService {
     }
 
     private Map<Long, BrokerVisitDto> getBrokerVisitMap(List<Long> brokerUserIds) {
-        return brokerVisitService.getVisitsByBrokerIdIn(brokerUserIds).stream()
+        return brokerVisitService.getVisitInfoListByBrokerIdIn(brokerUserIds).stream()
                 .collect(Collectors.toMap(BrokerVisitDto::getBrokerId, visitInfo -> visitInfo));
     }
 }

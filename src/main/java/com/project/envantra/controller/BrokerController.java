@@ -1,10 +1,7 @@
 package com.project.envantra.controller;
 
 import com.project.envantra.model.dto.BrokerDto;
-import com.project.envantra.model.request.BrokerCreateRequest;
-import com.project.envantra.model.request.BrokerOrderUpdateRequest;
-import com.project.envantra.model.request.BrokerUpdateRequest;
-import com.project.envantra.model.request.DiscountUpdateRequest;
+import com.project.envantra.model.request.*;
 import com.project.envantra.service.BrokerPostService;
 import com.project.envantra.service.BrokerGetService;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +45,11 @@ public class BrokerController {
     @GetMapping("/detail/{id}")
     public BrokerDto detail(@PathVariable Long id) {
         return brokerGetService.getActiveBroker(id);
+    }
+
+    @GetMapping("/today")
+    public List<BrokerDto> getTodayBrokers() {
+        return brokerGetService.getTodayBrokers();
     }
 
     @GetMapping("/all")

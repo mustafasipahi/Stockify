@@ -15,13 +15,10 @@ public class BrokerVisitController {
 
     private final BrokerVisitService brokerVisitService;
 
-    @GetMapping("/today")
-    public List<BrokerDto> getTodayBrokers() {
-        return brokerVisitService.getTodayBrokers();
-    }
+
 
     @PutMapping("/update")
     public void updateVisit(@RequestBody BrokerVisitRequest request) {
-        brokerVisitService.updateVisit(request);
+        brokerVisitService.updateVisitInfo(request);
     }
 }
