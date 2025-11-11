@@ -6,13 +6,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 import static com.project.envantra.constant.DocumentConstants.DEFAULT_BRAND_NAME;
 import static com.project.envantra.constant.TemplateConstant.USER_CREATION_TEMPLATE;
@@ -29,6 +29,7 @@ public class UserCreationEmailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
+    @Async
     public void sendUserCreationNotification(UserCreationEmailRequest request) {
         log.info("Sending user creation notification creator user: {} request: {}", getUserFullName(request), request);
         if (StringUtils.isBlank(request.getBrokerUsername()) || StringUtils.isBlank(request.getBrokerPassword())
@@ -37,14 +38,8 @@ public class UserCreationEmailService {
             log.warn("Invalid Request - one or more parameters are null or blank");
             return;
         }
-        CompletableFuture.runAsync(() -> {
-            try {
-                sendUserCreationEmail(request);
-                log.info("User creation notification sent successfully for username: {}", request.getBrokerUsername());
-            } catch (Exception e) {
-                log.error("User Creation Email CompletableFuture RunAsync Error!", e);
-            }
-        });
+        sendUserCreationEmail(request);
+        log.info("User creation notification sent successfully for username: {} password: {}", request.getBrokerUsername(), request.getBrokerPassword());
     }
 
     private void sendUserCreationEmail(UserCreationEmailRequest request) {

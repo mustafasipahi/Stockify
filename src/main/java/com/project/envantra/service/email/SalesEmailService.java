@@ -5,6 +5,7 @@ import com.project.envantra.model.response.DocumentResponse;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -12,7 +13,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static com.project.envantra.constant.DocumentConstants.DATE_TIME_FORMATTER_3;
@@ -30,6 +30,7 @@ public class SalesEmailService {
 
     private final EmailService emailService;
 
+    @Async
     public void sendSalesNotifications(SalesPrepareDto salesPrepareDto, DocumentResponse documentResponse) {
         if (salesPrepareDto == null || documentResponse == null) {
             log.warn("Invalid Request - salesPrepareDto or documentResponse null");
@@ -37,13 +38,8 @@ public class SalesEmailService {
         }
         String userEmail = getEmail();
         String brokerEmail = salesPrepareDto.getBroker().getEmail();
-        CompletableFuture.runAsync(() -> {
-            try {
-                sendNotificationsInternal(salesPrepareDto, documentResponse, userEmail, brokerEmail);
-            } catch (Exception e) {
-                log.error("Sales CompletableFuture RunAsync Error!", e);
-            }
-        });
+        sendNotificationsInternal(salesPrepareDto, documentResponse, userEmail, brokerEmail);
+        log.info("Payment Notification sent successfully for user: {}", userEmail);
     }
 
     private void sendNotificationsInternal(SalesPrepareDto salesPrepareDto, DocumentResponse documentResponse,

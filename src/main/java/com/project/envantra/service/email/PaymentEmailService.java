@@ -6,6 +6,7 @@ import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,7 +15,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 import static com.project.envantra.constant.DocumentConstants.DATE_TIME_FORMATTER_3;
 import static com.project.envantra.constant.DocumentConstants.DEFAULT_BRAND_NAME;
@@ -31,6 +31,7 @@ public class PaymentEmailService {
 
     private final EmailService emailService;
 
+    @Async
     public void sendPaymentNotifications(PaymentDto paymentDto, DocumentResponse documentResponse) {
         if (paymentDto == null || documentResponse == null) {
             log.warn("Invalid Request - paymentDto or documentResponse null");
@@ -38,13 +39,8 @@ public class PaymentEmailService {
         }
         String userEmail = getEmail();
         String brokerEmail = paymentDto.getBroker().getEmail();
-        CompletableFuture.runAsync(() -> {
-            try {
-                sendNotificationsInternal(paymentDto, documentResponse, userEmail, brokerEmail);
-            } catch (Exception e) {
-                log.error("Payment CompletableFuture RunAsync Error!", e);
-            }
-        });
+        sendNotificationsInternal(paymentDto, documentResponse, userEmail, brokerEmail);
+        log.info("Payment Notification sent successfully for user: {}", userEmail);
     }
 
     private void sendNotificationsInternal(PaymentDto paymentDto, DocumentResponse documentResponse,
