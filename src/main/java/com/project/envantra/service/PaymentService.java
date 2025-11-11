@@ -16,6 +16,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
@@ -40,6 +43,10 @@ public class PaymentService {
         saveTransaction(savedPaymentEntity);
         sendEmail(paymentDto, documentResponse);
         return PaymentConverter.toResponse(savedPaymentEntity, broker, documentResponse.getDownloadUrl());
+    }
+
+    public List<PaymentEntity> findAllByBrokerId(Collection<Long> brokerIds) {
+        return paymentRepository.findAllByBrokerIdIn(brokerIds);
     }
 
     private BrokerDto getBroker(Long brokerId) {

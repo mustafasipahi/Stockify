@@ -42,10 +42,10 @@ spring:
             enable: true
             required: true
           ssl:
+            enable: true
             protocols: TLSv1.2
             trust: smtp.gmail.com
-          timeout: 60000
-        debug: false
+          timeout: 30000
 
 security:
   secretKey: ${JWT_SECRET_KEY:mZ1p8Q9kT+L3s5vR1w6nV7yXf2aU0h3JqP4s8bYtQ1w=}
@@ -57,12 +57,6 @@ envantra:
         - application/pdf
         - image/jpeg
         - image/png
-        - image/gif
-        - application/vnd.ms-excel
-        - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
-        - text/plain
-        - application/msword
-        - application/vnd.openxmlformats-officedocument.wordprocessingml.document
       max-file-size: 50MB
 
 invoice:

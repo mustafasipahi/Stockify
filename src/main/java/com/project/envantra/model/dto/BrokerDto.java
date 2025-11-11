@@ -20,8 +20,10 @@ public class BrokerDto implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    private Long creatorUserId;
     private Long brokerId;
     private Long brokerUserId;
+    private Integer orderNo;
     private String firstName;
     private String lastName;
     private String email;
@@ -29,6 +31,7 @@ public class BrokerDto implements Serializable {
     private BigDecimal discountRate;
     private BrokerStatus status;
     private DayOfWeek targetDayOfWeek;
+    private BrokerVisitDto visitInfo;
     private Long createdDate;
     private Long lastModifiedDate;
 }

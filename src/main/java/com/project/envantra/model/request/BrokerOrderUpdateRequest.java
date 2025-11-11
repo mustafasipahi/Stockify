@@ -1,0 +1,19 @@
+package com.project.envantra.model.request;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class BrokerOrderUpdateRequest {
+
+    @NotNull
+    private Long brokerId;
+    @NotNull
+    private Integer orderNo;
+}

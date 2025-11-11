@@ -1,6 +1,6 @@
 package com.project.envantra.model.entity;
 
-import com.project.envantra.enums.BrokerStatus;
+import com.project.envantra.enums.BrokerVisitStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -8,8 +8,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.math.BigDecimal;
-import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 
 @Getter
@@ -19,11 +17,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "broker", indexes = {
-        @Index(name = "idx_broker_status_created", columnList = "status,createdDate")
+@Table(name = "broker_visit", indexes = {
+        @Index(name = "idx_visit_broker_date", columnList = "brokerId,visitDate"),
+        @Index(name = "idx_visit_user_date", columnList = "creatorUserId,visitDate"),
+        @Index(name = "idx_visit_date", columnList = "visitDate")
 })
 @EntityListeners(AuditingEntityListener.class)
-public class BrokerEntity {
+public class BrokerVisitEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,22 +35,19 @@ public class BrokerEntity {
 
     @NotNull
     @Column(nullable = false)
-    private Long brokerUserId;
+    private Long brokerId;
 
     @NotNull
     @Column(nullable = false)
-    private Integer orderNo;
-
-    @Column
-    private BigDecimal discountRate;
+    private LocalDateTime visitDate;
 
     @NotNull
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private BrokerStatus status;
+    private BrokerVisitStatus status;
 
-    @Column
-    private DayOfWeek targetDayOfWeek;
+    @Column(length = 500)
+    private String note;
 
     @CreatedDate
     private LocalDateTime createdDate;

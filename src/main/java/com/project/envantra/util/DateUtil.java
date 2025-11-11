@@ -13,6 +13,14 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DateUtil {
 
+    public static LocalDateTime getStartDate(Long startDate) {
+        return startDate != null ? getLocalDateTime(startDate) : LocalDate.now().atStartOfDay();
+    }
+
+    public static LocalDateTime getEndDate(Long endDate) {
+        return endDate != null ? getLocalDateTime(endDate) : LocalDateTime.now();
+    }
+
     public static Long getTime(LocalDateTime localDateTime) {
         return Optional.ofNullable(localDateTime)
                 .map(i -> Timestamp.valueOf(localDateTime).getTime())
@@ -35,5 +43,9 @@ public class DateUtil {
         return Optional.ofNullable(timestamp)
                 .map(i -> LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault()).toLocalDate())
                 .orElse(null);
+    }
+
+    public static boolean isDateInRange(LocalDateTime date, LocalDateTime start, LocalDateTime end) {
+        return !date.isBefore(start) && !date.isAfter(end);
     }
 }

@@ -5,10 +5,12 @@ import com.project.envantra.enums.BrokerStatus;
 import com.project.envantra.exception.BrokerDiscountRateException;
 import com.project.envantra.exception.BrokerIdException;
 import com.project.envantra.exception.BrokerNotFoundException;
+import com.project.envantra.exception.BrokerOrderException;
 import com.project.envantra.model.dto.BrokerDto;
 import com.project.envantra.model.entity.BrokerEntity;
 import com.project.envantra.model.entity.UserEntity;
 import com.project.envantra.model.request.BrokerCreateRequest;
+import com.project.envantra.model.request.BrokerOrderUpdateRequest;
 import com.project.envantra.model.request.BrokerUpdateRequest;
 import com.project.envantra.model.request.DiscountUpdateRequest;
 import com.project.envantra.repository.BrokerRepository;
@@ -20,6 +22,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import static com.project.envantra.converter.BrokerConverter.toEntity;
 import static com.project.envantra.util.LoginContext.*;
@@ -36,7 +41,8 @@ public class BrokerPostService {
     public BrokerDto save(BrokerCreateRequest request) {
         BrokerCreateValidator.validate(request);
         UserEntity brokerUser = userPostService.createNewUser(request);
-        BrokerEntity savedBrokerEntity = brokerRepository.save(toEntity(request, brokerUser.getId()));
+        Integer nextOrder = getNextOrder();
+        BrokerEntity savedBrokerEntity = brokerRepository.save(toEntity(request, brokerUser.getId(), nextOrder));
         log.info("User {} saved to broker {}", getUsername(), savedBrokerEntity);
         return BrokerConverter.toIdDto(savedBrokerEntity);
     }
@@ -59,6 +65,30 @@ public class BrokerPostService {
         BrokerEntity updatedBrokerEntity = brokerRepository.save(broker);
         log.info("User {} updated to broker {}", getUsername(), updatedBrokerEntity);
         return BrokerConverter.toIdDto(updatedBrokerEntity);
+    }
+
+    @Transactional
+    public BrokerDto updateOrder(BrokerOrderUpdateRequest request) {
+        List<BrokerEntity> allBrokers = brokerRepository.findByCreatorUserIdOrderByOrderNoAsc(getUserId());
+        BrokerEntity brokerToMove = allBrokers.stream()
+                .filter(broker -> broker.getId().equals(request.getBrokerId()))
+                .findFirst()
+                .orElseThrow(() -> new BrokerNotFoundException(request.getBrokerId()));
+        Integer oldOrder = brokerToMove.getOrderNo();
+        Integer newOrder = request.getOrderNo();
+        if (Objects.equals(oldOrder, newOrder)) {
+            return BrokerConverter.toIdDto(brokerToMove);
+        }
+        if (newOrder < 1 || newOrder > allBrokers.size()) {
+            throw new BrokerOrderException(request.getBrokerId());
+        }
+        allBrokers.remove(brokerToMove);
+        allBrokers.add(newOrder - 1, brokerToMove);
+        for (int i = 0; i < allBrokers.size(); i++) {
+            allBrokers.get(i).setOrderNo(i + 1);
+        }
+        brokerRepository.saveAll(allBrokers);
+        return BrokerConverter.toIdDto(brokerToMove);
     }
 
     @Transactional
@@ -96,5 +126,10 @@ public class BrokerPostService {
         BrokerEntity deletedBrokerEntity = brokerRepository.save(brokerEntity);
         log.info("User {} activated to broker {}", getUsername(), deletedBrokerEntity);
         return BrokerConverter.toIdDto(deletedBrokerEntity);
+    }
+
+    private Integer getNextOrder() {
+        return Optional.ofNullable(brokerRepository.findMaxOrderNoByCreatorUserId(getUserId()))
+                .orElse(0) + 1;
     }
 }

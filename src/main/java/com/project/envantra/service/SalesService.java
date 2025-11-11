@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -92,6 +93,10 @@ public class SalesService {
         BrokerDto broker = getBroker(brokerId);
         BigDecimal discountRate = getDiscountRate(broker.getDiscountRate());
         return validateAndPrepareProducts(basket, availableProducts, false, discountRate);
+    }
+
+    public List<SalesEntity> findAllByBrokerId(Collection<Long> brokerIds) {
+        return salesRepository.findAllByBrokerIdIn(brokerIds);
     }
 
     private SalesPrepareDto prepareSalesFlow(SalesRequest request) {

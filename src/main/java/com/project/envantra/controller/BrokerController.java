@@ -2,6 +2,7 @@ package com.project.envantra.controller;
 
 import com.project.envantra.model.dto.BrokerDto;
 import com.project.envantra.model.request.BrokerCreateRequest;
+import com.project.envantra.model.request.BrokerOrderUpdateRequest;
 import com.project.envantra.model.request.BrokerUpdateRequest;
 import com.project.envantra.model.request.DiscountUpdateRequest;
 import com.project.envantra.service.BrokerPostService;
@@ -27,6 +28,11 @@ public class BrokerController {
     @PutMapping("/update")
     public BrokerDto update(@RequestBody BrokerUpdateRequest request) {
         return brokerPostService.update(request);
+    }
+
+    @PutMapping("/update/order")
+    public BrokerDto updateOrder(@RequestBody BrokerOrderUpdateRequest request) {
+        return brokerPostService.updateOrder(request);
     }
 
     @DeleteMapping("/delete/{id}")
