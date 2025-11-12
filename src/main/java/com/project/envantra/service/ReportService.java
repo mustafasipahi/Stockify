@@ -173,7 +173,7 @@ public class ReportService {
             report.getDailyDetails().sort(Comparator.comparing(DailyBrokerReportDetailDto::getDate).reversed());
         }
         return reportMap.values().stream()
-                .sorted(Comparator.comparing(DailyBrokerReportDto::getOrderNo))
+                .sorted(Comparator.comparing(DailyBrokerReportDto::getBrokerFullName, Comparator.nullsLast(Comparator.naturalOrder())))
                 .toList();
     }
 
