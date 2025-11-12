@@ -27,7 +27,7 @@ public class BrokerVisitConverter {
     public static BrokerVisitDto toDto(BrokerVisitEntity visitEntity) {
         return BrokerVisitDto.builder()
                 .creatorUserId(visitEntity.getCreatorUserId())
-                .brokerId(visitEntity.getId())
+                .brokerId(visitEntity.getBrokerId())
                 .visitDate(getTime(visitEntity.getVisitDate()))
                 .status(visitEntity.getStatus())
                 .note(visitEntity.getNote())

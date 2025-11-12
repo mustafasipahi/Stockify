@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -76,7 +75,6 @@ public class BrokerGetService {
                     BrokerVisitDto visitInfo = brokerVisitMap.getOrDefault(brokerEntity.getId(), new BrokerVisitDto());
                     return BrokerConverter.toDto(brokerEntity, brokerUser, visitInfo, brokerCurrentBalance);
                 })
-                .sorted(Comparator.comparing(BrokerDto::getOrderNo, Comparator.nullsLast(Integer::compareTo)))
                 .toList();
     }
 
