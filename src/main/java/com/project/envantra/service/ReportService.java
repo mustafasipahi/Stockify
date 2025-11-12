@@ -81,11 +81,11 @@ public class ReportService {
                 .collect(Collectors.toMap(visit -> visit.getBrokerId() + "_" + visit.getVisitDate(), visit -> visit));
         for (SalesEntity sales : salesList) {
             Long brokerId = sales.getBrokerId();
+            BrokerDto broker = brokerMap.getOrDefault(brokerId, new BrokerDto());
             Long date = getTime(sales.getCreatedDate().toLocalDate());
             String detailKey = brokerId + "_" + date;
             DailyBrokerReportDto report = reportMap.get(brokerId);
             if (report == null) {
-                BrokerDto broker = brokerMap.get(brokerId);
                 report = new DailyBrokerReportDto();
                 report.setOrderNo(broker.getOrderNo());
                 report.setBrokerFullName(getBrokerFullName(broker));
@@ -108,11 +108,11 @@ public class ReportService {
         }
         for (PaymentEntity payment : paymentList) {
             Long brokerId = payment.getBrokerId();
+            BrokerDto broker = brokerMap.getOrDefault(brokerId, new BrokerDto());
             Long date = getTime(payment.getCreatedDate().toLocalDate());
             String detailKey = brokerId + "_" + date;
             DailyBrokerReportDto report = reportMap.get(brokerId);
             if (report == null) {
-                BrokerDto broker = brokerMap.get(brokerId);
                 report = new DailyBrokerReportDto();
                 report.setOrderNo(broker.getOrderNo());
                 report.setBrokerFullName(getBrokerFullName(broker));
@@ -135,12 +135,12 @@ public class ReportService {
         }
         for (BrokerVisitDto visitInfo : visitInfoList) {
             Long brokerId = visitInfo.getBrokerId();
+            BrokerDto broker = brokerMap.getOrDefault(brokerId, new BrokerDto());
             Long date = visitInfo.getVisitDate();
             String detailKey = brokerId + "_" + date;
             if (!detailMap.containsKey(detailKey)) {
                 DailyBrokerReportDto report = reportMap.get(brokerId);
                 if (report == null) {
-                    BrokerDto broker = brokerMap.get(brokerId);
                     report = new DailyBrokerReportDto();
                     report.setOrderNo(broker.getOrderNo());
                     report.setBrokerFullName(getBrokerFullName(broker));
