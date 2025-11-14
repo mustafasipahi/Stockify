@@ -7,14 +7,11 @@ import com.project.envantra.model.dto.UserSecurityDto;
 import com.project.envantra.model.entity.UserEntity;
 import com.project.envantra.model.request.BrokerCreateRequest;
 import com.project.envantra.repository.UserRepository;
-import com.project.envantra.service.email.UserCreationEmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import static com.project.envantra.converter.EmailConverter.toEmailRequest;
 
 @Slf4j
 @Service
@@ -24,7 +21,6 @@ public class UserPostService {
     private final UserRepository userRepository;
     private final CompanyPostService companyPostService;
     private final UserInfoGenerator userInfoGenerator;
-    private final UserCreationEmailService userCreationEmailService;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -45,7 +41,6 @@ public class UserPostService {
         UserEntity userEntity = UserConverter.toEntity(request, userSecurity.getUsername(), encryptedPassword);
         UserEntity savedNewUser = userRepository.save(userEntity);
         companyPostService.saveBrokerCompany(savedNewUser.getId());
-        userCreationEmailService.sendUserCreationNotification(toEmailRequest(userSecurity, savedNewUser));
         return savedNewUser;
     }
 }

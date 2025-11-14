@@ -44,8 +44,4 @@ public class DateUtil {
                 .map(i -> LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault()).toLocalDate())
                 .orElse(null);
     }
-
-    public static boolean isDateInRange(LocalDateTime date, LocalDateTime start, LocalDateTime end) {
-        return !date.isBefore(start) && !date.isAfter(end);
-    }
 }

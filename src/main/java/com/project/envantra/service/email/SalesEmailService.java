@@ -21,7 +21,6 @@ import static com.project.envantra.constant.TemplateConstant.SALES_EMAIL_BUYER_T
 import static com.project.envantra.constant.TemplateConstant.SALES_EMAIL_SELLER_TEMPLATE;
 import static com.project.envantra.util.EmailUtil.*;
 import static com.project.envantra.util.NameUtil.getBrokerFullName;
-import static com.project.envantra.util.LoginContext.getEmail;
 
 @Slf4j
 @Service
@@ -36,7 +35,7 @@ public class SalesEmailService {
             log.warn("Invalid Request - salesPrepareDto or documentResponse null");
             return;
         }
-        String userEmail = getEmail();
+        String userEmail = salesPrepareDto.getUser().getEmail();
         String brokerEmail = salesPrepareDto.getBroker().getEmail();
         sendNotificationsInternal(salesPrepareDto, documentResponse, userEmail, brokerEmail);
         log.info("Payment Notification sent successfully for user: {}", userEmail);

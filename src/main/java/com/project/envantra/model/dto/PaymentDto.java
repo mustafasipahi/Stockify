@@ -2,6 +2,7 @@ package com.project.envantra.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.project.envantra.enums.PaymentType;
+import com.project.envantra.model.entity.UserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PaymentDto {
 
+    private UserEntity user;
     private Long documentId;
     private String documentNumber;
     private BrokerDto broker;

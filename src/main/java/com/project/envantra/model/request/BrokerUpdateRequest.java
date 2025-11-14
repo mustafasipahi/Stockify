@@ -17,4 +17,9 @@ public class BrokerUpdateRequest {
     private Long brokerId;
     private BigDecimal discountRate;
     private DayOfWeek targetDayOfWeek;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String tkn;
+    private String vkn;
 }

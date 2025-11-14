@@ -1,10 +1,12 @@
 package com.project.envantra.model.entity;
 
 import com.project.envantra.enums.Role;
+import com.project.envantra.enums.UserStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
@@ -41,6 +43,11 @@ public class UserEntity implements Serializable {
 
     @NotNull
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserStatus status;
+
+    @NotNull
+    @Column(nullable = false)
     private String firstName;
 
     @NotNull
@@ -63,4 +70,7 @@ public class UserEntity implements Serializable {
 
     @CreatedDate
     private LocalDateTime createdDate;
+
+    @LastModifiedDate
+    private LocalDateTime lastModifiedDate;
 }

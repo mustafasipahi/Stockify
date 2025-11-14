@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+import static com.project.envantra.util.LoginContext.getUser;
 import static com.project.envantra.util.LoginContext.getUserId;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -17,6 +18,7 @@ public class PaymentConverter {
 
     public static PaymentDto toDto(PaymentCreateRequest request, BrokerDto broker) {
         return PaymentDto.builder()
+                .user(getUser())
                 .broker(broker)
                 .price(request.getPaymentPrice())
                 .type(request.getPaymentType())

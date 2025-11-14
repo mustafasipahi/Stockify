@@ -2,6 +2,7 @@ package com.project.envantra.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.project.envantra.enums.Role;
+import com.project.envantra.enums.UserStatus;
 import lombok.*;
 
 @Getter
@@ -15,6 +16,7 @@ public class UserDto {
     private Long profileImageId;
     private String username;
     private String password;
+    private UserStatus status;
     private String firstName;
     private String lastName;
     private String email;

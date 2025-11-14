@@ -1,6 +1,7 @@
 package com.project.envantra.initialization;
 
 import com.project.envantra.enums.Role;
+import com.project.envantra.enums.UserStatus;
 import com.project.envantra.model.dto.UserDto;
 import com.project.envantra.model.entity.CompanyEntity;
 import com.project.envantra.model.entity.UserEntity;
@@ -32,6 +33,7 @@ public class DataInitializerService implements ApplicationRunner {
         UserDto userDto1 = UserDto.builder()
                 .username("test1")
                 .password("test1234")
+                .status(UserStatus.ACTIVE)
                 .firstName("Test1")
                 .lastName("User1")
                 .email("test1@user.com")
@@ -50,6 +52,7 @@ public class DataInitializerService implements ApplicationRunner {
         UserDto userDto2 = UserDto.builder()
                 .username("test2")
                 .password("test4321")
+                .status(UserStatus.ACTIVE)
                 .firstName("Test2")
                 .lastName("User2")
                 .email("test2@user.com")
@@ -70,6 +73,7 @@ public class DataInitializerService implements ApplicationRunner {
         UserDto userDto1 = UserDto.builder()
                 .username("soner")
                 .password("test1234")
+                .status(UserStatus.ACTIVE)
                 .firstName("Soner")
                 .lastName("Sekanlı")
                 .email("sonersekanli@icloud.com")
@@ -86,6 +90,7 @@ public class DataInitializerService implements ApplicationRunner {
         UserDto userDto2 = UserDto.builder()
                 .username("selcuk")
                 .password("test4321")
+                .status(UserStatus.ACTIVE)
                 .firstName("Selçuk")
                 .lastName("Yılmaz")
                 .email("selcuk.yilmaz.ant@gmail.com")

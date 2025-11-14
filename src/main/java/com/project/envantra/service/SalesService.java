@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -95,8 +96,8 @@ public class SalesService {
         return validateAndPrepareProducts(basket, availableProducts, false, discountRate);
     }
 
-    public List<SalesEntity> findAllByBrokerId(Collection<Long> brokerIds) {
-        return salesRepository.findAllByBrokerIdIn(brokerIds);
+    public List<SalesEntity> findAllByBrokerIdByDate(Collection<Long> brokerIds, LocalDateTime startDate, LocalDateTime endDate) {
+        return salesRepository.findAllByBrokerIdInAndCreatedDateBetween(brokerIds, startDate, endDate);
     }
 
     private SalesPrepareDto prepareSalesFlow(SalesRequest request) {

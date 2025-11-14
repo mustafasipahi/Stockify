@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -45,8 +46,8 @@ public class PaymentService {
         return PaymentConverter.toResponse(savedPaymentEntity, broker, documentResponse.getDownloadUrl());
     }
 
-    public List<PaymentEntity> findAllByBrokerId(Collection<Long> brokerIds) {
-        return paymentRepository.findAllByBrokerIdIn(brokerIds);
+    public List<PaymentEntity> findAllByBrokerIdByDate(Collection<Long> brokerIds, LocalDateTime startDate, LocalDateTime endDate) {
+        return paymentRepository.findAllByBrokerIdInAndCreatedDateBetween(brokerIds, startDate, endDate);
     }
 
     private BrokerDto getBroker(Long brokerId) {

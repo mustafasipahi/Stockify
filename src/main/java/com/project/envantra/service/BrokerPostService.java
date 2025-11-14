@@ -2,6 +2,7 @@ package com.project.envantra.service;
 
 import com.project.envantra.converter.BrokerConverter;
 import com.project.envantra.enums.BrokerStatus;
+import com.project.envantra.enums.UserStatus;
 import com.project.envantra.exception.BrokerDiscountRateException;
 import com.project.envantra.exception.BrokerIdException;
 import com.project.envantra.exception.BrokerNotFoundException;
@@ -18,6 +19,7 @@ import com.project.envantra.validator.BrokerCreateValidator;
 import com.project.envantra.validator.BrokerUpdateValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +38,7 @@ public class BrokerPostService {
 
     private final BrokerRepository brokerRepository;
     private final UserPostService userPostService;
+    private final UserGetService userGetService;
 
     @Transactional
     public BrokerDto save(BrokerCreateRequest request) {
@@ -55,6 +58,10 @@ public class BrokerPostService {
         Long brokerId = request.getBrokerId();
         BrokerEntity broker = brokerRepository.findById(brokerId)
                 .orElseThrow(() -> new BrokerNotFoundException(brokerId));
+        UserEntity user = userGetService.findById(broker.getBrokerUserId());
+        if (user.getStatus().equals(UserStatus.PASSIVE)) {
+            updateUserInfo(request, user);
+        }
         if (request.getDiscountRate() != null) {
             BrokerUpdateValidator.validateDiscountRate(request.getDiscountRate());
             broker.setDiscountRate(request.getDiscountRate());
@@ -131,5 +138,24 @@ public class BrokerPostService {
     private Integer getNextOrder() {
         return Optional.ofNullable(brokerRepository.findMaxOrderNoByCreatorUserId(getUserId()))
                 .orElse(0) + 1;
+    }
+
+    private void updateUserInfo(BrokerUpdateRequest request, UserEntity user) {
+        if (StringUtils.isNotBlank(request.getFirstName())) {
+            user.setFirstName(request.getFirstName());
+        }
+        if (StringUtils.isNotBlank(request.getLastName())) {
+            user.setLastName(request.getLastName());
+        }
+        if (StringUtils.isNotBlank(request.getEmail())) {
+            user.setEmail(request.getEmail());
+        }
+        if (StringUtils.isNotBlank(request.getTkn())) {
+            user.setTkn(request.getTkn());
+        }
+        if (StringUtils.isNotBlank(request.getVkn())) {
+            user.setVkn(request.getVkn());
+        }
+        userPostService.save(user);
     }
 }

@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.project.envantra.util.DateUtil.getTime;
+import static com.project.envantra.util.LoginContext.getUser;
 import static com.project.envantra.util.LoginContext.getUserId;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -20,6 +21,7 @@ public class SalesConverter {
 
     public static SalesPrepareDto toPrepareDto(SalesDto sales, List<SalesItemDto> salesItems, BrokerDto broker) {
         return SalesPrepareDto.builder()
+                .user(getUser())
                 .sales(sales)
                 .salesItems(salesItems)
                 .broker(broker)

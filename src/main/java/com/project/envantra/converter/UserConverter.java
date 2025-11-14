@@ -1,6 +1,7 @@
 package com.project.envantra.converter;
 
 import com.project.envantra.enums.Role;
+import com.project.envantra.enums.UserStatus;
 import com.project.envantra.model.entity.UserEntity;
 import com.project.envantra.model.dto.UserDto;
 import com.project.envantra.model.request.BrokerCreateRequest;
@@ -16,6 +17,7 @@ public class UserConverter {
         return UserDto.builder()
                 .profileImageId(userEntity.getProfileImageId())
                 .username(userEntity.getUsername())
+                .status(userEntity.getStatus())
                 .firstName(userEntity.getFirstName())
                 .lastName(userEntity.getLastName())
                 .email(userEntity.getEmail())
@@ -28,6 +30,7 @@ public class UserConverter {
         return UserEntity.builder()
                 .username(username)
                 .password(encryptedPassword)
+                .status(UserStatus.PASSIVE)
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
@@ -41,6 +44,7 @@ public class UserConverter {
         return UserEntity.builder()
                 .username(username)
                 .password(encryptedPassword)
+                .status(userDto.getStatus())
                 .firstName(userDto.getFirstName())
                 .lastName(userDto.getLastName())
                 .email(userDto.getEmail())

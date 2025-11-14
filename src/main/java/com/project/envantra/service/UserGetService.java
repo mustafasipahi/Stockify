@@ -1,6 +1,7 @@
 package com.project.envantra.service;
 
 import com.project.envantra.converter.UserConverter;
+import com.project.envantra.enums.UserStatus;
 import com.project.envantra.exception.UserNotFoundException;
 import com.project.envantra.model.dto.UserDto;
 import com.project.envantra.model.entity.UserEntity;
@@ -35,6 +36,6 @@ public class UserGetService {
     }
 
     public Optional<UserEntity> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+        return userRepository.findByUsernameAndStatus(username, UserStatus.ACTIVE);
     }
 }
