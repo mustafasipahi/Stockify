@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static com.project.envantra.util.DateUtil.isAfter;
 import static com.project.envantra.util.LoginContext.getUserId;
 
 @Slf4j
@@ -31,14 +32,14 @@ public class BrokerGetService {
     private final BrokerRepository brokerRepository;
     private final AccountService accountService;
     private final UserGetService userGetService;
-    private final BrokerVisitService brokerVisitService;
+    private final BrokerVisitGetService brokerVisitGetService;
 
     public BrokerDto getActiveBroker(Long brokerId) {
         BrokerEntity brokerEntity = brokerRepository.findById(brokerId)
                 .filter(broker -> broker.getStatus() == BrokerStatus.ACTIVE)
                 .orElseThrow(() -> new BrokerNotFoundException(brokerId));
         UserEntity brokerUser = userGetService.findById(brokerEntity.getBrokerUserId());
-        BrokerVisitDto visitInfo = brokerVisitService.getVisitInfoByBrokerId(brokerId);
+        BrokerVisitDto visitInfo = brokerVisitGetService.getTodayVisitInfoByBrokerId(brokerId);
         return BrokerConverter.toDto(brokerEntity, brokerUser, visitInfo, getBrokerCurrentBalance(brokerId));
     }
 
@@ -123,7 +124,12 @@ public class BrokerGetService {
     }
 
     private Map<Long, BrokerVisitDto> getBrokerVisitMap(List<Long> brokerUserIds) {
-        return brokerVisitService.getVisitInfoListByBrokerIdIn(brokerUserIds).stream()
-                .collect(Collectors.toMap(BrokerVisitDto::getBrokerId, visitInfo -> visitInfo));
+        return brokerVisitGetService.getTodayVisitInfoListByBrokerIdIn(brokerUserIds)
+                .stream()
+                .collect(Collectors.toMap(
+                        BrokerVisitDto::getCreatorUserId,
+                        visit -> visit,
+                        (v1, v2) -> isAfter(v1.getVisitDate(), v2.getVisitDate()) ? v1 : v2
+                ));
     }
 }

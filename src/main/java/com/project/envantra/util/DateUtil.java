@@ -44,4 +44,13 @@ public class DateUtil {
                 .map(i -> LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault()).toLocalDate())
                 .orElse(null);
     }
+
+    public static boolean isAfter(Long firstTimestamp, Long secondTimestamp) {
+        LocalDateTime first = getLocalDateTime(firstTimestamp);
+        LocalDateTime second = getLocalDateTime(secondTimestamp);
+        if (first == null || second == null) {
+            return false;
+        }
+        return first.isAfter(second);
+    }
 }

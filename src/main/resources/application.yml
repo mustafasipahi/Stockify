@@ -67,6 +67,9 @@ document:
   pdf-path: /pdfs
   image-path: /images
 
+initialize-config:
+  value: ${INITIALIZE_VALUE:none}
+
 management:
   endpoints:
     web:

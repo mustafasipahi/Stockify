@@ -24,7 +24,7 @@ public class ReportService {
     private final BrokerGetService brokerGetService;
     private final SalesService salesService;
     private final PaymentService paymentService;
-    private final BrokerVisitService brokerVisitService;
+    private final BrokerVisitGetService brokerVisitGetService;
 
     public DailyReportResponse getDailyReport(DailyReportRequest request) {
         Map<Long, BrokerDto> brokerMap = getBrokerMap(request.getBrokerId());
@@ -35,7 +35,7 @@ public class ReportService {
         LocalDateTime endDate = getEndDate(request.getEndDate());
         List<SalesEntity> salesList = salesService.findAllByBrokerIdByDate(brokerMap.keySet(), startDate, endDate);
         List<PaymentEntity> paymentList = paymentService.findAllByBrokerIdByDate(brokerMap.keySet(), startDate, endDate);
-        List<BrokerVisitDto> visitInfoList = brokerVisitService.getVisitInfoListByDate(startDate, endDate);
+        List<BrokerVisitDto> visitInfoList = brokerVisitGetService.getVisitInfoListByDate(startDate, endDate);
         return DailyReportResponse.builder()
                 .dailyBrokerReports(createBrokerReports(salesList, paymentList, visitInfoList, brokerMap))
                 .dailySummaryReports(createSummaryReports(salesList, paymentList))
@@ -44,7 +44,7 @@ public class ReportService {
     }
 
     private Map<Long, BrokerDto> getBrokerMap(Long brokerId) {
-        return brokerGetService.getBrokerMap(List.of(brokerId));
+        return brokerGetService.getBrokerMap(brokerId != null ? List.of(brokerId) : Collections.emptyList());
     }
 
     private DailyReportResponse createEmptyResponse() {
