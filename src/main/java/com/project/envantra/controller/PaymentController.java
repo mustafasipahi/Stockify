@@ -33,6 +33,7 @@ public class PaymentController {
         return paymentService.cancel(request);
     }
 
+    @GetMapping("/search")
     public Page<PaymentResponse> search(@ModelAttribute PaymentSearchRequest request,
                                         @RequestParam(defaultValue = "0") int page,
                                         @RequestParam(defaultValue = "10") int size) {
