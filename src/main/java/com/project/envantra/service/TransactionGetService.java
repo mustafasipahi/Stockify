@@ -11,9 +11,7 @@ import com.project.envantra.service.document.DocumentGetService;
 import com.project.envantra.specification.TransactionSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -29,13 +27,11 @@ public class TransactionGetService {
     private final BrokerGetService brokerGetService;
     private final DocumentGetService documentGetService;
 
-    public Page<TransactionDto> getAllTransactions(TransactionSearchRequest request, int page, int size) {
-        BrokerDto broker = getBroker(request.getBrokerId());
+    public Page<TransactionDto> getAllTransactions(TransactionSearchRequest request, Pageable pageable) {
         Specification<TransactionEntity> specification = TransactionSpecification.filter(request);
-        Sort sort = Sort.by("createdDate").descending();
-        Pageable pageable = PageRequest.of(page, size, sort);
         Page<TransactionEntity> transactions = transactionRepository.findAll(specification, pageable);
         Map<Long, DocumentResponse> documents = getTransactionDocuments(transactions);
+        BrokerDto broker = getBroker(request.getBrokerId());
         return transactions.map(transaction -> {
             DocumentResponse documentResponse = documents.getOrDefault(transaction.getDocumentId(), null);
             String documentDownloadUrl = (documentResponse != null) ? documentResponse.getDownloadUrl() : null;

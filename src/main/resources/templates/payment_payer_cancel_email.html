@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="tr">
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+<div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h2 style="color: #dc3545;">❌ Ödemeniz İptal Edildi</h2>
+
+    <p>Sayın {{BROKER_NAME}},</p>
+    <p>Ödeme kaydınız iptal edilmiştir.</p>
+
+    <div style="background-color: #f8d7da; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #dc3545;">
+        <h3>⚠️ Önemli Bilgi:</h3>
+        <p>Bu makbuz artık geçerli değildir. Ödeme işlemi geri alınmıştır.</p>
+    </div>
+
+    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <h3>İptal Edilen Ödeme Detayları:</h3>
+        <p><strong>Makbuz No:</strong> {{DOCUMENT_NUMBER}}</p>
+        <p><strong>İptal Tarihi:</strong> {{PAYMENT_DATE}}</p>
+        <p><strong>Broker ID:</strong> {{BROKER_ID}}</p>
+    </div>
+
+    <div style="background-color: #e7e7e7; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <h3>İptal Edilen Ödeme Bilgileri:</h3>
+        <p><strong>Ödeme Yöntemi:</strong> {{PAYMENT_METHOD}}</p>
+        <p style="font-size: 20px; color: #dc3545; margin-top: 15px;">
+            <strong>İptal Edilen Tutar:</strong> ₺{{PAYMENT_AMOUNT}}
+        </p>
+    </div>
+
+    <div style="background-color: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <h3>İptal Nedeni:</h3>
+        <p>{{CANCEL_REASON}}</p>
+    </div>
+
+    <div style="background-color: #d1ecf1; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #17a2b8;">
+        <p style="margin: 0; font-size: 14px;">
+            <strong>💡 Not:</strong> İptal kaydı sistemde saklanmaktadır. Herhangi bir sorunuz olması durumunda makbuz numarasını belirterek bizimle iletişime geçebilirsiniz.
+        </p>
+    </div>
+
+    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 14px; color: #666;">
+        <p>Teşekkürler,<br>{{COMPANY_NAME}}</p>
+    </div>
+</div>
+</body>
+</html>

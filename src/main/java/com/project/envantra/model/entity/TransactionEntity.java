@@ -1,6 +1,7 @@
 package com.project.envantra.model.entity;
 
 import com.project.envantra.enums.PaymentType;
+import com.project.envantra.enums.TransactionStatus;
 import com.project.envantra.enums.TransactionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -43,6 +44,9 @@ public class TransactionEntity {
     @Column
     private Long paymentId;
 
+    @Column
+    private String groupId;
+
     @NotNull
     @Column(nullable = false)
     private Long documentId;
@@ -65,6 +69,11 @@ public class TransactionEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TransactionType type;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TransactionStatus status;
 
     @Column
     @Enumerated(EnumType.STRING)

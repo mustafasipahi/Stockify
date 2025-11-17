@@ -10,6 +10,7 @@ import com.project.envantra.model.entity.UserEntity;
 import com.project.envantra.repository.BrokerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -17,6 +18,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.project.envantra.util.LoginContext.getUserId;
@@ -27,7 +29,7 @@ import static com.project.envantra.util.LoginContext.getUserId;
 public class BrokerGetService {
 
     private final BrokerRepository brokerRepository;
-    private final BalanceService balanceService;
+    private final AccountService accountService;
     private final UserGetService userGetService;
     private final BrokerVisitService brokerVisitService;
 
@@ -38,6 +40,22 @@ public class BrokerGetService {
         UserEntity brokerUser = userGetService.findById(brokerEntity.getBrokerUserId());
         BrokerVisitDto visitInfo = brokerVisitService.getVisitInfoByBrokerId(brokerId);
         return BrokerConverter.toDto(brokerEntity, brokerUser, visitInfo, getBrokerCurrentBalance(brokerId));
+    }
+
+    public List<BrokerDto> getActiveBrokers(List<Long> brokerIds) {
+        List<BrokerEntity> brokerList = brokerRepository.findAllById(brokerIds).stream()
+                .filter(broker -> broker.getStatus() == BrokerStatus.ACTIVE)
+                .toList();
+        Map<Long, UserEntity> brokerUserMap = getBrokerUserMap(brokerIds);
+        Map<Long, BrokerVisitDto> brokerVisitMap = getBrokerVisitMap(brokerIds);
+        Map<Long, BigDecimal> brokerCurrentBalanceMap = getBrokerCurrentBalanceMap(brokerIds);
+        return brokerList.stream()
+                .map(broker -> {
+                    UserEntity brokerUser = brokerUserMap.getOrDefault(broker.getBrokerUserId(), new UserEntity());
+                    BrokerVisitDto visitInfo = brokerVisitMap.getOrDefault(broker.getBrokerUserId(), new BrokerVisitDto());
+                    BigDecimal balance = brokerCurrentBalanceMap.getOrDefault(broker.getBrokerUserId(), BigDecimal.ZERO);
+                    return BrokerConverter.toDto(broker, brokerUser, visitInfo, balance);
+                }).toList();
     }
 
     public List<BrokerDto> getTodayBrokers() {
@@ -53,6 +71,19 @@ public class BrokerGetService {
 
     public List<BrokerDto> getAllPassiveBrokers() {
         return getAllBrokersByStatus(BrokerStatus.PASSIVE);
+    }
+
+    public Map<Long, BrokerDto> getBrokerMap(List<Long> brokerIds) {
+        if (CollectionUtils.isNotEmpty(brokerIds)) {
+            Long userId = getUserId();
+            return getActiveBrokers(brokerIds).stream()
+                    .filter(activeBroker -> Objects.equals(activeBroker.getCreatorUserId(), userId))
+                    .collect(Collectors.toMap(BrokerDto::getBrokerId, brokerDto -> brokerDto));
+        } else {
+            List<BrokerDto> activeBrokers = getAllBrokers();
+            return activeBrokers.stream()
+                    .collect(Collectors.toMap(BrokerDto::getBrokerId, broker -> broker));
+        }
     }
 
     private List<BrokerDto> getAllBrokersByStatus(BrokerStatus status) {
@@ -79,11 +110,11 @@ public class BrokerGetService {
     }
 
     private BigDecimal getBrokerCurrentBalance(Long brokerId) {
-        return balanceService.getBrokerCurrentBalance(brokerId);
+        return accountService.getBalance(brokerId);
     }
 
     private Map<Long, BigDecimal> getBrokerCurrentBalanceMap(List<Long> brokerIds) {
-        return balanceService.getBrokerCurrentBalanceMap(brokerIds);
+        return accountService.getBalanceMap(brokerIds);
     }
 
     private Map<Long, UserEntity> getBrokerUserMap(List<Long> brokerUserIds) {

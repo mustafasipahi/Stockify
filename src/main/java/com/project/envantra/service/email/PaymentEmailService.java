@@ -1,6 +1,9 @@
 package com.project.envantra.service.email;
 
+import com.project.envantra.enums.EmailType;
+import com.project.envantra.enums.RecipientType;
 import com.project.envantra.model.dto.PaymentDto;
+import com.project.envantra.model.entity.PaymentEntity;
 import com.project.envantra.model.response.DocumentResponse;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +21,7 @@ import java.util.Map;
 
 import static com.project.envantra.constant.DocumentConstants.DATE_TIME_FORMATTER_3;
 import static com.project.envantra.constant.DocumentConstants.DEFAULT_BRAND_NAME;
-import static com.project.envantra.constant.TemplateConstant.PAYMENT_EMAIL_PAYER_TEMPLATE;
-import static com.project.envantra.constant.TemplateConstant.PAYMENT_EMAIL_RECEIVER_TEMPLATE;
+import static com.project.envantra.constant.TemplateConstant.*;
 import static com.project.envantra.util.EmailUtil.*;
 import static com.project.envantra.util.NameUtil.getBrokerFullName;
 
@@ -31,75 +33,140 @@ public class PaymentEmailService {
     private final EmailService emailService;
 
     @Async
-    public void sendPaymentNotifications(PaymentDto paymentDto, DocumentResponse documentResponse) {
-        if (paymentDto == null || documentResponse == null) {
-            log.warn("Invalid Request - paymentDto or documentResponse null");
+    public void sendPaymentCreatedNotifications(PaymentDto paymentDto, DocumentResponse documentResponse) {
+        if (!validateRequest(paymentDto, documentResponse)) {
             return;
         }
         String userEmail = paymentDto.getUser().getEmail();
         String brokerEmail = paymentDto.getBroker().getEmail();
-        sendNotificationsInternal(paymentDto, documentResponse, userEmail, brokerEmail);
-        log.info("Payment Notification sent successfully for user: {}", userEmail);
+        sendEmailToReceiver(
+                userEmail,
+                paymentDto,
+                documentResponse.getFile(),
+                PAYMENT_EMAIL_RECEIVER_TEMPLATE,
+                EmailType.CREATED,
+                Map.of());
+        sendEmailToPayer(
+                brokerEmail,
+                paymentDto,
+                documentResponse.getFile(),
+                PAYMENT_EMAIL_PAYER_TEMPLATE,
+                EmailType.CREATED,
+                Map.of());
+        log.info("Payment created notifications sent successfully..");
     }
 
-    private void sendNotificationsInternal(PaymentDto paymentDto, DocumentResponse documentResponse,
-                                           String userEmail, String brokerEmail) {
-        if (isValidEmail(userEmail)) {
-            try {
-                sendReceiverNotification(paymentDto, userEmail, documentResponse.getFile());
-                log.info("Sent ReceiverNotification email to {}", maskEmail(userEmail));
-            } catch (Exception e) {
-                log.error("Send ReceiverNotification Error! Email: {}", maskEmail(userEmail), e);
-            }
-        } else {
-            log.info("Company Email is invalid");
+    @Async
+    public void sendPaymentUpdatedNotifications(PaymentDto newPaymentDto, DocumentResponse newDocumentResponse,
+                                                PaymentEntity oldPayment) {
+        if (!validateRequest(newPaymentDto, newDocumentResponse)) {
+            return;
         }
-        if (isValidEmail(brokerEmail)) {
-            try {
-                sendPayerNotification(paymentDto, brokerEmail, documentResponse.getFile());
-                log.info("Sent PayerNotification email to {}", maskEmail(brokerEmail));
-            } catch (Exception e) {
-                log.error("Send PayerNotification Error! Email: {}", maskEmail(brokerEmail), e);
+        String userEmail = newPaymentDto.getUser().getEmail();
+        String brokerEmail = newPaymentDto.getBroker().getEmail();
+        Map<String, String> oldPaymentData = extractOldPaymentData(oldPayment);
+        sendEmailToReceiver(
+                userEmail,
+                newPaymentDto,
+                newDocumentResponse.getFile(),
+                PAYMENT_EMAIL_RECEIVER_UPDATE_TEMPLATE,
+                EmailType.UPDATED,
+                oldPaymentData);
+        sendEmailToPayer(
+                brokerEmail,
+                newPaymentDto,
+                newDocumentResponse.getFile(),
+                PAYMENT_EMAIL_PAYER_UPDATE_TEMPLATE,
+                EmailType.UPDATED,
+                oldPaymentData);
+        log.info("Payment update notifications sent successfully..");
+    }
+
+    @Async
+    public void sendPaymentCancelledNotifications(PaymentDto paymentDto) {
+        if (paymentDto == null) {
+            log.warn("Invalid Request - cancelledPayment is null");
+            return;
+        }
+        String userEmail = paymentDto.getUser().getEmail();
+        String brokerEmail = paymentDto.getBroker().getEmail();
+        String cancelReason = StringUtils.defaultString(paymentDto.getCancelReason(), "Belirtilmemiş");
+        Map<String, String> cancelData = Map.of("{{CANCEL_REASON}}", cancelReason);
+        sendEmailToReceiver(
+                userEmail,
+                paymentDto,
+                null,
+                PAYMENT_EMAIL_RECEIVER_CANCEL_TEMPLATE,
+                EmailType.CANCELLED,
+                cancelData);
+        sendEmailToPayer(
+                brokerEmail,
+                paymentDto,
+                null,
+                PAYMENT_EMAIL_PAYER_CANCEL_TEMPLATE,
+                EmailType.CANCELLED,
+                cancelData);
+        log.info("Payment cancel notifications sent successfully..");
+    }
+
+    private void sendEmailToReceiver(String email, PaymentDto paymentDto, MultipartFile file,
+                                     String templatePath, EmailType emailType, Map<String, String> extraData) {
+        if (!isValidEmail(email)) {
+            log.warn("Receiver email is invalid: {}", maskEmail(email));
+            return;
+        }
+        try {
+            String subject = createSubject(paymentDto, emailType, RecipientType.RECEIVER);
+            String htmlContent = createEmailContent(templatePath, paymentDto, extraData);
+            String fileName = createFileName(paymentDto, emailType, RecipientType.RECEIVER);
+            if (file != null) {
+                emailService.sendEmailWithAttachment(email, subject, htmlContent, file, fileName);
+            } else {
+                emailService.sendEmail(email, subject, htmlContent);
             }
-        } else {
-            log.error("Broker Email is invalid");
+            log.info("Email sent to receiver: {}", maskEmail(email));
+        } catch (Exception e) {
+            log.error("Failed to send email to receiver: {}", maskEmail(email), e);
         }
     }
 
-    private void sendReceiverNotification(PaymentDto paymentDto, String receiverEmail, MultipartFile file) throws MessagingException {
-        String subject = createReceiverSubject(paymentDto);
-        String htmlContent = createEmailContent(PAYMENT_EMAIL_RECEIVER_TEMPLATE, paymentDto);
-        String fileName = createReceiverFileName(paymentDto);
-        sendEmailWithAttachment(receiverEmail, subject, htmlContent, file, fileName);
+    private void sendEmailToPayer(String email, PaymentDto paymentDto, MultipartFile file,
+                                  String templatePath, EmailType emailType, Map<String, String> extraData) {
+        if (!isValidEmail(email)) {
+            log.warn("Payer email is invalid: {}", maskEmail(email));
+            return;
+        }
+        try {
+            String subject = createSubject(paymentDto, emailType, RecipientType.PAYER);
+            String htmlContent = createEmailContent(templatePath, paymentDto, extraData);
+            String fileName = createFileName(paymentDto, emailType, RecipientType.PAYER);
+            if (file != null) {
+                emailService.sendEmailWithAttachment(email, subject, htmlContent, file, fileName);
+            } else {
+                emailService.sendEmail(email, subject, htmlContent);
+            }
+            log.info("Email sent to payer: {}", maskEmail(email));
+        } catch (Exception e) {
+            log.error("Failed to send email to payer: {}", maskEmail(email), e);
+        }
     }
 
-    private void sendPayerNotification(PaymentDto paymentDto, String payerEmail, MultipartFile file) throws MessagingException {
-        String subject = createPayerSubject(paymentDto);
-        String htmlContent = createEmailContent(PAYMENT_EMAIL_PAYER_TEMPLATE, paymentDto);
-        String fileName = createPayerFileName(paymentDto);
-        sendEmailWithAttachment(payerEmail, subject, htmlContent, file, fileName);
-    }
-
-    private void sendEmailWithAttachment(String to, String subject, String htmlContent,
-                                         MultipartFile file, String fileName) throws MessagingException {
-        emailService.sendEmailWithAttachment(to, subject, htmlContent, file, fileName);
-    }
-
-    private String createEmailContent(String templatePath, PaymentDto paymentDto) throws MessagingException {
+    private String createEmailContent(String templatePath, PaymentDto paymentDto,
+                                      Map<String, String> extraData) throws MessagingException {
         try {
             String htmlTemplate = loadTemplate(templatePath);
-            Map<String, String> templateVariables = buildTemplateVariables(paymentDto);
-            return replacePlaceholders(htmlTemplate, templateVariables);
+            Map<String, String> variables = buildTemplateVariables(paymentDto);
+            variables.putAll(extraData);
+            return replacePlaceholders(htmlTemplate, variables);
         } catch (IOException e) {
-            log.error("Load Template Error!", e);
-            throw new MessagingException(templatePath, e);
+            log.error("Failed to load template: {}", templatePath, e);
+            throw new MessagingException("Template loading failed", e);
         }
     }
 
     private String loadTemplate(String templatePath) throws IOException {
-        try (InputStream inputStream = PaymentEmailService.class.getClassLoader().getResourceAsStream(templatePath)) {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(templatePath)) {
             if (inputStream == null) {
-                log.error("Template not found in classpath: {}", templatePath);
                 throw new IOException("Template not found: " + templatePath);
             }
             return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
@@ -117,7 +184,6 @@ public class PaymentEmailService {
         variables.put("{{PAYMENT_METHOD}}", paymentDto.getType().getName());
         variables.put("{{DESCRIPTION}}", StringUtils.defaultString(null, "Açıklama bulunmuyor"));
         variables.put("{{COMPANY_NAME}}", DEFAULT_BRAND_NAME);
-
         return variables;
     }
 
@@ -129,19 +195,44 @@ public class PaymentEmailService {
         return result;
     }
 
-    private String createReceiverSubject(PaymentDto paymentDto) {
-        return "Ödeme Alındı - Makbuz #" + paymentDto.getDocumentNumber();
+    private String createSubject(PaymentDto paymentDto, EmailType emailType, RecipientType recipientType) {
+        String documentNumber = paymentDto.getDocumentNumber();
+        return switch (emailType) {
+            case CREATED -> recipientType == RecipientType.RECEIVER
+                    ? "Ödeme Alındı - Makbuz #" + documentNumber
+                    : "Ödemeniz Onaylandı - Makbuz #" + documentNumber;
+            case UPDATED -> recipientType == RecipientType.RECEIVER
+                    ? "Ödeme Güncellendi - Makbuz #" + documentNumber
+                    : "Ödemeniz Güncellendi - Makbuz #" + documentNumber;
+            case CANCELLED -> recipientType == RecipientType.RECEIVER
+                    ? "Ödeme İptal Edildi - Makbuz #" + documentNumber
+                    : "Ödemeniz İptal Edildi - Makbuz #" + documentNumber;
+        };
     }
 
-    private String createPayerSubject(PaymentDto paymentDto) {
-        return "Ödemeniz Onaylandı - Makbuz #" + paymentDto.getDocumentNumber();
+    private String createFileName(PaymentDto paymentDto, EmailType emailType, RecipientType recipientType) {
+        String documentNumber = paymentDto.getDocumentNumber();
+        String prefix = recipientType == RecipientType.RECEIVER ? "Odeme_Makbuzu_" : "Makbuz_";
+        return switch (emailType) {
+            case CREATED -> prefix + documentNumber + ".pdf";
+            case UPDATED -> prefix + documentNumber + "_Guncelleme.pdf";
+            case CANCELLED -> prefix + documentNumber + "_Iptal.pdf";
+        };
     }
 
-    private String createReceiverFileName(PaymentDto paymentDto) {
-        return "Odeme_Makbuzu_" + paymentDto.getDocumentNumber() + ".pdf";
+    private boolean validateRequest(PaymentDto paymentDto, DocumentResponse documentResponse) {
+        if (paymentDto == null || documentResponse == null) {
+            log.warn("Invalid request - paymentDto or documentResponse is null");
+            return false;
+        }
+        return true;
     }
 
-    private String createPayerFileName(PaymentDto paymentDto) {
-        return "Makbuz_" + paymentDto.getDocumentNumber() + ".pdf";
+    private Map<String, String> extractOldPaymentData(PaymentEntity oldPayment) {
+        Map<String, String> oldData = new HashMap<>();
+        oldData.put("{{OLD_DOCUMENT_NUMBER}}", String.valueOf(oldPayment.getId()));
+        oldData.put("{{OLD_PAYMENT_AMOUNT}}", formatPrice(oldPayment.getPrice()));
+        oldData.put("{{OLD_PAYMENT_METHOD}}", oldPayment.getType().getName());
+        return oldData;
     }
 }

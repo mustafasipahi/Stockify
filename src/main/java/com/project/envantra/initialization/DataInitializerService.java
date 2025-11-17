@@ -31,21 +31,19 @@ public class DataInitializerService implements ApplicationRunner {
 
     private void createTest() {
         UserDto userDto1 = UserDto.builder()
-                .username("test1")
+                .username("test")
                 .password("test1234")
                 .status(UserStatus.ACTIVE)
-                .firstName("Test1")
-                .lastName("User1")
-                .email("test1@user.com")
+                .firstName("Apple")
+                .lastName("Test")
+                .email("test@apple.com")
                 .role(Role.ROLE_ADMIN)
                 .build();
         UserEntity userEntity1 = userPostService.save(userDto1);
         CompanyEntity company1 = CompanyEntity.builder()
                 .creatorUserId(userEntity1.getId())
-                .name("Test1 Şirketler Grubu Lt.Ş.")
-                .address("Antalyada Bir Yerde Test1")
-                .invoiceUsername("mehmetali@birhesap.com.tr")
-                .invoicePassword("Abc123456!")
+                .name("Test Apple Lt.Ş.")
+                .address("Amerika")
                 .build();
         companyPostService.save(company1);
 

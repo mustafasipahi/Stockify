@@ -14,7 +14,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.project.envantra.util.DateUtil.*;
-import static com.project.envantra.util.LoginContext.getUserId;
 import static com.project.envantra.util.NameUtil.getBrokerFullName;
 
 @Slf4j
@@ -45,16 +44,7 @@ public class ReportService {
     }
 
     private Map<Long, BrokerDto> getBrokerMap(Long brokerId) {
-        if (brokerId != null) {
-            BrokerDto activeBroker = brokerGetService.getActiveBroker(brokerId);
-            return Objects.equals(activeBroker.getCreatorUserId(), getUserId())
-                    ? Collections.singletonMap(brokerId, activeBroker)
-                    : Collections.emptyMap();
-        } else {
-            List<BrokerDto> activeBrokers = brokerGetService.getAllBrokers();
-            return activeBrokers.stream()
-                    .collect(Collectors.toMap(BrokerDto::getBrokerId, broker -> broker));
-        }
+        return brokerGetService.getBrokerMap(List.of(brokerId));
     }
 
     private DailyReportResponse createEmptyResponse() {

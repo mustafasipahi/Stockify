@@ -1,10 +1,12 @@
 package com.project.envantra.model.entity;
 
+import com.project.envantra.enums.PaymentStatus;
 import com.project.envantra.enums.PaymentType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
@@ -19,7 +21,8 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "payment", indexes = {
         @Index(name = "idx_payment_broker_created", columnList = "brokerId,createdDate"),
-        @Index(name = "idx_payment_created", columnList = "createdDate")
+        @Index(name = "idx_payment_created", columnList = "createdDate"),
+        @Index(name = "idx_payment_status", columnList = "status")
 })
 @EntityListeners(AuditingEntityListener.class)
 public class PaymentEntity {
@@ -36,6 +39,9 @@ public class PaymentEntity {
     @Column(nullable = false)
     private Long brokerId;
 
+    @Column
+    private Long originalPaymentId;
+
     @NotNull
     @Column(nullable = false)
     private Long documentId;
@@ -49,6 +55,17 @@ public class PaymentEntity {
     @Enumerated(EnumType.STRING)
     private PaymentType type;
 
+    @NotNull
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
+
+    @Column
+    private String cancelReason;
+
     @CreatedDate
     private LocalDateTime createdDate;
+
+    @LastModifiedDate
+    private LocalDateTime lastModifiedDate;
 }

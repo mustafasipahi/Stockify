@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="tr">
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+<div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h2 style="color: #ff9800;">🔄 Ödemeniz Güncellendi</h2>
+
+    <p>Sayın {{BROKER_NAME}},</p>
+    <p>Ödeme kaydınız güncellenmiştir.</p>
+
+    <div style="background-color: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #ff9800;">
+        <h3>⚠️ Önemli Bilgi:</h3>
+        <p>Önceki makbuz geçerliliğini yitirmiştir. Lütfen yeni makbuzu kullanın.</p>
+    </div>
+
+    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <h3>Eski Ödeme Bilgileri:</h3>
+        <p><strong>Eski Makbuz No:</strong> {{OLD_DOCUMENT_NUMBER}}</p>
+        <p><strong>Eski Tutar:</strong> ₺{{OLD_PAYMENT_AMOUNT}}</p>
+        <p><strong>Eski Ödeme Yöntemi:</strong> {{OLD_PAYMENT_METHOD}}</p>
+    </div>
+
+    <div style="background-color: #e3f2fd; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <h3>Yeni Ödeme Bilgileri:</h3>
+        <p><strong>Yeni Makbuz No:</strong> {{DOCUMENT_NUMBER}}</p>
+        <p><strong>Güncelleme Tarihi:</strong> {{PAYMENT_DATE}}</p>
+        <p><strong>Broker ID:</strong> {{BROKER_ID}}</p>
+        <p><strong>Ödeme Yöntemi:</strong> {{PAYMENT_METHOD}}</p>
+        <p style="font-size: 20px; color: #2c5aa0; margin-top: 15px;">
+            <strong>Güncel Tutar:</strong> ₺{{PAYMENT_AMOUNT}}
+        </p>
+    </div>
+
+    <div style="background-color: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <h3>Açıklama:</h3>
+        <p>{{DESCRIPTION}}</p>
+    </div>
+
+    <p>Ekteki PDF dosyasında güncel ödeme makbuzunuzu bulabilirsiniz.</p>
+
+    <div style="background-color: #f0f8f0; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #28a745;">
+        <p style="margin: 0; font-size: 14px;">
+            <strong>💡 Not:</strong> Güncellenmiş ödemeniz kayıt altına alınmıştır. Herhangi bir sorunuz olması durumunda yeni makbuz numarasını belirterek bizimle iletişime geçebilirsiniz.
+        </p>
+    </div>
+
+    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 14px; color: #666;">
+        <p>Teşekkürler,<br>{{COMPANY_NAME}}</p>
+    </div>
+</div>
+</body>
+</html>

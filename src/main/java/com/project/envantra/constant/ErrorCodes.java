@@ -49,6 +49,8 @@ public class ErrorCodes {
     public static final int IMAGE_ERROR = 1041;
     public static final int INVOICE_INFO_REQUIRED = 1042;
     public static final int INVALID_ORDER_NO = 1043;
+    public static final int PAYMENT_NOT_FOUND = 1044;
+    public static final int TRANSACTION_NOT_FOUND = 1045;
 
     public static final int UNKNOWN_ERROR = 9999;
 }

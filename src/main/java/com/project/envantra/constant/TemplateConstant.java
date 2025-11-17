@@ -9,6 +9,10 @@ public class TemplateConstant {
     public static final String PAYMENT_PDF_DOCUMENT_TEMPLATE = "/templates/payment_document.html";
     public static final String PAYMENT_EMAIL_RECEIVER_TEMPLATE = "templates/payment_receiver_email.html";
     public static final String PAYMENT_EMAIL_PAYER_TEMPLATE = "templates/payment_payer_email.html";
+    public static final String PAYMENT_EMAIL_PAYER_UPDATE_TEMPLATE = "templates/payment_payer_update_email.html";
+    public static final String PAYMENT_EMAIL_RECEIVER_UPDATE_TEMPLATE = "templates/payment_receiver_update_email.html";
+    public static final String PAYMENT_EMAIL_PAYER_CANCEL_TEMPLATE = "templates/payment_payer_cancel_email.html";
+    public static final String PAYMENT_EMAIL_RECEIVER_CANCEL_TEMPLATE = "templates/payment_receiver_cancel_email.html";
 
     public static final String SALES_PDF_DOCUMENT_TEMPLATE = "/templates/sales_document.html";
     public static final String SALES_EMAIL_SELLER_TEMPLATE = "templates/sales_seller_email.html";
