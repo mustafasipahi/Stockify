@@ -40,6 +40,7 @@ public class AuthenticationService {
                     .role(userPrincipal.getUserEntity().getRole().getRoleName())
                     .build();
         } catch (Exception e) {
+            log.error("Authentication Exception!: {}", e.getMessage());
             throw new AuthenticationException();
         }
     }

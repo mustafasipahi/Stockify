@@ -83,7 +83,8 @@ public class ReportService {
         return visitInfoList.stream()
                 .collect(Collectors.toMap(
                         visit -> visit.getBrokerId() + "_" + visit.getVisitDate(),
-                        visit -> visit
+                        visit -> visit,
+                        (existing, replacement) -> existing
                 ));
     }
 
