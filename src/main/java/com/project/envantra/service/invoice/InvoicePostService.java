@@ -1,4 +1,4 @@
-package com.project.envantra.service;
+package com.project.envantra.service.invoice;
 
 import com.project.envantra.configuration.properties.InvoiceProperties;
 import com.project.envantra.exception.EnvantraRuntimeException;
@@ -7,6 +7,7 @@ import com.project.envantra.model.response.InvoiceTokenResponse;
 import com.project.envantra.model.dto.SalesPrepareDto;
 import com.project.envantra.model.request.InvoiceCreateRequest;
 import com.project.envantra.model.response.InvoiceCreateResponse;
+import com.project.envantra.service.InvoiceTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -18,7 +19,7 @@ import static com.project.envantra.converter.InvoiceConverter.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class InvoiceCreateService {
+public class InvoicePostService {
 
     private final RestTemplate restTemplate;
     private final InvoiceProperties invoiceProperties;

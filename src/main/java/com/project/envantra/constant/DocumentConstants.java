@@ -18,8 +18,8 @@ public class DocumentConstants {
     public static final DecimalFormat MONEY_FORMAT = new DecimalFormat("#,##0.00");
     public static final DecimalFormat QTY_FORMAT = new DecimalFormat("#,##0.###");
 
-    public static final String PAYMENT_PREFIX = "PY";
-    public static final String SALES_PREFIX = "SL";
+    public static final String PAYMENT_DOCUMENT_NAME_PREFIX = "PY";
+    public static final String SALES_DOCUMENT_NAME_PREFIX = "SL";
     public static final String UNKNOWN_PREFIX = "UKN";
     public static final String PROFILE_IMAGE_PREFIX = "PI";
     public static final String COMPANY_LOGO_PREFIX = "CL";

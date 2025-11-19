@@ -31,8 +31,8 @@ public class ReportService {
         if (brokerMap.isEmpty()) {
             return createEmptyResponse();
         }
-        LocalDateTime startDate = getStartDate(request.getStartDate());
-        LocalDateTime endDate = getEndDate(request.getEndDate());
+        LocalDateTime startDate = getTodayStartDate(request.getStartDate());
+        LocalDateTime endDate = getTodayEndDate(request.getEndDate());
         List<SalesEntity> salesList = salesService.findAllByBrokerIdByDate(brokerMap.keySet(), startDate, endDate);
         List<PaymentEntity> paymentList = paymentService.findAllByBrokerIdByDate(brokerMap.keySet(), startDate, endDate);
         List<BrokerVisitDto> visitInfoList = brokerVisitGetService.getVisitInfoListByDate(startDate, endDate);

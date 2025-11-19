@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.project.envantra.util.DateUtil.getEndDate;
-import static com.project.envantra.util.DateUtil.getStartDate;
+import static com.project.envantra.util.DateUtil.getTodayEndDate;
+import static com.project.envantra.util.DateUtil.getTodayStartDate;
 import static com.project.envantra.util.LoginContext.getUserId;
 
 @Slf4j
@@ -22,16 +22,16 @@ public class BrokerVisitGetService {
     private final BrokerVisitRepository brokerVisitRepository;
 
     public BrokerVisitDto getTodayVisitInfoByBrokerId(Long brokerId) {
-        LocalDateTime startDate = getStartDate(null);
-        LocalDateTime endDate = getEndDate(null);
+        LocalDateTime startDate = getTodayStartDate(null);
+        LocalDateTime endDate = getTodayEndDate(null);
         return brokerVisitRepository.findByBrokerIdAndVisitDateBetween(brokerId, startDate, endDate)
                 .map(BrokerVisitConverter::toDto)
                 .orElse(new BrokerVisitDto());
     }
 
     public List<BrokerVisitDto> getTodayVisitInfoListByBrokerIdIn(List<Long> brokerIds) {
-        LocalDateTime startDate = getStartDate(null);
-        LocalDateTime endDate = getEndDate(null);
+        LocalDateTime startDate = getTodayStartDate(null);
+        LocalDateTime endDate = getTodayEndDate(null);
         return brokerVisitRepository.findByBrokerIdInAndVisitDateBetween(brokerIds, startDate, endDate).stream()
                 .map(BrokerVisitConverter::toDto)
                 .toList();

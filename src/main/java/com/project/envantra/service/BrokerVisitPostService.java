@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static com.project.envantra.util.DateUtil.getEndDate;
-import static com.project.envantra.util.DateUtil.getStartDate;
+import static com.project.envantra.util.DateUtil.getTodayEndDate;
+import static com.project.envantra.util.DateUtil.getTodayStartDate;
 
 @Slf4j
 @Service
@@ -22,8 +22,8 @@ public class BrokerVisitPostService {
     private final BrokerVisitRepository brokerVisitRepository;
 
     public void updateVisitInfo(BrokerVisitRequest request) {
-        LocalDateTime startDate = getStartDate(null);
-        LocalDateTime endDate = getEndDate(null);
+        LocalDateTime startDate = getTodayStartDate(null);
+        LocalDateTime endDate = getTodayEndDate(null);
         Optional<BrokerVisitEntity> visitEntity = brokerVisitRepository.findByBrokerIdAndVisitDateBetween(request.getBrokerId(), startDate, endDate);
         BrokerVisitEntity visit;
         if (visitEntity.isPresent()) {

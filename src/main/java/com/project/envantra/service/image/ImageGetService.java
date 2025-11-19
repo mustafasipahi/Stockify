@@ -1,4 +1,4 @@
-package com.project.envantra.service;
+package com.project.envantra.service.image;
 
 import com.project.envantra.enums.DocumentType;
 import com.project.envantra.exception.ImageException;

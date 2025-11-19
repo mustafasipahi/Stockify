@@ -14,7 +14,7 @@ import com.project.envantra.model.response.InvoiceCreateResponse;
 import com.project.envantra.model.response.PaymentDocumentResponse;
 import com.project.envantra.model.response.SalesDocumentResponse;
 import com.project.envantra.repository.DocumentRepository;
-import com.project.envantra.service.ImagePostService;
+import com.project.envantra.service.image.ImagePostService;
 import com.project.envantra.service.pdf.PdfPostService;
 import com.project.envantra.validator.DocumentUploadValidator;
 import lombok.AllArgsConstructor;

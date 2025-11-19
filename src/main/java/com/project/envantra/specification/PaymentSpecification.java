@@ -21,7 +21,7 @@ public class PaymentSpecification {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(criteriaBuilder.equal(root.get("creatorUserId"), getUserId()));
             predicates.add(criteriaBuilder.equal(root.get("brokerId"), request.getBrokerId()));
-            predicates.add(criteriaBuilder.between(root.get("createdDate"), getStartDate(request.getStartDate()), getEndDate(request.getEndDate())));
+            predicates.add(criteriaBuilder.between(root.get("createdDate"), getTodayStartDate(request.getStartDate()), getTodayEndDate(request.getEndDate())));
             query.orderBy(criteriaBuilder.desc(root.get("createdDate")));
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

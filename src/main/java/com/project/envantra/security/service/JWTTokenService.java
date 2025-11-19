@@ -19,8 +19,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-import static com.project.envantra.constant.LoginConstant.EXPIRE_DURATION_ONE_DAY;
-import static com.project.envantra.constant.LoginConstant.EXPIRE_DURATION_SEVEN_DAY;
+import static com.project.envantra.util.AuthenticationUtil.getTokenExpirationDate;
 
 @Slf4j
 @Service
@@ -148,10 +147,5 @@ public class JWTTokenService {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-    }
-
-    private Date getTokenExpirationDate(boolean rememberMe) {
-        long duration = rememberMe ? EXPIRE_DURATION_SEVEN_DAY : EXPIRE_DURATION_ONE_DAY;
-        return new Date(System.currentTimeMillis() + duration);
     }
 }

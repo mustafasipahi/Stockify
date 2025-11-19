@@ -14,8 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import static com.project.envantra.constant.LoginConstant.EXPIRE_DURATION_ONE_DAY;
-import static com.project.envantra.constant.LoginConstant.EXPIRE_DURATION_SEVEN_DAY;
+import static com.project.envantra.util.AuthenticationUtil.getTokenExpirationTime;
 
 @Slf4j
 @Service
@@ -34,7 +33,7 @@ public class AuthenticationService {
             final UserPrincipal userPrincipal = (UserPrincipal) authenticate.getPrincipal();
             boolean rememberMe = authenticationRequest.isRememberMe();
             String token = jwtTokenService.generateToken(userPrincipal, rememberMe);
-            jwtTokenService.storeToken(authenticationRequest.getUsername(), token, getTokenExpirationDate(rememberMe));
+            jwtTokenService.storeToken(authenticationRequest.getUsername(), token, getTokenExpirationTime(rememberMe));
             return AuthenticationResponse.builder()
                     .token(token)
                     .role(userPrincipal.getUserEntity().getRole().getRoleName())
@@ -74,9 +73,5 @@ public class AuthenticationService {
                     .message("Logout failed")
                     .build();
         }
-    }
-
-    private long getTokenExpirationDate(boolean rememberMe) {
-        return rememberMe ? EXPIRE_DURATION_SEVEN_DAY : EXPIRE_DURATION_ONE_DAY;
     }
 }

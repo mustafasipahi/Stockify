@@ -15,7 +15,7 @@ public class DocumentNumberGenerator {
     public static String getSalesDocumentNumber() {
         LocalDateTime now = LocalDateTime.now();
         String period = now.format(DATE_TIME_FORMATTER_2);
-        String prefix = SALES_PREFIX + "-" + period + "-";
+        String prefix = SALES_DOCUMENT_NAME_PREFIX + "-" + period + "-";
         int nextSequence = counter.incrementAndGet();
         return prefix + nextSequence;
     }
@@ -23,7 +23,7 @@ public class DocumentNumberGenerator {
     public static String getPaymentDocumentNumber() {
         LocalDateTime now = LocalDateTime.now();
         String period = now.format(DATE_TIME_FORMATTER_2);
-        String prefix = PAYMENT_PREFIX + "-" + period + "-";
+        String prefix = PAYMENT_DOCUMENT_NAME_PREFIX + "-" + period + "-";
         int nextSequence = counter.incrementAndGet();
         return prefix + nextSequence;
     }

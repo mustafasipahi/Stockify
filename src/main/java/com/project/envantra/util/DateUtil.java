@@ -13,11 +13,11 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DateUtil {
 
-    public static LocalDateTime getStartDate(Long startDate) {
+    public static LocalDateTime getTodayStartDate(Long startDate) {
         return startDate != null ? getLocalDateTime(startDate) : LocalDate.now().atStartOfDay();
     }
 
-    public static LocalDateTime getEndDate(Long endDate) {
+    public static LocalDateTime getTodayEndDate(Long endDate) {
         return endDate != null ? getLocalDateTime(endDate) : LocalDateTime.now();
     }
 

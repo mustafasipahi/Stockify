@@ -12,6 +12,7 @@ import com.project.envantra.repository.SalesItemRepository;
 import com.project.envantra.repository.SalesRepository;
 import com.project.envantra.service.document.DocumentPostService;
 import com.project.envantra.service.email.SalesEmailService;
+import com.project.envantra.service.invoice.InvoicePostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +43,7 @@ public class SalesService {
     private final BasketPostService basketPostService;
     private final SalesEmailService salesEmailService;
     private final CompanyGetService companyGetService;
-    private final InvoiceCreateService invoiceCreateService;
+    private final InvoicePostService invoicePostService;
 
     @Transactional
     public SalesResponse salesCalculate(SalesRequest request) {
@@ -163,7 +164,7 @@ public class SalesService {
 
     private DocumentResponse uploadInvoice(SalesPrepareDto prepareDto, boolean createInvoice) {
         if (createInvoice) {
-            InvoiceCreateResponse invoice = invoiceCreateService.createInvoice(prepareDto);
+            InvoiceCreateResponse invoice = invoicePostService.createInvoice(prepareDto);
             return documentPostService.uploadInvoicePdf(prepareDto, invoice);
         }
         return new DocumentResponse();
